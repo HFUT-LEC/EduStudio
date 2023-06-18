@@ -8,10 +8,11 @@
 <img src="https://img.shields.io/github/issues/HFUT-LEC/EduStudio.svg">
 </p>
 
-
 EduStudio is a Unified and Templatized Framework for Student Assessment Models including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
 
+# Description
 
+![Overall Framework](./assets/framework.svg)
 
 ## Quick Start
 
@@ -39,7 +40,7 @@ run_edustudio(
         'cls': 'NCDM',
     },
     evalfmt_cfg_dict={
-        'clses': ['BinaryClassificationEvalFmt', 'CognitiveDiagnosisEvalFmt']
+        'clses': ['BinaryClassificationEvalFmt']
     }
 )
 ```

@@ -1,0 +1,1 @@
+recursive-include edustudio/assets/ *.yaml
