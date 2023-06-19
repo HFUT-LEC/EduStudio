@@ -27,8 +27,8 @@ extras_require = {}
 classifiers = ["License :: OSI Approved :: MIT License"]
 
 long_description = (
-    "EduStudio is a Unified and Templatized Framework"
-    "for Student Assessment Models including"
+    "EduStudio is a Unified and Templatized Framework "
+    "for Student Assessment Models including "
     "Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch."
 )
 

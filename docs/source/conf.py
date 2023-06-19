@@ -21,11 +21,11 @@ sys.path.insert(0, os.path.abspath("../.."))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'myst_parser' # pip install myst-parser 支持markdown,
-    # "sphinx.ext.autodoc",
-    # "sphinx.ext.napoleon",
-    # "sphinx.ext.viewcode",
-    # "sphinx_copybutton",
+    'myst_parser',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx_copybutton",
 ]
 
 templates_path = ['_templates']
