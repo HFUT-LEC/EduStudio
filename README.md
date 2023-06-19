@@ -12,7 +12,12 @@ EduStudio is a Unified and Templatized Framework for Student Assessment Models i
 
 # Description
 
-![Overall Framework](./assets/framework.svg)
+
+<p align="center">
+  <img src="assets/framework.svg" alt="EduStudio Architecture" width="600">
+  <br>
+  <b>Figure</b>: EduStudio Overall Architecture
+</p>
 
 ## Quick Start
 
