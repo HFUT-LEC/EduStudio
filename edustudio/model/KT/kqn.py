@@ -18,9 +18,9 @@ class KQN(GDBaseModel):
         super().__init__(cfg)
     
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        # assert self.model_cfg['rnn_or_lstm'] in {'rnn', 'lstm'}
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        # assert self.modeltpl_cfg['rnn_or_lstm'] in {'rnn', 'lstm'}
     
     def build_model(self):
         # helper variable for making a one-hot vector for rnn input
@@ -28,33 +28,33 @@ class KQN(GDBaseModel):
         # helper variable for making a one-hot vector for skills
         self.cpt_emb = torch.eye(self.n_item)
 
-        if self.model_cfg['rnn_or_lstm'] == 'gru':
+        if self.modeltpl_cfg['rnn_or_lstm'] == 'gru':
             self.seq_model = nn.GRU(
-                2 * self.n_item, self.model_cfg['rnn_hidden_size'], 
-                self.model_cfg['n_rnn_layers'], batch_first=True
+                2 * self.n_item, self.modeltpl_cfg['rnn_hidden_size'], 
+                self.modeltpl_cfg['n_rnn_layers'], batch_first=True
             )
         else:
             self.seq_model = nn.LSTM(
-                2 * self.n_item, self.model_cfg['rnn_hidden_size'], 
-                self.model_cfg['n_rnn_layers'], batch_first=True
+                2 * self.n_item, self.modeltpl_cfg['rnn_hidden_size'], 
+                self.modeltpl_cfg['n_rnn_layers'], batch_first=True
             )
         
         self.skill_encoder = nn.Sequential(
-            nn.Linear(self.n_item, self.model_cfg['mlp_hidden_size']),
+            nn.Linear(self.n_item, self.modeltpl_cfg['mlp_hidden_size']),
             nn.ReLU(),
-            nn.Linear(self.model_cfg['mlp_hidden_size'], self.model_cfg['emb_size']),
+            nn.Linear(self.modeltpl_cfg['mlp_hidden_size'], self.modeltpl_cfg['emb_size']),
             nn.ReLU()
         )
-        self.fc_layer = nn.Linear(self.model_cfg['rnn_hidden_size'], self.model_cfg['emb_size'])
-        self.drop_layer = nn.Dropout(self.model_cfg['dropout'])
+        self.fc_layer = nn.Linear(self.modeltpl_cfg['rnn_hidden_size'], self.modeltpl_cfg['emb_size'])
+        self.drop_layer = nn.Dropout(self.modeltpl_cfg['dropout'])
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, exer_seq, label_seq, **kwargs):
         in_data = self.inter_emb[(exer_seq[:,:-1] + label_seq[:,:-1] * self.n_item).long()]
         next_skills = self.cpt_emb[(exer_seq[:,1:]).long()]
 
-        encoded_knowledge = self.encode_knowledge(in_data.to(self.trainfmt_cfg['device']))
-        encoded_skills = self.encode_skills(next_skills.to(self.trainfmt_cfg['device']))
+        encoded_knowledge = self.encode_knowledge(in_data.to(self.traintpl_cfg['device']))
+        encoded_skills = self.encode_skills(next_skills.to(self.traintpl_cfg['device']))
         encoded_knowledge = self.drop_layer(encoded_knowledge)
 
         y_pd = torch.sum(encoded_knowledge * encoded_skills, dim=2) # (batch_size, max_seq_len)
@@ -81,11 +81,11 @@ class KQN(GDBaseModel):
 
     def init_hidden(self, batch_size: int):
         weight = next(self.parameters()).data
-        if self.model_cfg['rnn_or_lstm'] == 'lstm':
-            return (Variable(weight.new(self.model_cfg['n_rnn_layers'], batch_size, self.model_cfg['rnn_hidden_size']).zero_()),
-                    Variable(weight.new(self.model_cfg['n_rnn_layers'], batch_size, self.model_cfg['rnn_hidden_size']).zero_()))
+        if self.modeltpl_cfg['rnn_or_lstm'] == 'lstm':
+            return (Variable(weight.new(self.modeltpl_cfg['n_rnn_layers'], batch_size, self.modeltpl_cfg['rnn_hidden_size']).zero_()),
+                    Variable(weight.new(self.modeltpl_cfg['n_rnn_layers'], batch_size, self.modeltpl_cfg['rnn_hidden_size']).zero_()))
         else:
-            return Variable(weight.new(self.model_cfg['n_rnn_layers'], batch_size, self.model_cfg['rnn_hidden_size']).zero_())
+            return Variable(weight.new(self.modeltpl_cfg['n_rnn_layers'], batch_size, self.modeltpl_cfg['rnn_hidden_size']).zero_())
 
     @torch.no_grad()
     def predict(self, **kwargs):

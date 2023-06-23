@@ -21,29 +21,29 @@ class DKTDSC(GDBaseModel):
     #     self.cluster = kwargs.pop('cluster')
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_clusters = self.datafmt_cfg['dt_info']['n_cluster']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_clusters = self.datatpl_cfg['dt_info']['n_cluster']
 
     def build_model(self):
         self.exer_emb = nn.Embedding(
-            self.n_item * 2, self.model_cfg['emb_size']
+            self.n_item * 2, self.modeltpl_cfg['emb_size']
         )
         self.next_id_emb = nn.Embedding(
-            self.n_item, self.model_cfg['emb_size']
+            self.n_item, self.modeltpl_cfg['emb_size']
         )
-        if self.model_cfg['rnn_or_lstm'] == 'rnn':
+        if self.modeltpl_cfg['rnn_or_lstm'] == 'rnn':
             self.seq_model = nn.RNN(
-                self.model_cfg['emb_size'] * 2, self.model_cfg['hidden_size'],
-                self.model_cfg['num_layers'], batch_first=True
+                self.modeltpl_cfg['emb_size'] * 2, self.modeltpl_cfg['hidden_size'],
+                self.modeltpl_cfg['num_layers'], batch_first=True
             )
         else:
             self.seq_model = nn.LSTM(
-                self.model_cfg['emb_size'] * 2, self.model_cfg['hidden_size'],
-                self.model_cfg['num_layers'], batch_first=True
+                self.modeltpl_cfg['emb_size'] * 2, self.modeltpl_cfg['hidden_size'],
+                self.modeltpl_cfg['num_layers'], batch_first=True
             )
-        self.dropout_layer = nn.Dropout(self.model_cfg['dropout_rate'])
-        self.fc_layer = nn.Linear(self.model_cfg['hidden_size'], self.n_clusters + 1)
+        self.dropout_layer = nn.Dropout(self.modeltpl_cfg['dropout_rate'])
+        self.fc_layer = nn.Linear(self.modeltpl_cfg['hidden_size'], self.n_clusters + 1)
 
 
     def forward(self, exer_seq, label_seq, **kwargs):

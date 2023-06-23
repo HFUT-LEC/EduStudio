@@ -49,11 +49,11 @@ class HierCDF(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
-        self.hidden_dim = self.model_cfg['hidden_dim']
-        self.itf_type = self.model_cfg['itf_type']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
+        self.hidden_dim = self.modeltpl_cfg['hidden_dim']
+        self.itf_type = self.modeltpl_cfg['itf_type']
 
         self.set_itf(self.itf_type)
 
@@ -118,7 +118,7 @@ class HierCDF(GDBaseModel):
                 continue
 
             # format of masks
-            fmt = '{0:0%db}'%(len_p)
+            tpl = '{0:0%db}'%(len_p)
             # number of parent master condition
             n_condi = 2 ** len_p
 
@@ -136,7 +136,7 @@ class HierCDF(GDBaseModel):
 
             for idx in range(n_condi):
                 # for each parent mastery condition, do:
-                mask = fmt.format(idx)
+                mask = tpl.format(idx)
                 mask = torch.Tensor(np.array(list(mask)).astype(int)).to(self.device)
 
                 margin = mask * margin_p + (1-mask) * margin_n
@@ -224,7 +224,7 @@ class HierCDF(GDBaseModel):
     def get_J_loss(self, **kwargs):
         stu_id = kwargs['stu_id']
         return {
-            'loss_J': self.model_cfg['lambda'] * \
+            'loss_J': self.modeltpl_cfg['lambda'] * \
                 torch.sum(torch.relu(self.condi_n(stu_id)-self.condi_p(stu_id)))
         }
     

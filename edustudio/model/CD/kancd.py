@@ -27,19 +27,19 @@ class KaNCD(GDBaseModel):
     }
     def __init__(self, cfg):
         super().__init__(cfg)
-        assert self.model_cfg['mf_type'] in ['mf', 'gmf', 'ncf1', 'ncf2']
+        assert self.modeltpl_cfg['mf_type'] in ['mf', 'gmf', 'ncf1', 'ncf2']
 
     def add_extra_data(self, **kwargs):
         self.Q_mat = kwargs['Q_mat'].to(self.device)
 
     def build_cfg(self):
-        self.knowledge_n = self.datafmt_cfg['dt_info']['cpt_count']
-        self.exer_n = self.datafmt_cfg['dt_info']['exer_count']
-        self.student_n = self.datafmt_cfg['dt_info']['stu_count']
-        self.emb_dim = self.model_cfg['emb_dim']
-        self.mf_type = self.model_cfg['mf_type']
+        self.knowledge_n = self.datatpl_cfg['dt_info']['cpt_count']
+        self.exer_n = self.datatpl_cfg['dt_info']['exer_count']
+        self.student_n = self.datatpl_cfg['dt_info']['stu_count']
+        self.emb_dim = self.modeltpl_cfg['emb_dim']
+        self.mf_type = self.modeltpl_cfg['mf_type']
         self.prednet_input_len = self.knowledge_n
-        self.prednet_len1, self.prednet_len2 = self.model_cfg['prednet_len1'], self.model_cfg['prednet_len2']
+        self.prednet_len1, self.prednet_len2 = self.modeltpl_cfg['prednet_len1'], self.modeltpl_cfg['prednet_len2']
 
     def build_model(self):
         # prediction sub-net

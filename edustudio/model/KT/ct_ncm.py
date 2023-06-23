@@ -40,21 +40,21 @@ class CT_NCM(GDBaseModel):
 
     def build_cfg(self):
         """Initialize the parameters of the model"""
-        self.problem_num = self.datafmt_cfg['dt_info']['exer_count']
-        self.skill_num = self.datafmt_cfg['dt_info']['cpt_count']
-        self.device = self.trainfmt_cfg['device']
-        self.hidden_size = self.model_cfg['hidden_size']
-        self.embed_size = self.model_cfg['embed_size']
+        self.problem_num = self.datatpl_cfg['dt_info']['exer_count']
+        self.skill_num = self.datatpl_cfg['dt_info']['cpt_count']
+        self.device = self.traintpl_cfg['device']
+        self.hidden_size = self.modeltpl_cfg['hidden_size']
+        self.embed_size = self.modeltpl_cfg['embed_size']
         self.knowledge_dim = self.hidden_size
         self.input_len = self.knowledge_dim
-        self.prelen1 = self.model_cfg['prelen1']
-        self.prelen2 = self.model_cfg['prelen2']
+        self.prelen1 = self.modeltpl_cfg['prelen1']
+        self.prelen2 = self.modeltpl_cfg['prelen2']
         self.loss_function = torch.nn.BCELoss()
 
     def build_model(self):
         """Initialize the various components of the model"""
-        self.dropout1 = nn.Dropout(p=self.model_cfg['dropout1'])
-        self.dropout2 = nn.Dropout(p=self.model_cfg['dropout2'])
+        self.dropout1 = nn.Dropout(p=self.modeltpl_cfg['dropout1'])
+        self.dropout2 = nn.Dropout(p=self.modeltpl_cfg['dropout2'])
 
         self.inter_embedding = torch.nn.Embedding(2 * self.skill_num, self.embed_size)
         self.reclstm = torch.nn.Linear(self.embed_size + self.hidden_size, 7 * self.hidden_size)

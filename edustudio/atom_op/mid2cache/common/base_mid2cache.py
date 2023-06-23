@@ -15,7 +15,7 @@ class BaseMid2Cache(object):
 
     @classmethod
     def from_cfg(cls, cfg: UnifyConfig):
-        return cls(cfg.datafmt_cfg.get(cls.__name__))
+        return cls(cfg.datatpl_cfg.get(cls.__name__))
     
     @classmethod
     def get_default_cfg(cls, **kwargs):

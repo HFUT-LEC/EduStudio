@@ -1,3 +1,15 @@
+r"""
+AKT
+##########################################
+
+Reference:
+    Aritra Ghosh et al. "Context-Aware Attentive Knowledge Tracing" in KDD 2020.
+
+Reference Code:
+    https://github.com/pykt-team/pykt-toolkit/blob/main/pykt/models/akt.py
+    https://github.com/arghosh/AKT
+
+"""
 import math
 
 from ..gd_basemodel import GDBaseModel
@@ -8,6 +20,21 @@ import numpy as np
 from torch.nn.init import xavier_uniform_, constant_
 
 class AKT(GDBaseModel):
+    r"""
+    AKT
+
+    default_cfg:
+        'l2': 1e-5              # weight of l2 regularization
+        'kq_same': 1              # if k and q share the same structure, 1 denotes yes,0 denotes no,used in MultiHeadAttention
+        'dropout_rate': 0.05      # dropout rate
+        'separate_qa': False      # Whether to separate questions and answers
+        'd_model': 256      # dimension of attention input/output
+        'n_blocks':1      # number of stacked blocks in the attention
+        'final_fc_dim': 512      # dimension of final fully connected net before prediction
+        'n_heads': 8      # number of heads. n_heads*d_feature = d_model
+        'd_ff': 2048      # dimension for fully conntected net inside the basic block
+    """
+
     default_cfg = {
         'l2': 1e-5,
         'kq_same': 1,
@@ -28,18 +55,18 @@ class AKT(GDBaseModel):
             if p.size(0) == self.n_pid + 1 and self.n_pid > 0:
                 constant_(p, 0.)
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_question = self.datafmt_cfg['dt_info']['cpt_count']
-        self.dropout = self.model_cfg['dropout_rate']
-        self.kq_same = self.model_cfg['kq_same']
-        self.l2 = self.model_cfg['l2']
-        self.separate_qa = self.model_cfg['separate_qa']
-        self.d_model = self.model_cfg['d_model']
-        self.n_blocks = self.model_cfg['n_blocks']
-        self.final_fc_dim = self.model_cfg['final_fc_dim']
-        self.n_heads = self.model_cfg['n_heads']
-        self.d_ff = self.model_cfg['d_ff']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_question = self.datatpl_cfg['dt_info']['cpt_count']
+        self.dropout = self.modeltpl_cfg['dropout_rate']
+        self.kq_same = self.modeltpl_cfg['kq_same']
+        self.l2 = self.modeltpl_cfg['l2']
+        self.separate_qa = self.modeltpl_cfg['separate_qa']
+        self.d_model = self.modeltpl_cfg['d_model']
+        self.n_blocks = self.modeltpl_cfg['n_blocks']
+        self.final_fc_dim = self.modeltpl_cfg['final_fc_dim']
+        self.n_heads = self.modeltpl_cfg['n_heads']
+        self.d_ff = self.modeltpl_cfg['d_ff']
         
     def build_model(self):
         embed_l = self.d_model

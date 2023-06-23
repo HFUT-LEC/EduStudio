@@ -1,6 +1,6 @@
 from edustudio.utils.common import UnifyConfig
 from ..common.base_mid2cache import BaseMid2Cache
-from edustudio.datafmt.utils import SpliterUtil
+from edustudio.datatpl.utils import SpliterUtil
 from sklearn.model_selection import StratifiedKFold, KFold
 from itertools import chain
 
@@ -25,9 +25,9 @@ class M2C_RandomDataSplit4CD(BaseMid2Cache):
 
     @classmethod
     def from_cfg(cls, cfg: UnifyConfig):
-        m2c_cfg = cfg.datafmt_cfg.get(cls.__name__)
-        n_folds = cfg.datafmt_cfg.n_folds
-        is_dataset_divided = cfg.datafmt_cfg.is_dataset_divided
+        m2c_cfg = cfg.datatpl_cfg.get(cls.__name__)
+        n_folds = cfg.datatpl_cfg.n_folds
+        is_dataset_divided = cfg.datatpl_cfg.is_dataset_divided
         return cls(m2c_cfg, n_folds, is_dataset_divided)
 
     def process(self, **kwargs):

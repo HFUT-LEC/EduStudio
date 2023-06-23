@@ -30,11 +30,11 @@ class MIRT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        if self.model_cfg['a_range']  < 0: self.model_cfg['a_range'] = None
+        if self.modeltpl_cfg['a_range']  < 0: self.modeltpl_cfg['a_range'] = None
 
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.emb_dim = self.model_cfg['emb_dim']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.emb_dim = self.modeltpl_cfg['emb_dim']
 
     def build_model(self):
         self.theta = nn.Embedding(self.n_user, self.emb_dim) # student ability
@@ -46,8 +46,8 @@ class MIRT(GDBaseModel):
         a = self.a(exer_id)
         b = self.b(exer_id).flatten()
 
-        if self.model_cfg['a_range'] is not None:
-            a = self.model_cfg['a_range'] * torch.sigmoid(a)
+        if self.modeltpl_cfg['a_range'] is not None:
+            a = self.modeltpl_cfg['a_range'] * torch.sigmoid(a)
         else:
             a = F.softplus(a) # 让区分度大于0，保持单调性假设
         if torch.max(theta != theta) or torch.max(a != a) or torch.max(b != b):  # pragma: no cover

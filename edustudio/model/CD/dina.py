@@ -32,14 +32,14 @@ class DINA(GDBaseModel):
         self.Q_mat = kwargs['Q_mat'].to(self.device)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
         self.step = 0
-        self.max_step = self.model_cfg['max_step']
-        self.max_slip =  self.model_cfg['max_slip']
-        self.max_guess =  self.model_cfg['max_guess']
+        self.max_step = self.modeltpl_cfg['max_step']
+        self.max_slip =  self.modeltpl_cfg['max_slip']
+        self.max_guess =  self.modeltpl_cfg['max_guess']
         self.emb_dim = self.n_cpt
 
     def build_model(self):
@@ -120,12 +120,12 @@ class STEDINA(DINA):
         self.sign = StraightThroughEstimator()
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
-        self.max_slip =  self.model_cfg['max_slip']
-        self.max_guess =  self.model_cfg['max_guess']
+        self.max_slip =  self.modeltpl_cfg['max_slip']
+        self.max_guess =  self.modeltpl_cfg['max_guess']
         self.emb_dim = self.n_cpt
 
     def forward(self, stu_id, exer_id):

@@ -33,20 +33,20 @@ class SimpleKT(GDBaseModel):
                 constant_(p, 0.)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_question = self.datafmt_cfg['dt_info']['cpt_count']
-        self.dropout = self.model_cfg['dropout_rate']
-        self.kq_same = self.model_cfg['kq_same']
-        self.l2 = self.model_cfg['l2']
-        self.separate_qa = self.model_cfg['separate_qa']
-        self.d_model = self.model_cfg['d_model']
-        self.n_blocks = self.model_cfg['n_blocks']
-        self.final_fc_dim = self.model_cfg['final_fc_dim']
-        self.n_heads = self.model_cfg['n_heads']
-        self.d_ff = self.model_cfg['d_ff']
-        self.seq_len = self.datafmt_cfg['dt_info']['real_window_size']
-        self.device = self.trainfmt_cfg['device']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_question = self.datatpl_cfg['dt_info']['cpt_count']
+        self.dropout = self.modeltpl_cfg['dropout_rate']
+        self.kq_same = self.modeltpl_cfg['kq_same']
+        self.l2 = self.modeltpl_cfg['l2']
+        self.separate_qa = self.modeltpl_cfg['separate_qa']
+        self.d_model = self.modeltpl_cfg['d_model']
+        self.n_blocks = self.modeltpl_cfg['n_blocks']
+        self.final_fc_dim = self.modeltpl_cfg['final_fc_dim']
+        self.n_heads = self.modeltpl_cfg['n_heads']
+        self.d_ff = self.modeltpl_cfg['d_ff']
+        self.seq_len = self.datatpl_cfg['dt_info']['real_window_size']
+        self.device = self.traintpl_cfg['device']
 
     def build_model(self):
         embed_l = self.d_model

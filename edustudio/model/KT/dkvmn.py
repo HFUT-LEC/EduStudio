@@ -20,22 +20,22 @@ class DKVMN(GDBaseModel):
         nn.init.kaiming_normal_(self.Mv0)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
 
     def build_model(self):
-        self.k_emb_layer = nn.Embedding(self.n_item, self.model_cfg['dim_s'])
-        self.Mk = nn.Parameter(torch.Tensor(self.model_cfg['size_m'], self.model_cfg['dim_s']))
-        self.Mv0 = nn.Parameter(torch.Tensor(self.model_cfg['size_m'], self.model_cfg['dim_s']))
+        self.k_emb_layer = nn.Embedding(self.n_item, self.modeltpl_cfg['dim_s'])
+        self.Mk = nn.Parameter(torch.Tensor(self.modeltpl_cfg['size_m'], self.modeltpl_cfg['dim_s']))
+        self.Mv0 = nn.Parameter(torch.Tensor(self.modeltpl_cfg['size_m'], self.modeltpl_cfg['dim_s']))
 
-        self.v_emb_layer = nn.Embedding(self.n_item * 2, self.model_cfg['dim_s'])
+        self.v_emb_layer = nn.Embedding(self.n_item * 2, self.modeltpl_cfg['dim_s'])
 
-        self.f_layer = nn.Linear(self.model_cfg['dim_s'] * 2, self.model_cfg['dim_s'])
-        self.dropout_layer = nn.Dropout(self.model_cfg['drop_out'])
-        self.p_layer = nn.Linear(self.model_cfg['dim_s'], 1)
+        self.f_layer = nn.Linear(self.modeltpl_cfg['dim_s'] * 2, self.modeltpl_cfg['dim_s'])
+        self.dropout_layer = nn.Dropout(self.modeltpl_cfg['drop_out'])
+        self.p_layer = nn.Linear(self.modeltpl_cfg['dim_s'], 1)
 
-        self.e_layer = nn.Linear(self.model_cfg['dim_s'], self.model_cfg['dim_s'])
-        self.a_layer = nn.Linear(self.model_cfg['dim_s'], self.model_cfg['dim_s'])
+        self.e_layer = nn.Linear(self.modeltpl_cfg['dim_s'], self.modeltpl_cfg['dim_s'])
+        self.a_layer = nn.Linear(self.modeltpl_cfg['dim_s'], self.modeltpl_cfg['dim_s'])
 
 
     def forward(self, exer_seq, label_seq, **kwargs):

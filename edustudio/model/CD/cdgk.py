@@ -78,9 +78,9 @@ class CDGK_META(nn.Module):
 
 class CDGK_SINGLE(GDBaseModel):
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def build_model(self):
         self.cdgk = CDGK_META(
@@ -105,9 +105,9 @@ class CDGK_SINGLE(GDBaseModel):
 
 class CDGK_MULTI(GDBaseModel):
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     
     def add_extra_data(self, **kwargs):

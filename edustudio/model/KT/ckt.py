@@ -15,10 +15,10 @@ class CKT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
 
-        self.hidden_size = self.model_cfg['hidden_size']
+        self.hidden_size = self.modeltpl_cfg['hidden_size']
         self.num_skills = self.n_item
 
     def build_model(self):
@@ -31,13 +31,13 @@ class CKT(GDBaseModel):
         t2 = torch.cat([zeros, self.skill_w], dim=-1)
         self.input_w = torch.cat([t1, t2], dim=0)
 
-        self.cnn_block = CNNBlock(self.model_cfg['hidden_size'],
-                                  self.model_cfg['k1'],
-                                  self.model_cfg['k2'],
-                                  self.model_cfg['drop_rate'],
+        self.cnn_block = CNNBlock(self.modeltpl_cfg['hidden_size'],
+                                  self.modeltpl_cfg['k1'],
+                                  self.modeltpl_cfg['k2'],
+                                  self.modeltpl_cfg['drop_rate'],
                                   self.device).to(self.device)
 
-        self.cnn = CNN(self.model_cfg['hidden_size'],
+        self.cnn = CNN(self.modeltpl_cfg['hidden_size'],
                        self.cnn_block,
                        self.device
                        ).to(self.device)
@@ -82,8 +82,8 @@ class CKT(GDBaseModel):
         return self.get_main_loss(**kwargs)
 
     def data_helper(self, exer_seq, label_seq):
-        num_steps = self.datafmt_cfg['dt_info']['real_window_size']
-        batch_size = self.trainfmt_cfg['batch_size']
+        num_steps = self.datatpl_cfg['dt_info']['real_window_size']
+        batch_size = self.traintpl_cfg['batch_size']
 
         input_data = torch.zeros((batch_size, num_steps), device=self.device)
         input_skill = torch.zeros((batch_size, num_steps), device=self.device)

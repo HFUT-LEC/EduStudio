@@ -16,26 +16,26 @@ class LPKT_S(GDBaseModel):
     }
 
     def build_cfg(self):
-        self.n_stu = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_exer = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
-        self.n_at = self.datafmt_cfg['dt_info']['answer_time_count'] # answer time
-        self.n_it = self.datafmt_cfg['dt_info']['interval_time_count'] # interval time
-        self.d_k = self.model_cfg['d_k']
-        self.d_e = self.model_cfg['d_e']
-        self.d_a = self.model_cfg['d_a']
-        self.d_s = self.model_cfg['d_s']
+        self.n_stu = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_exer = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
+        self.n_at = self.datatpl_cfg['dt_info']['answer_time_count'] # answer time
+        self.n_it = self.datatpl_cfg['dt_info']['interval_time_count'] # interval time
+        self.d_k = self.modeltpl_cfg['d_k']
+        self.d_e = self.modeltpl_cfg['d_e']
+        self.d_a = self.modeltpl_cfg['d_a']
+        self.d_s = self.modeltpl_cfg['d_s']
 
     def add_extra_data(self, **kwargs):
         Q_mat = kwargs['Q_mat']
-        Q_mat[Q_mat == 0] = self.model_cfg['q_gamma']
+        Q_mat[Q_mat == 0] = self.modeltpl_cfg['q_gamma']
         self.q_matrix = Q_mat.to(self.device).float()
 
     def build_model(self):
-        d_k = self.model_cfg['d_k']
-        d_e = self.model_cfg['d_e']
-        d_a = self.model_cfg['d_a']
-        d_s = self.model_cfg['d_s']
+        d_k = self.modeltpl_cfg['d_k']
+        d_e = self.modeltpl_cfg['d_e']
+        d_a = self.modeltpl_cfg['d_a']
+        d_s = self.modeltpl_cfg['d_s']
 
         self.at_embed = nn.Embedding(self.n_at, d_k)
         self.it_embed = nn.Embedding(self.n_it, d_k)
@@ -48,7 +48,7 @@ class LPKT_S(GDBaseModel):
         self.linear_4 = nn.Linear(4 * d_k, d_k)
         self.linear_5 = nn.Linear(3 * d_k, d_k)
 
-        self.dropout = nn.Dropout(self.model_cfg['drop_rate'])
+        self.dropout = nn.Dropout(self.modeltpl_cfg['drop_rate'])
 
     def forward(self, stu_id, exer_seq, answer_time_seq, interval_time_seq, mask_seq, **kwargs):  # answer_time_seq是学生回答每道习题的时间
         #  interval_time_seq是学生回答习题间的间隔时间

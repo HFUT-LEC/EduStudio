@@ -29,13 +29,13 @@ class DKT_plus(DKT):
         gt_next = kwargs['label_seq'][:, 1:][kwargs['mask_seq'][:, 1:] == 1]
 
         loss_main = F.binary_cross_entropy(input=y_next, target=gt_next)
-        loss_r = self.model_cfg['lambda_r'] * F.binary_cross_entropy(input=y_curr, target=gt_curr)
+        loss_r = self.modeltpl_cfg['lambda_r'] * F.binary_cross_entropy(input=y_curr, target=gt_curr)
 
         diff = (pred_shft - pred)[kwargs['mask_seq'][:, 1:] == 1]
         loss_w1 = torch.norm(diff, 1) / len(diff)
-        loss_w1 = self.model_cfg['lambda_w1'] * loss_w1 / self.n_item
+        loss_w1 = self.modeltpl_cfg['lambda_w1'] * loss_w1 / self.n_item
         loss_w2 = torch.norm(diff, 2) / len(diff)
-        loss_w2 = self.model_cfg['lambda_w2'] * loss_w2 / self.n_item
+        loss_w2 = self.modeltpl_cfg['lambda_w2'] * loss_w2 / self.n_item
 
         return {
             'loss_main': loss_main,

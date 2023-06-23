@@ -39,35 +39,35 @@ class KSCD(GDBaseModel):
         self.Q_mat = kwargs['Q_mat'].to(self.device)
 
     def build_cfg(self):
-        self.stu_count = self.datafmt_cfg['dt_info']['stu_count']
-        self.exer_count = self.datafmt_cfg['dt_info']['exer_count']
-        self.cpt_count = self.datafmt_cfg['dt_info']['cpt_count']
+        self.stu_count = self.datatpl_cfg['dt_info']['stu_count']
+        self.exer_count = self.datatpl_cfg['dt_info']['exer_count']
+        self.cpt_count = self.datatpl_cfg['dt_info']['cpt_count']
     
-        self.lowdim = self.model_cfg['emb_dim']
-        self.interaction_type = self.model_cfg['interaction_type']
+        self.lowdim = self.modeltpl_cfg['emb_dim']
+        self.interaction_type = self.modeltpl_cfg['interaction_type']
 
     def build_model(self):
         self.stu_emb = nn.Embedding(self.stu_count, self.lowdim)
         self.cpt_emb = nn.Embedding(self.cpt_count, self.lowdim)
         self.exer_emb = nn.Embedding(self.exer_count, self.lowdim)
 
-        if self.model_cfg['interaction_type'] == 'ncdm':
+        if self.modeltpl_cfg['interaction_type'] == 'ncdm':
             # self.exer_disc_infer = nn.Linear(self.lowdim, 1)
             self.layer1 = nn.Linear(self.lowdim, 1)
             self.pd_net = PosMLP(
                 input_dim=self.cpt_count, output_dim=1, 
-                activation=self.model_cfg['interaction_type_ncdm']['activation'],
-                dnn_units=self.model_cfg['interaction_type_ncdm']['dnn_units'], 
-                dropout_rate=self.model_cfg['interaction_type_ncdm']['dropout_rate']
+                activation=self.modeltpl_cfg['interaction_type_ncdm']['activation'],
+                dnn_units=self.modeltpl_cfg['interaction_type_ncdm']['dnn_units'], 
+                dropout_rate=self.modeltpl_cfg['interaction_type_ncdm']['dropout_rate']
             )
-        elif self.model_cfg['interaction_type'] == 'kscd':
+        elif self.modeltpl_cfg['interaction_type'] == 'kscd':
             self.prednet_full1 = PosLinear(self.cpt_count + self.lowdim, self.cpt_count, bias=False)
-            self.drop_1 = nn.Dropout(p=self.model_cfg['interaction_type_kscd']['dropout_rate'])
+            self.drop_1 = nn.Dropout(p=self.modeltpl_cfg['interaction_type_kscd']['dropout_rate'])
             self.prednet_full2 = PosLinear(self.cpt_count + self.lowdim, self.cpt_count, bias=False)
-            self.drop_2 = nn.Dropout(p=self.model_cfg['interaction_type_kscd']['dropout_rate'])
+            self.drop_2 = nn.Dropout(p=self.modeltpl_cfg['interaction_type_kscd']['dropout_rate'])
             self.prednet_full3 = PosLinear(1 * self.cpt_count, 1)
         else:
-            raise ValueError(f"unknown interaction_type: {self.model_cfg['interaction_type']}")
+            raise ValueError(f"unknown interaction_type: {self.modeltpl_cfg['interaction_type']}")
 
     def forward(self, stu_id, exer_id, **kwargs):
         
@@ -78,12 +78,12 @@ class KSCD(GDBaseModel):
         stu_ability = torch.mm(stu_emb, self.cpt_emb.weight.T).sigmoid()
         exer_diff = torch.mm(exer_emb, self.cpt_emb.weight.T).sigmoid()
         
-        if self.model_cfg['interaction_type'] == 'ncdm':
-            # exer_disc = self.exer_disc_infer(exer_emb).sigmoid() * self.model_cfg['interaction_type_ncdm']['disc_scale']
-            exer_disc = torch.sigmoid(self.layer1(exer_emb)) * self.model_cfg['interaction_type_ncdm']['disc_scale']
+        if self.modeltpl_cfg['interaction_type'] == 'ncdm':
+            # exer_disc = self.exer_disc_infer(exer_emb).sigmoid() * self.modeltpl_cfg['interaction_type_ncdm']['disc_scale']
+            exer_disc = torch.sigmoid(self.layer1(exer_emb)) * self.modeltpl_cfg['interaction_type_ncdm']['disc_scale']
             input_x = exer_disc * (stu_ability - exer_diff) * exer_q_mat
             y_pd = self.pd_net(input_x).sigmoid()
-        elif self.model_cfg['interaction_type'] == 'kscd':
+        elif self.modeltpl_cfg['interaction_type'] == 'kscd':
             batch_stu_vector = stu_ability.repeat(1, self.cpt_count).reshape(stu_ability.shape[0], self.cpt_count, stu_ability.shape[1])
             batch_exer_vector = exer_diff.repeat(1, self.cpt_count).reshape(exer_diff.shape[0], self.cpt_count, exer_diff.shape[1])
 
@@ -98,7 +98,7 @@ class KSCD(GDBaseModel):
             count_of_concept = torch.sum(exer_q_mat, dim=1).unsqueeze(1)
             y_pd = sum_out / count_of_concept
         else:
-            raise ValueError(f"unknown interaction_type: {self.model_cfg['interaction_type']}")
+            raise ValueError(f"unknown interaction_type: {self.modeltpl_cfg['interaction_type']}")
 
         return y_pd
 

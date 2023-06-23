@@ -30,9 +30,9 @@ class CDMFKC(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def add_extra_data(self, **kwargs):
         self.Q_mat = kwargs['Q_mat'].to(self.device)
@@ -43,8 +43,8 @@ class CDMFKC(GDBaseModel):
         self.e_difficulty = nn.Embedding(self.n_item, 1)
         self.k_impact = nn.Embedding(self.n_item, self.n_cpt)
         self.pd_net = PosMLP(
-            input_dim=self.n_cpt, output_dim=1, activation=self.model_cfg['activation'],
-            dnn_units=self.model_cfg['dnn_units'], dropout_rate=self.model_cfg['dropout_rate']
+            input_dim=self.n_cpt, output_dim=1, activation=self.modeltpl_cfg['activation'],
+            dnn_units=self.modeltpl_cfg['dnn_units'], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
 
     def forward(self, stu_id, exer_id, **kwargs):
@@ -56,8 +56,8 @@ class CDMFKC(GDBaseModel):
         k_difficulty = torch.sigmoid(self.k_difficulty(exer_id))
         e_difficulty = torch.sigmoid(self.e_difficulty(exer_id))
         h_impact = torch.sigmoid(self.k_impact(exer_id))
-        g_impact = torch.sigmoid(self.model_cfg['g_impact_a'] * h_impact + 
-                                 self.model_cfg['g_impact_b'] * k_difficulty * e_difficulty)
+        g_impact = torch.sigmoid(self.modeltpl_cfg['g_impact_a'] * h_impact + 
+                                 self.modeltpl_cfg['g_impact_b'] * k_difficulty * e_difficulty)
         # k_num = torch.sum(items_Q_mat, dim=1)  #  batch_exer_num
         # avg_impact = torch.multiply(k_num, torch.sum(torch.multiply(items_Q_mat, g_impact), dim=1))
         # k_difficulty_sum = torch.sum(items_Q_mat * k_difficulty, dim=1)

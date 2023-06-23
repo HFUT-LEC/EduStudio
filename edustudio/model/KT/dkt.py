@@ -26,26 +26,26 @@ class DKT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        assert self.model_cfg['rnn_or_lstm'] in {'rnn', 'lstm'}
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        assert self.modeltpl_cfg['rnn_or_lstm'] in {'rnn', 'lstm'}
 
     def build_model(self):
         self.exer_emb = nn.Embedding(
-            self.n_item * 2, self.model_cfg['emb_size']
+            self.n_item * 2, self.modeltpl_cfg['emb_size']
         )
-        if self.model_cfg['rnn_or_lstm'] == 'rnn':
+        if self.modeltpl_cfg['rnn_or_lstm'] == 'rnn':
             self.seq_model = nn.RNN(
-                self.model_cfg['emb_size'], self.model_cfg['hidden_size'], 
-                self.model_cfg['num_layers'], batch_first=True
+                self.modeltpl_cfg['emb_size'], self.modeltpl_cfg['hidden_size'], 
+                self.modeltpl_cfg['num_layers'], batch_first=True
             )
         else:
             self.seq_model = nn.LSTM(
-                self.model_cfg['emb_size'], self.model_cfg['hidden_size'], 
-                self.model_cfg['num_layers'], batch_first=True
+                self.modeltpl_cfg['emb_size'], self.modeltpl_cfg['hidden_size'], 
+                self.modeltpl_cfg['num_layers'], batch_first=True
             )
-        self.dropout_layer = nn.Dropout(self.model_cfg['dropout_rate'])
-        self.fc_layer = nn.Linear(self.model_cfg['hidden_size'], self.n_item)
+        self.dropout_layer = nn.Dropout(self.modeltpl_cfg['dropout_rate'])
+        self.fc_layer = nn.Linear(self.modeltpl_cfg['hidden_size'], self.n_item)
 
     def forward(self, exer_seq, label_seq, **kwargs):
         input_x = self.exer_emb(exer_seq + label_seq.long() * self.n_item)

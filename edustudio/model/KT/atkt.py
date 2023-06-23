@@ -41,11 +41,11 @@ class ATKT(GDBaseModel):
 
     def build_cfg(self):
         """Initialize the parameters of the model"""
-        self.output_dim = self.datafmt_cfg['dt_info']['cpt_count']
-        self.skill_dim = self.model_cfg['skill_dim']
-        self.answer_dim = self.model_cfg['answer_dim']
-        self.hidden_dim = self.model_cfg['hidden_dim']
-        self.attention_dim = self.model_cfg['attention_dim']
+        self.output_dim = self.datatpl_cfg['dt_info']['cpt_count']
+        self.skill_dim = self.modeltpl_cfg['skill_dim']
+        self.answer_dim = self.modeltpl_cfg['answer_dim']
+        self.hidden_dim = self.modeltpl_cfg['hidden_dim']
+        self.attention_dim = self.modeltpl_cfg['attention_dim']
 
     def build_model(self):
         """Initialize the various components of the model"""
@@ -73,7 +73,7 @@ class ATKT(GDBaseModel):
             torch.Tensor: the model predictions of students' responses to exercise questions. Shape of [batch_size, seq_len-1]
         """
         one_hot = torch.eye(self.output_dim, device=res.device)
-        one_hot = torch.cat((one_hot, torch.zeros(1, self.output_dim)), dim=0)
+        one_hot = torch.cat((one_hot, torch.zeros(1, self.output_dim).to(self.device)), dim=0)
         next_skill = skill[:, 1:]
         one_hot_skill = F.embedding(next_skill, one_hot)
         
@@ -115,8 +115,8 @@ class ATKT(GDBaseModel):
         Returns:
             torch.Tensor: The predictions of the model and the skill answer embedding
         """
-        skill = torch.where(mask_seq==0, torch.tensor([self.output_dim]), cpt_unfold_seq)
-        answer = torch.where(mask_seq==0, torch.tensor([2]), label_seq).long()
+        skill = torch.where(mask_seq==0, torch.tensor([self.output_dim]).to(self.device), cpt_unfold_seq)
+        answer = torch.where(mask_seq==0, torch.tensor([2]).to(self.device), label_seq).long()
         perturbation = p_adv
         
         skill_embedding=self.skill_emb(skill)  # skill:24*500(batch_size*seq_len)

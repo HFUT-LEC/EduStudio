@@ -1,0 +1,97 @@
+import logging
+from edustudio.utils.common import UnifyConfig
+from torch.utils.data import Dataset
+import copy
+from ..utils.common import BigfileDownloader, DecompressionUtil
+import yaml
+import re
+import os
+
+
+class BaseDataTPL(Dataset):
+    default_cfg = {'seed': 2023}
+
+    def __init__(self, cfg):
+        self.cfg: UnifyConfig = cfg
+        self.datatpl_cfg: UnifyConfig = cfg.datatpl_cfg
+        self.evaltpl_cfg: UnifyConfig = cfg.evaltpl_cfg
+        self.traintpl_cfg: UnifyConfig = cfg.traintpl_cfg
+        self.frame_cfg: UnifyConfig = cfg.frame_cfg
+        self.modeltpl_cfg: UnifyConfig = cfg.modeltpl_cfg
+        self.logger: logging.Logger = logging.getLogger("edustudio")
+        self._check_params()
+
+    @classmethod
+    def get_default_cfg(cls, **kwargs):
+        cfg = UnifyConfig()
+        for _cls in cls.__mro__:
+            if not hasattr(_cls, 'default_cfg'):
+                break
+            cfg.update(_cls.default_cfg, update_unknown_key_only=True)
+        return cfg
+
+    @classmethod
+    def from_cfg(cls, cfg):
+        return cls(cfg)
+    
+    def get_extra_data(self, **kwargs):
+        return {}
+
+    def _check_params(self):
+        pass
+
+    def _copy(self):
+        obj = copy.copy(self)
+        return obj
+
+    @classmethod
+    def download_dataset(cls, cfg):
+        dt_name = cfg.dataset
+        cfg.logger.warning(f"Can't find dataset files of {dt_name} in local environment!")
+        cfg.logger.info(f"Prepare to download {dt_name} from Internet.")
+        fph = cfg.frame_cfg['DT_INFO_FILE_PATH']
+        dataset_info = cls.read_yml_file(fph)
+        if dt_name not in dataset_info:
+            raise Exception("Can't find dataset files from Local and Internet!")
+
+        if not os.path.exists(cfg.frame_cfg.data_folder_path):
+            os.makedirs(cfg.frame_cfg.data_folder_path)
+        fph_tmp = f"{cfg.frame_cfg.data_folder_path}/{dt_name}-middata.zip.tmp"
+        fph_zip = f"{cfg.frame_cfg.data_folder_path}/{dt_name}-middata.zip"
+        if not os.path.exists(fph_zip):
+            if os.path.exists(fph_tmp):
+                os.remove(fph_tmp)
+            BigfileDownloader.download(
+                url=dataset_info[dt_name]['middata_url'], title=f"{dt_name} downloading...", 
+                filepath=fph_tmp
+            )
+            os.rename(fph_tmp, fph_zip)
+        else:
+            cfg.logger.info(f"Find a zip file of {dt_name} at {fph_zip}, skip downloading process")
+
+        DecompressionUtil.unzip_file(
+            zip_src=fph_zip, dst_dir=cfg.frame_cfg.data_folder_path
+        )
+        
+    @classmethod
+    def read_yml_file(cls, filepath: str):
+        with open(filepath, 'r', encoding='utf-8') as f:
+            config = yaml.load(f, Loader=cls._build_yaml_loader())
+        return config
+
+    @staticmethod
+    def _build_yaml_loader():
+        loader = yaml.FullLoader
+        loader.add_implicit_resolver(
+            u'tag:yaml.org,2002:float',
+            re.compile(
+                u'''^(?:
+             [-+]?(?:[0-9][0-9_]*)\\.[0-9_]*(?:[eE][-+]?[0-9]+)?
+            |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
+            |\\.[0-9_]+(?:[eE][-+][0-9]+)?
+            |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\\.[0-9_]*
+            |[-+]?\\.(?:inf|Inf|INF)
+            |\\.(?:nan|NaN|NAN))$''', re.X
+            ), list(u'-+0123456789.')
+        )
+        return loader

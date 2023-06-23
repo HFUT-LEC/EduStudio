@@ -14,16 +14,16 @@ from edustudio.utils.common import UnifyConfig
 def run_edustudio(
     dataset: str = None,
     cfg_file_name: str = None,  # config file
-    trainfmt_cfg_dict: Dict[str, Any] = {},  # parameters dictionary
-    datafmt_cfg_dict:  Dict[str, Any] = {},  # parameters dictionary
-    evalfmt_cfg_dict:  Dict[str, Any] = {},  # parameters dictionary
-    model_cfg_dict: Dict[str, Any] = {},  # parameters dictionary
+    traintpl_cfg_dict: Dict[str, Any] = {},  # parameters dictionary
+    datatpl_cfg_dict:  Dict[str, Any] = {},  # parameters dictionary
+    evaltpl_cfg_dict:  Dict[str, Any] = {},  # parameters dictionary
+    modeltpl_cfg_dict: Dict[str, Any] = {},  # parameters dictionary
     frame_cfg_dict:  Dict[str, Any] = {},  # parameters dictionary
     return_cfg_and_result: bool = False,
 ):
     cfg: UnifyConfig = get_global_cfg(
-        dataset, cfg_file_name, trainfmt_cfg_dict,
-        datafmt_cfg_dict, evalfmt_cfg_dict, model_cfg_dict, frame_cfg_dict
+        dataset, cfg_file_name, traintpl_cfg_dict,
+        datatpl_cfg_dict, evaltpl_cfg_dict, modeltpl_cfg_dict, frame_cfg_dict
     )
     init_all(cfg)
     try:
@@ -34,13 +34,13 @@ def run_edustudio(
         cfg.logger.info(f"[ALL_CFG]: \n{cfg.dump_fmt()}")
         cfg.dump_file(f"{cfg.frame_cfg.temp_folder_path}/cfg.json")
         cfg.logger.info("====" * 15)
-        if isinstance(cfg.trainfmt_cfg['cls'], str):
-            cls = importlib.import_module('edustudio.trainfmt').\
-                __getattribute__(cfg.trainfmt_cfg['cls'])
+        if isinstance(cfg.traintpl_cfg['cls'], str):
+            cls = importlib.import_module('edustudio.traintpl').\
+                __getattribute__(cfg.traintpl_cfg['cls'])
         else:
-            cls = cfg.trainfmt_cfg['cls']
-        trainfmt = cls(cfg)
-        trainfmt.start()
+            cls = cfg.traintpl_cfg['cls']
+        traintpl = cls(cfg)
+        traintpl.start()
         cfg.logger.info(f"Task: {cfg.frame_cfg.ID} Completed!")
         logging.shutdown()
         shutil.move(cfg.frame_cfg.temp_folder_path, cfg.frame_cfg.archive_folder_path)

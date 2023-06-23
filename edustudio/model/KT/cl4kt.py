@@ -6,7 +6,7 @@ import torch
 import torch.nn.functional as F
 from edustudio.utils.common import set_same_seeds
 import numpy as np
-from ...datafmt.utils import PadSeqUtil
+from ...datatpl.utils import PadSeqUtil
 
 
 class CL4KT(GDBaseModel):
@@ -34,65 +34,65 @@ class CL4KT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def build_model(self):
         self.question_embed = nn.Embedding(
-            self.n_cpt  + 2, self.model_cfg['emb_size']
+            self.n_cpt  + 2, self.modeltpl_cfg['emb_size']
         )
         self.interaction_embed = nn.Embedding(
-            2 * (self.n_cpt + 2), self.model_cfg['emb_size']
+            2 * (self.n_cpt + 2), self.modeltpl_cfg['emb_size']
         )
-        self.sim = Similarity(temp=self.model_cfg["temp"])
+        self.sim = Similarity(temp=self.modeltpl_cfg["temp"])
         self.cpt_encoder = nn.ModuleList(
             [
                 CL4KTTransformerLayer(
-                    self.model_cfg['hidden_size'],
-                    self.model_cfg['hidden_size'] // self.model_cfg['num_attn_heads'],
-                    self.model_cfg['d_ff'],
-                    self.model_cfg['num_attn_heads'],
-                    self.model_cfg['dropout'],
-                    self.model_cfg['kq_same']
+                    self.modeltpl_cfg['hidden_size'],
+                    self.modeltpl_cfg['hidden_size'] // self.modeltpl_cfg['num_attn_heads'],
+                    self.modeltpl_cfg['d_ff'],
+                    self.modeltpl_cfg['num_attn_heads'],
+                    self.modeltpl_cfg['dropout'],
+                    self.modeltpl_cfg['kq_same']
                     )
-                for _ in range(self.model_cfg['num_blocks'])
+                for _ in range(self.modeltpl_cfg['num_blocks'])
             ]
         )
         self.interaction_encoder = nn.ModuleList(
             [
                 CL4KTTransformerLayer(
-                    self.model_cfg['hidden_size'],
-                    self.model_cfg['hidden_size'] // self.model_cfg['num_attn_heads'],
-                    self.model_cfg['d_ff'],
-                    self.model_cfg['num_attn_heads'],
-                    self.model_cfg['dropout'],
-                    self.model_cfg['kq_same']
+                    self.modeltpl_cfg['hidden_size'],
+                    self.modeltpl_cfg['hidden_size'] // self.modeltpl_cfg['num_attn_heads'],
+                    self.modeltpl_cfg['d_ff'],
+                    self.modeltpl_cfg['num_attn_heads'],
+                    self.modeltpl_cfg['dropout'],
+                    self.modeltpl_cfg['kq_same']
                     )
-                for _ in range(self.model_cfg['num_blocks'])
+                for _ in range(self.modeltpl_cfg['num_blocks'])
             ]
         )
         self.knoweldge_retriever = nn.ModuleList(
             [
                 CL4KTTransformerLayer(
-                    self.model_cfg['hidden_size'],
-                    self.model_cfg['hidden_size'] // self.model_cfg['num_attn_heads'],
-                    self.model_cfg['d_ff'],
-                    self.model_cfg['num_attn_heads'],
-                    self.model_cfg['dropout'],
-                    self.model_cfg['kq_same']
+                    self.modeltpl_cfg['hidden_size'],
+                    self.modeltpl_cfg['hidden_size'] // self.modeltpl_cfg['num_attn_heads'],
+                    self.modeltpl_cfg['d_ff'],
+                    self.modeltpl_cfg['num_attn_heads'],
+                    self.modeltpl_cfg['dropout'],
+                    self.modeltpl_cfg['kq_same']
                     )
-                for _ in range(self.model_cfg['num_blocks'])
+                for _ in range(self.modeltpl_cfg['num_blocks'])
             ]
         )
 
         self.out = nn.Sequential(
-            nn.Linear(self.model_cfg['hidden_size'] * 2, self.model_cfg['dim_fc']),
+            nn.Linear(self.modeltpl_cfg['hidden_size'] * 2, self.modeltpl_cfg['dim_fc']),
             nn.GELU(),
-            nn.Dropout(self.model_cfg['dropout']),
-            nn.Linear(self.model_cfg['dim_fc'], self.model_cfg['dim_fc'] // 2),
+            nn.Dropout(self.modeltpl_cfg['dropout']),
+            nn.Linear(self.modeltpl_cfg['dim_fc'], self.modeltpl_cfg['dim_fc'] // 2),
             nn.GELU(),
-            nn.Dropout(self.model_cfg['dropout']),
-            nn.Linear(self.model_cfg['dim_fc'] // 2, 1),
+            nn.Dropout(self.modeltpl_cfg['dropout']),
+            nn.Linear(self.modeltpl_cfg['dim_fc'] // 2, 1),
         )
 
     def forward(self, **kwargs):
@@ -141,7 +141,7 @@ class CL4KT(GDBaseModel):
         # CL loss
         cpt_i_embed, cpt_j_embed = self.question_embed(aug_c_seq_1), self.question_embed(aug_c_seq_2)
         inter_i_embed, inter_j_embed = self.get_interaction_embed(aug_c_seq_1, aug_r_seq_1, attention_mask_1), self.get_interaction_embed(aug_c_seq_2, aug_r_seq_2, attention_mask_2)
-        if self.model_cfg['hard_negative']: inter_k_embed = self.get_interaction_embed(kwargs['cpt_unfold_seq'], negative_r_seq, kwargs['mask_seq'])
+        if self.modeltpl_cfg['hard_negative']: inter_k_embed = self.get_interaction_embed(kwargs['cpt_unfold_seq'], negative_r_seq, kwargs['mask_seq'])
 
         cpt_i_score, cpt_j_score = cpt_i_embed, cpt_j_embed
         inter_i_score, inter_j_score = inter_i_embed, inter_j_embed
@@ -151,7 +151,7 @@ class CL4KT(GDBaseModel):
         for block in self.interaction_encoder:
             inter_i_score, _ = block(mask=2, query=inter_i_score, key=inter_i_score, values=inter_i_embed, apply_pos=False)
             inter_j_score, _ = block(mask=2, query=inter_j_score, key=inter_j_score, values=inter_j_embed, apply_pos=False)
-            if self.model_cfg['hard_negative']: inter_k_embed, _ = block(mask=2, query=inter_k_embed, key=inter_k_embed, values=inter_k_embed, apply_pos=False)
+            if self.modeltpl_cfg['hard_negative']: inter_k_embed, _ = block(mask=2, query=inter_k_embed, key=inter_k_embed, values=inter_k_embed, apply_pos=False)
         
         pool_cpt_i_score = (cpt_i_score * attention_mask_1.unsqueeze(-1)).sum(1) / attention_mask_1.sum(-1).unsqueeze(-1)
         pool_cpt_j_score = (cpt_j_score * attention_mask_2.unsqueeze(-1)).sum(1) / attention_mask_2.sum(-1).unsqueeze(-1)
@@ -164,17 +164,17 @@ class CL4KT(GDBaseModel):
         pool_inter_i_score = (inter_i_score * attention_mask_1.unsqueeze(-1)).sum(1) / attention_mask_1.sum(-1).unsqueeze(-1)
         pool_inter_j_score = (inter_j_score * attention_mask_2.unsqueeze(-1)).sum(1) / attention_mask_2.sum(-1).unsqueeze(-1)
         inter_cos_sim = self.sim(pool_inter_i_score.unsqueeze(1), pool_inter_j_score.unsqueeze(0))
-        if self.model_cfg['hard_negative']: 
+        if self.modeltpl_cfg['hard_negative']: 
             pool_inter_k_score = (inter_k_embed * kwargs['mask_seq'].unsqueeze(-1)).sum(1) / kwargs['mask_seq'].sum(-1).unsqueeze(-1)
             neg_inter_cos_sim = self.sim(pool_inter_i_score.unsqueeze(1), pool_inter_k_score.unsqueeze(0))
             inter_cos_sim = torch.cat([inter_cos_sim, neg_inter_cos_sim], 1)
         inter_labels = torch.arange(inter_cos_sim.size(0)).long().to(aug_c_seq_1.device)
-        if self.model_cfg['hard_negative']:
+        if self.modeltpl_cfg['hard_negative']:
             weights = torch.tensor(
                     [
                         [0.0] * (inter_cos_sim.size(-1) - neg_inter_cos_sim.size(-1))
                         + [0.0] * i
-                        + [self.model_cfg['hard_negative_weight']]
+                        + [self.modeltpl_cfg['hard_negative_weight']]
                         + [0.0] * (neg_inter_cos_sim.size(-1) - i - 1)
                         for i in range(neg_inter_cos_sim.size(-1))
                     ]
@@ -196,7 +196,7 @@ class CL4KT(GDBaseModel):
             input=y_pd, target=y_gt, reduction="mean"
         )
         return {
-            'loss_main': loss + cl_loss * self.model_cfg['reg_cl']
+            'loss_main': loss + cl_loss * self.modeltpl_cfg['reg_cl']
         }
         
 
@@ -205,8 +205,8 @@ class CL4KT(GDBaseModel):
 
     def augment_kt_seqs(self, seed_change=False, **kwargs):
         if seed_change:
-            random.Random(self.trainfmt_cfg['seed'] + 1)
-            np.random.seed(self.trainfmt_cfg['seed'] + 1)
+            random.Random(self.traintpl_cfg['seed'] + 1)
+            np.random.seed(self.traintpl_cfg['seed'] + 1)
         bs = kwargs['exer_seq'].size(0)
         lens = (kwargs['mask_seq'] > 0).sum(dim=1)
 
@@ -216,40 +216,40 @@ class CL4KT(GDBaseModel):
         exer_seq_ = kwargs['exer_seq'].clone()
         
         # Manipulate order: Question mask
-        if self.model_cfg['mask_prob'] > 0:
+        if self.modeltpl_cfg['mask_prob'] > 0:
            for b in range(bs):
-                if self.datafmt_cfg['sequence_option'] == 'recent':
-                    idx = random.sample(range(self.datafmt_cfg['window_size']-lens[b], self.datafmt_cfg['window_size']-1), max(1, int(lens[b] * self.model_cfg['mask_prob'])))
+                if self.datatpl_cfg['sequence_option'] == 'recent':
+                    idx = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-1), max(1, int(lens[b] * self.modeltpl_cfg['mask_prob'])))
                 else:
-                    idx = random.sample(range(lens[b]-1), max(1, int(lens[b] * self.model_cfg['mask_prob'])))
+                    idx = random.sample(range(lens[b]-1), max(1, int(lens[b] * self.modeltpl_cfg['mask_prob'])))
                 for i in idx:
                         cpt_seq_[b, i] = self.n_cpt + 1
                         exer_seq_[b, i] = self.n_item + 1
         # Hard negative
-        label_seq_flip = kwargs['label_seq'].clone() if self.model_cfg['hard_negative'] else label_seq_
+        label_seq_flip = kwargs['label_seq'].clone() if self.modeltpl_cfg['hard_negative'] else label_seq_
         for b in range(bs):
-            if self.datafmt_cfg['sequence_option'] == 'recent':
-                idx = torch.arange(self.datafmt_cfg['window_size']-lens[b], self.datafmt_cfg['window_size']) 
+            if self.datatpl_cfg['sequence_option'] == 'recent':
+                idx = torch.arange(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']) 
             else:
                 idx = torch.arange(lens[b])
             for i in idx:
                 label_seq_flip[b, i] = 1 - label_seq_flip[b, i]
         # Manipulate order:Question replace
-        if self.model_cfg['replace_prob'] > 0:
+        if self.modeltpl_cfg['replace_prob'] > 0:
             for b in range(bs):
-                if self.datafmt_cfg['sequence_option'] == 'recent':
-                    idx = random.sample(range(self.datafmt_cfg['window_size']-lens[b], self.datafmt_cfg['window_size']-1), max(1, int(lens[b] * self.model_cfg['replace_prob'])))
+                if self.datatpl_cfg['sequence_option'] == 'recent':
+                    idx = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-1), max(1, int(lens[b] * self.modeltpl_cfg['replace_prob'])))
                 else:
-                    idx = random.sample(range(lens[b]-1), max(1, int(lens[b] * self.model_cfg['replace_prob'])))
+                    idx = random.sample(range(lens[b]-1), max(1, int(lens[b] * self.modeltpl_cfg['replace_prob'])))
                 for i in idx:
-                    if cpt_seq_[b, i] != self.n_cpt + 1 and i in self.datafmt_cfg['dt_info']['train_harder_cpts'] and i in self.datafmt_cfg['dt_info']['train_harder_cpts']:
-                        cpt_seq_[b, i] = self.datafmt_cfg['dt_info']['train_harder_cpts'][i]  if label_seq_[b, i] == 0 else self.datafmt_cfg['dt_info']['train_harder_cpts'][i]
+                    if cpt_seq_[b, i] != self.n_cpt + 1 and i in self.datatpl_cfg['dt_info']['train_harder_cpts'] and i in self.datatpl_cfg['dt_info']['train_harder_cpts']:
+                        cpt_seq_[b, i] = self.datatpl_cfg['dt_info']['train_harder_cpts'][i]  if label_seq_[b, i] == 0 else self.datatpl_cfg['dt_info']['train_harder_cpts'][i]
         # Manipulate order:Interaction permute
-        if self.model_cfg['permute_prob'] > 0:
+        if self.modeltpl_cfg['permute_prob'] > 0:
             for b in range(bs):
-                reorder_seq_len = int(lens[b] * self.model_cfg['permute_prob'])
-                if self.datafmt_cfg['sequence_option'] == 'recent':
-                    start_pos = random.sample(range(self.datafmt_cfg['window_size']-lens[b], self.datafmt_cfg['window_size']-reorder_seq_len-1), 1)
+                reorder_seq_len = int(lens[b] * self.modeltpl_cfg['permute_prob'])
+                if self.datatpl_cfg['sequence_option'] == 'recent':
+                    start_pos = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-reorder_seq_len-1), 1)
                 else:
                     start_pos = random.sample(range(lens[b]-reorder_seq_len-1), 1)
 
@@ -259,17 +259,17 @@ class CL4KT(GDBaseModel):
                 label_seq_[b, start_pos[0]:start_pos[0]+reorder_seq_len] = label_seq_[b, start_pos[0]:start_pos[0]+reorder_seq_len][perm]
         # Manipulate order:Interaction crop
         exer_seq_final, cpt_seq_fianl, label_seq_final, mask = torch.zeros_like(exer_seq_), torch.zeros_like(cpt_seq_), torch.zeros_like(label_seq_), torch.zeros_like(kwargs['mask_seq'])
-        if self.model_cfg['crop_prob'] > 0:
+        if self.modeltpl_cfg['crop_prob'] > 0:
             for b in range(bs):
-                crop_seq_len = 1 if int(lens[b] * self.model_cfg['permute_prob']) == 0 else int(lens[b] * self.model_cfg['permute_prob'])
-                if self.datafmt_cfg['sequence_option'] == 'recent':
-                    start_pos = random.sample(range(self.datafmt_cfg['window_size']-lens[b], self.datafmt_cfg['window_size']-crop_seq_len-1), 1)
+                crop_seq_len = 1 if int(lens[b] * self.modeltpl_cfg['permute_prob']) == 0 else int(lens[b] * self.modeltpl_cfg['permute_prob'])
+                if self.datatpl_cfg['sequence_option'] == 'recent':
+                    start_pos = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-crop_seq_len-1), 1)
                     exer_seq_final[b, -crop_seq_len:] = exer_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     cpt_seq_fianl[b, -crop_seq_len:] = cpt_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     label_seq_final[b, -crop_seq_len:] = label_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     mask[b, -crop_seq_len:] = 1
                 else:
-                    start_pos = random.sample(range(self.datafmt_cfg['window_size']-lens[b], self.datafmt_cfg['window_size']-crop_seq_len-1), 1)
+                    start_pos = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-crop_seq_len-1), 1)
                     exer_seq_final[b, :crop_seq_len] = exer_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     cpt_seq_fianl[b, :crop_seq_len] = cpt_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     label_seq_final[b, :crop_seq_len] = label_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]

@@ -11,7 +11,7 @@ class GDBaseModel(BaseModel):
     }
     def __init__(self, cfg):
         super().__init__(cfg)
-        self.device = self.trainfmt_cfg['device']
+        self.device = self.traintpl_cfg['device']
         self.share_callback_dict = {
             "stop_training": False
         }
@@ -32,21 +32,21 @@ class GDBaseModel(BaseModel):
 
 
     def _init_params(self):
-        if self.model_cfg['param_init_type'] == 'default':
+        if self.modeltpl_cfg['param_init_type'] == 'default':
             pass
-        elif self.model_cfg['param_init_type'] == 'xavier_normal':
+        elif self.modeltpl_cfg['param_init_type'] == 'xavier_normal':
             self.apply(xavier_normal_initialization)
-        elif self.model_cfg['param_init_type'] == 'xavier_uniform':
+        elif self.modeltpl_cfg['param_init_type'] == 'xavier_uniform':
             self.apply(xavier_uniform_initialization)
-        elif self.model_cfg['param_init_type'] == 'kaiming_normal':
+        elif self.modeltpl_cfg['param_init_type'] == 'kaiming_normal':
             self.apply(kaiming_normal_initialization)
-        elif self.model_cfg['param_init_type'] == 'kaiming_uniform':
+        elif self.modeltpl_cfg['param_init_type'] == 'kaiming_uniform':
             self.apply(kaiming_uniform_initialization)
-        elif self.model_cfg['param_init_type'] == 'init_from_pretrained':
+        elif self.modeltpl_cfg['param_init_type'] == 'init_from_pretrained':
             self._load_params_from_pretrained()
 
     def _load_params_from_pretrained(self):
-        self.load_state_dict(torch.load(self.model_cfg['pretrained_file_path']))
+        self.load_state_dict(torch.load(self.modeltpl_cfg['pretrained_file_path']))
 
     def predict(self, **kwargs):
         pass

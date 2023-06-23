@@ -1,11 +1,30 @@
-import numpy as np
+r"""
+QDKT
+##########################################
 
+Reference:
+    Shashank Sonkar et al. "qDKT: Question-Centric Deep Knowledge Tracing" in EDM 2020.
+
+Reference Code:
+    https://github.com/pykt-team/pykt-toolkit/blob/main/pykt/models/qdkt.py
+
+"""
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
 
 class QDKT(GDBaseModel):
+    r"""
+   QDKT
+
+   default_cfg:
+      'emb_size': 100  # dimension of embedding
+      'dropout_rate': 0.2      # dropout rate
+      'hidden_size': 100        # hidden size of LSTM
+        'num_layers': 1         # num layers of LSTM
+        'w_reg':0.01            # weight of loss_reg
+   """
     default_cfg = {
         'emb_size': 100,
         'hidden_size': 100,
@@ -23,9 +42,9 @@ class QDKT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.w_reg = self.model_cfg['w_reg']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.w_reg = self.modeltpl_cfg['w_reg']
 
     def _init_params(self):
         super()._init_params()
@@ -39,22 +58,22 @@ class QDKT(GDBaseModel):
 
     def build_model(self):
         self.exer_emb = nn.Embedding(
-            self.n_item * 2, self.model_cfg['emb_size']
+            self.n_item * 2, self.modeltpl_cfg['emb_size']
         )
         self.seq_model = nn.LSTM(
-            self.model_cfg['emb_size'], self.model_cfg['hidden_size'],
-            self.model_cfg['num_layers'], batch_first=True
+            self.modeltpl_cfg['emb_size'], self.modeltpl_cfg['hidden_size'],
+            self.modeltpl_cfg['num_layers'], batch_first=True
         )
 
-        self.dropout_layer = nn.Dropout(self.model_cfg['dropout_rate'])
-        self.fc_layer = nn.Linear(self.model_cfg['hidden_size'], self.n_item)
+        self.dropout_layer = nn.Dropout(self.modeltpl_cfg['dropout_rate'])
+        self.fc_layer = nn.Linear(self.modeltpl_cfg['hidden_size'], self.n_item)
 
         f = open("tmp.txt", "w")
         for l in self.train_fasttext():
             f.writelines(l)
         f.close()
         import fasttext
-        self.fasttext_model = fasttext.train_unsupervised("tmp.txt",  dim = self.model_cfg['emb_size'],minCount=1, wordNgrams=2)
+        self.fasttext_model = fasttext.train_unsupervised("tmp.txt",  dim = self.modeltpl_cfg['emb_size'],minCount=1, wordNgrams=2)
 
     def train_fasttext(self):
         stu_ids = self.train_dict['stu_id'].cpu().numpy()

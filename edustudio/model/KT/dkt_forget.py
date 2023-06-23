@@ -26,33 +26,33 @@ class DKTForget(GDBaseModel):
     }
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_rgap = self.datafmt_cfg['dt_info']['n_rgap']
-        self.n_sgap = self.datafmt_cfg['dt_info']['n_sgap']
-        self.n_pcount = self.datafmt_cfg['dt_info']['n_pcount']
-        assert self.model_cfg['rnn_or_lstm'] in {'rnn', 'lstm'}
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_rgap = self.datatpl_cfg['dt_info']['n_rgap']
+        self.n_sgap = self.datatpl_cfg['dt_info']['n_sgap']
+        self.n_pcount = self.datatpl_cfg['dt_info']['n_pcount']
+        assert self.modeltpl_cfg['rnn_or_lstm'] in {'rnn', 'lstm'}
         
     def build_model(self):
         self.exer_emb = nn.Embedding(
-            self.n_item * 2, self.model_cfg['emb_size']
+            self.n_item * 2, self.modeltpl_cfg['emb_size']
         )
         self.integration_compont = IntegrationComponent(
             n_rgap=self.n_rgap, n_sgap=self.n_sgap, n_pcount=self.n_pcount,
-            emb_dim=self.model_cfg['emb_size'], device=self.device,
-            integration_type=self.model_cfg['integration_type']
+            emb_dim=self.modeltpl_cfg['emb_size'], device=self.device,
+            integration_type=self.modeltpl_cfg['integration_type']
         )
-        if self.model_cfg['rnn_or_lstm'] == 'rnn':
+        if self.modeltpl_cfg['rnn_or_lstm'] == 'rnn':
             self.seq_model = nn.RNN(
-                self.integration_compont.output_dim, self.model_cfg['emb_size'], 
-                self.model_cfg['num_layers'], batch_first=True
+                self.integration_compont.output_dim, self.modeltpl_cfg['emb_size'], 
+                self.modeltpl_cfg['num_layers'], batch_first=True
             )
         else:
             self.seq_model = nn.LSTM(
-                self.integration_compont.output_dim, self.model_cfg['emb_size'], 
-                self.model_cfg['num_layers'], batch_first=True
+                self.integration_compont.output_dim, self.modeltpl_cfg['emb_size'], 
+                self.modeltpl_cfg['num_layers'], batch_first=True
             )
-        self.dropout_layer = nn.Dropout(self.model_cfg['dropout_rate'])
+        self.dropout_layer = nn.Dropout(self.modeltpl_cfg['dropout_rate'])
         self.fc_layer = nn.Linear(self.integration_compont.output_dim, self.n_item)
 
     def forward(self, exer_seq, label_seq, r_gap, s_gap, p_count, **kwargs):

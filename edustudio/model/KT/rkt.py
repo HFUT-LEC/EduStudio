@@ -1,3 +1,14 @@
+r"""
+RKT
+##########################################
+
+Reference:
+    Shalini Pandey et al. "RKT: Relation-Aware Self-Attention for Knowledge Tracing." in CIKM 2020.
+
+Reference Code:
+    https://github.com/shalini1194/RKT/blob/master/RKT/model_rkt.py
+
+"""
 import math
 import copy
 from ..gd_basemodel import GDBaseModel
@@ -9,6 +20,17 @@ from scipy import sparse
 from torch.nn.init import xavier_uniform_, constant_
 
 class RKT(GDBaseModel):
+    r"""
+   RKT
+
+   default_cfg:
+      'embed_size': 200  # dimension of embedding
+      'drop_prob': 0.2      # dropout rate
+      'num_attn_layers': 1        # number of attention layers
+        'num_heads': 5         # number of parallel attention heads
+        'encode_pos':False            # if True, use relative position embeddings
+         'max_pos': 10          # number of position embeddings to use
+   """
     default_cfg = {
         'embed_size': 200,
         'num_attn_layers': 1,
@@ -20,14 +42,14 @@ class RKT(GDBaseModel):
 
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.embed_size = self.model_cfg['embed_size']
-        self.num_attn_layers = self.model_cfg['num_attn_layers']
-        self.num_heads = self.model_cfg['num_heads']
-        self.encode_pos = self.model_cfg['encode_pos']
-        self.max_pos = self.model_cfg['max_pos']
-        self.drop_prob = self.model_cfg['drop_prob']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.embed_size = self.modeltpl_cfg['embed_size']
+        self.num_attn_layers = self.modeltpl_cfg['num_attn_layers']
+        self.num_heads = self.modeltpl_cfg['num_heads']
+        self.encode_pos = self.modeltpl_cfg['encode_pos']
+        self.max_pos = self.modeltpl_cfg['max_pos']
+        self.drop_prob = self.modeltpl_cfg['drop_prob']
         
     def build_model(self):
         self.item_embeds = nn.Embedding(self.n_item, self.embed_size, padding_idx=0)

@@ -24,12 +24,12 @@ class EKTM(EERNNM):
 
     def build_cfg(self):
         super().build_cfg()
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def build_model(self):
         super().build_model()
-        self.cpt_mem_emb = nn.Embedding(self.n_cpt, self.model_cfg['d_k'])
-        self.W_K = nn.Embedding(self.n_cpt, self.model_cfg['d_k'])
+        self.cpt_mem_emb = nn.Embedding(self.n_cpt, self.modeltpl_cfg['d_k'])
+        self.W_K = nn.Embedding(self.n_cpt, self.modeltpl_cfg['d_k'])
 
     def forward(self, exer_seq, label_seq, cpt_seq, cpt_seq_mask, **kwargs):
         exers, idx = exer_seq.unique(return_inverse=True)

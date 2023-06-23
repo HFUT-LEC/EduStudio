@@ -1,3 +1,14 @@
+r"""
+SAINT
+##########################################
+
+Reference:
+     Youngduck Choi et al. "Towards an Appropriate Query, Key, and Value Computation for Knowledge Tracing" in L-AT-S 2020.
+
+Reference Code:
+    https://github.com/pykt-team/pykt-toolkit/blob/main/pykt/models/saint.py
+
+"""
 import copy
 
 import math
@@ -12,6 +23,15 @@ import numpy as np
 from torch.nn.init import xavier_uniform_, constant_
 
 class SAINT(GDBaseModel):
+    r"""
+    SAINT
+
+    default_cfg:
+       'emb_size': 256          # dimension of embedding
+        'num_attn_heads': 8     # number of parallel attention heads
+        'dropout_rate': 0.2     # dropout rate
+        'n_blocks':4          # number of Encoder_blocks
+    """
     default_cfg = {
         'emb_size': 256,
         'num_attn_heads': 8,
@@ -21,14 +41,14 @@ class SAINT(GDBaseModel):
 
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.num_q = self.datafmt_cfg['dt_info']['exer_count']
-        self.num_c = self.datafmt_cfg['dt_info']['cpt_count']
-        self.window_size = self.datafmt_cfg['dt_info']['real_window_size']
-        self.dropout_r = self.model_cfg['dropout_rate']
-        self.num_attn_heads = self.model_cfg['num_attn_heads']
-        self.emb_size = self.model_cfg['emb_size']
-        self.n_blocks = self.model_cfg['n_blocks']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.num_q = self.datatpl_cfg['dt_info']['exer_count']
+        self.num_c = self.datatpl_cfg['dt_info']['cpt_count']
+        self.window_size = self.datatpl_cfg['dt_info']['real_window_size']
+        self.dropout_r = self.modeltpl_cfg['dropout_rate']
+        self.num_attn_heads = self.modeltpl_cfg['num_attn_heads']
+        self.emb_size = self.modeltpl_cfg['emb_size']
+        self.n_blocks = self.modeltpl_cfg['n_blocks']
         
     def build_model(self):
         self.embd_pos = nn.Embedding(self.window_size, embedding_dim=self.emb_size)

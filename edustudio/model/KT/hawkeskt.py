@@ -18,10 +18,10 @@ class HawkesKT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.problem_num = self.datafmt_cfg['dt_info']['exer_count']  # 习题数量
-        self.skill_num = self.datafmt_cfg['dt_info']['cpt_count']  # 知识点数量
-        self.emb_size = self.model_cfg['emb_size']
-        self.time_log = self.model_cfg['time_log']
+        self.problem_num = self.datatpl_cfg['dt_info']['exer_count']  # 习题数量
+        self.skill_num = self.datatpl_cfg['dt_info']['cpt_count']  # 知识点数量
+        self.emb_size = self.modeltpl_cfg['emb_size']
+        self.time_log = self.modeltpl_cfg['time_log']
 
     def build_model(self):
         self.problem_base = torch.nn.Embedding(self.problem_num, 1)

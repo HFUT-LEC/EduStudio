@@ -27,12 +27,12 @@ class EERNNM(GDBaseModel):
         self.exer_content = kwargs['exer_content'].to(self.device)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_word = self.datafmt_cfg['dt_info']['word_count']
-        self.d_0 = self.datafmt_cfg['dt_info']['word_emb_dim']
-        self.d_v = self.model_cfg['d_v']
-        self.d_h = self.model_cfg['d_h']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_word = self.datatpl_cfg['dt_info']['word_count']
+        self.d_0 = self.datatpl_cfg['dt_info']['word_emb_dim']
+        self.d_v = self.modeltpl_cfg['d_v']
+        self.d_h = self.modeltpl_cfg['d_h']
 
     def build_model(self):
         self.word_emb = nn.Embedding(self.n_word, self.d_0, padding_idx=0)

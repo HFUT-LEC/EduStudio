@@ -26,35 +26,35 @@ class DTransformer(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_exer = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_exer = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def build_model(self):
-        self.cpt_embed = nn.Embedding(self.n_cpt + 1, self.model_cfg['hidden_size'])
-        self.label_embed = nn.Embedding(2, self.model_cfg['hidden_size'])
+        self.cpt_embed = nn.Embedding(self.n_cpt + 1, self.modeltpl_cfg['hidden_size'])
+        self.label_embed = nn.Embedding(2, self.modeltpl_cfg['hidden_size'])
         
-        self.cpt_diff_embed = nn.Embedding(self.n_cpt + 1, self.model_cfg['hidden_size'])
-        self.label_diff_embed = nn.Embedding(2, self.model_cfg['hidden_size'])
+        self.cpt_diff_embed = nn.Embedding(self.n_cpt + 1, self.modeltpl_cfg['hidden_size'])
+        self.label_diff_embed = nn.Embedding(2, self.modeltpl_cfg['hidden_size'])
         self.exer_diff_embed = nn.Embedding(self.n_exer + 1, 1)  # difficult parameter
 
-        self.block1 = DTransformerLayer(self.model_cfg['hidden_size'], self.model_cfg['num_heads'], self.model_cfg['dropout'])
-        self.block2 = DTransformerLayer(self.model_cfg['hidden_size'], self.model_cfg['num_heads'], self.model_cfg['dropout'], kq_same=False)
+        self.block1 = DTransformerLayer(self.modeltpl_cfg['hidden_size'], self.modeltpl_cfg['num_heads'], self.modeltpl_cfg['dropout'])
+        self.block2 = DTransformerLayer(self.modeltpl_cfg['hidden_size'], self.modeltpl_cfg['num_heads'], self.modeltpl_cfg['dropout'], kq_same=False)
 
-        self.know_params = nn.Parameter(torch.empty(self.model_cfg['n_knowledges'], self.model_cfg['hidden_size']))
+        self.know_params = nn.Parameter(torch.empty(self.modeltpl_cfg['n_knowledges'], self.modeltpl_cfg['hidden_size']))
         nn.init.uniform_(self.know_params, -1.0, 1.0)
 
         self.out = nn.Sequential(
-            nn.Linear(self.model_cfg['hidden_size'] * 2, self.model_cfg['dim_fc']),
+            nn.Linear(self.modeltpl_cfg['hidden_size'] * 2, self.modeltpl_cfg['dim_fc']),
             nn.GELU(),
-            nn.Dropout(self.model_cfg['dropout']),
-            nn.Linear(self.model_cfg['dim_fc'], self.model_cfg['dim_fc'] // 2),
+            nn.Dropout(self.modeltpl_cfg['dropout']),
+            nn.Linear(self.modeltpl_cfg['dim_fc'], self.modeltpl_cfg['dim_fc'] // 2),
             nn.GELU(),
-            nn.Dropout(self.model_cfg['dropout']),
-            nn.Linear(self.model_cfg['dim_fc'] // 2, 1),
+            nn.Dropout(self.modeltpl_cfg['dropout']),
+            nn.Linear(self.modeltpl_cfg['dim_fc'] // 2, 1),
         )
 
-        if self.model_cfg['projection_alhead_cl']:
-            self.proj = nn.Sequential(nn.Linear(self.model_cfg['hidden_size'], self.model_cfg['hidden_size']), nn.GELU())
+        if self.modeltpl_cfg['projection_alhead_cl']:
+            self.proj = nn.Sequential(nn.Linear(self.modeltpl_cfg['hidden_size'], self.modeltpl_cfg['hidden_size']), nn.GELU())
         else:
             self.proj = None
         
@@ -62,11 +62,11 @@ class DTransformer(GDBaseModel):
         lens = (mask_seq > 0).sum(dim=1)
         q_emb, a_emb, exer_diff = self.embedding(cpt_unfold_seq, label_seq, exer_seq)
         
-        if self.model_cfg['num_layers'] == 1:
+        if self.modeltpl_cfg['num_layers'] == 1:
             hq = q_emb.clone()
             ha = a_emb.clone()
             m, e_score = self.block1(hq, hq, ha, lens, peek_cur=True)
-        elif self.model_cfg['num_layers'] == 2:
+        elif self.modeltpl_cfg['num_layers'] == 2:
             hq = q_emb.clone()
             ha, _ = self.block1(a_emb, a_emb, a_emb, lens, peek_cur=True)
             m, e_score = self.block1(hq, hq, ha, lens, peek_cur=True)
@@ -81,19 +81,19 @@ class DTransformer(GDBaseModel):
             self.know_params[None, :, None, :]
             .expand(bs, -1, seqlen, -1)
             .contiguous()
-            .view(bs * self.model_cfg['n_knowledges'], seqlen, self.model_cfg['hidden_size'])
+            .view(bs * self.modeltpl_cfg['n_knowledges'], seqlen, self.modeltpl_cfg['hidden_size'])
         )
-        hq = hq.unsqueeze(1).expand(-1, self.model_cfg['n_knowledges'], -1, -1).reshape_as(query)  # key embedding
-        m = m.unsqueeze(1).expand(-1, self.model_cfg['n_knowledges'], -1, -1).reshape_as(query)  # value embedding
-        z, c_score = self.block2(query, hq, m, torch.repeat_interleave(lens, self.model_cfg['n_knowledges']), peek_cur=False)
+        hq = hq.unsqueeze(1).expand(-1, self.modeltpl_cfg['n_knowledges'], -1, -1).reshape_as(query)  # key embedding
+        m = m.unsqueeze(1).expand(-1, self.modeltpl_cfg['n_knowledges'], -1, -1).reshape_as(query)  # value embedding
+        z, c_score = self.block2(query, hq, m, torch.repeat_interleave(lens, self.modeltpl_cfg['n_knowledges']), peek_cur=False)
         z = (
-            z.view(bs, self.model_cfg['n_knowledges'], seqlen, self.model_cfg['hidden_size'])  # unpack dimensions
+            z.view(bs, self.modeltpl_cfg['n_knowledges'], seqlen, self.modeltpl_cfg['hidden_size'])  # unpack dimensions
             .transpose(1, 2)  # (bs, seqlen, n_know, d_model)
             .contiguous()
             .view(bs, seqlen, -1)
         )
         c_score = (
-            c_score.view(bs, self.model_cfg['n_knowledges'], self.model_cfg['num_heads'], seqlen, seqlen)  # unpack dimensions
+            c_score.view(bs, self.modeltpl_cfg['n_knowledges'], self.modeltpl_cfg['num_heads'], seqlen, seqlen)  # unpack dimensions
             .permute(0, 2, 3, 1, 4)  # (bs, n_heads, seqlen, n_know, seqlen)
             .contiguous()
         )
@@ -111,14 +111,14 @@ class DTransformer(GDBaseModel):
         key = (
             self.know_params[None, None, :, :]
             .expand(bs, seqlen, -1, -1)
-            .view(bs * seqlen, self.model_cfg['n_knowledges'], -1)
+            .view(bs * seqlen, self.modeltpl_cfg['n_knowledges'], -1)
         )
-        value = z.reshape(bs * seqlen, self.model_cfg['n_knowledges'], -1)
+        value = z.reshape(bs * seqlen, self.modeltpl_cfg['n_knowledges'], -1)
 
         beta = torch.matmul(
             key,
             query.reshape(bs * seqlen, -1, 1),
-        ).view(bs * seqlen, 1, self.model_cfg['n_knowledges'])
+        ).view(bs * seqlen, 1, self.modeltpl_cfg['n_knowledges'])
         alpha = torch.softmax(beta, -1)
 
         return torch.matmul(alpha, value).view(bs, seqlen, -1)
@@ -184,31 +184,31 @@ class DTransformer(GDBaseModel):
         exer_seq_ = kwargs['exer_seq'].clone()
         # Manipulate order: Swap Adjacent Items
         for b in range(bs):
-            idx = random.sample(range(lens[b] - 1), max(1, int(lens[b] * self.model_cfg['dropout'])))
+            idx = random.sample(range(lens[b] - 1), max(1, int(lens[b] * self.modeltpl_cfg['dropout'])))
             for i in idx:
                 cpt_seq_[b, i], cpt_seq_[b, i + 1] = cpt_seq_[b, i + 1], cpt_seq_[b, i]
                 label_seq_[b, i], label_seq_[b, i + 1] = label_seq_[b, i + 1], label_seq_[b, i]
                 exer_seq_[b, i], exer_seq_[b, i + 1] = exer_seq_[b, i + 1], exer_seq_[b, i]
         # Hard negative 
-        label_seq_flip = kwargs['label_seq'].clone() if self.model_cfg['hard_negative'] else label_seq_
+        label_seq_flip = kwargs['label_seq'].clone() if self.modeltpl_cfg['hard_negative'] else label_seq_
         # Manipulate score: Flip Response
         for b in range(bs):
-            idx = random.sample(range(lens[b] - 1), max(1, int(lens[b] * self.model_cfg['dropout'])))
+            idx = random.sample(range(lens[b] - 1), max(1, int(lens[b] * self.modeltpl_cfg['dropout'])))
             for i in idx:
                 label_seq_flip[b, i] = 1 - label_seq_flip[b, i]
-        if not self.model_cfg['hard_negative']: label_seq_ = label_seq_flip
+        if not self.modeltpl_cfg['hard_negative']: label_seq_ = label_seq_flip
 
         # Model loss
         logits, z_1, q_emb, reg_loss, _ = self(**kwargs, is_train=True)
         logits_masked = logits[kwargs['mask_seq'] == 1]
 
         _, z_2, *_ = self(exer_seq_, cpt_seq_, label_seq_, kwargs['mask_seq'], is_train=True)
-        if self.model_cfg['hard_negative']:
+        if self.modeltpl_cfg['hard_negative']:
             _, z_3, *_ = self(kwargs['exer_seq'], kwargs['cpt_unfold_seq'], label_seq_flip, kwargs['mask_seq'], is_train=True)
 
         # CL loss
         input = self.sim(z_1[:, :minlen, :], z_2[:, :minlen, :])
-        if self.model_cfg['hard_negative']:
+        if self.modeltpl_cfg['hard_negative']:
             hard_neg = self.sim(z_1[:, :minlen, :], z_3[:, :minlen, :])
             input = torch.cat([input, hard_neg], dim=1)
         target = (
@@ -226,7 +226,7 @@ class DTransformer(GDBaseModel):
             input=logits_masked, target=labels_masked, reduction="mean"
         )
         
-        for i in range(1, self.model_cfg["prediction_window"]):
+        for i in range(1, self.modeltpl_cfg["prediction_window"]):
             y_gt = kwargs['label_seq'][:, i:]
             y_gt = y_gt[kwargs['mask_seq'][:, i:] == 1]
 
@@ -238,23 +238,23 @@ class DTransformer(GDBaseModel):
             pred_loss += F.binary_cross_entropy(
             input=y_pt, target=y_gt, reduction="mean"
         )
-        pred_loss /= self.model_cfg["prediction_window"]
+        pred_loss /= self.modeltpl_cfg["prediction_window"]
 
         return {
-            'loss_main': pred_loss + cl_loss * self.model_cfg['lambda_cl'] + reg_loss,
+            'loss_main': pred_loss + cl_loss * self.modeltpl_cfg['lambda_cl'] + reg_loss,
         }
 
     def get_loss_dict(self, **kwargs):
-        if self.model_cfg['cl_loss']:
+        if self.modeltpl_cfg['cl_loss']:
             return self.get_cl_loss(**kwargs)
         else:
             return self.get_loss(**kwargs)
 
     def sim(self, z1, z2):
         bs, seqlen, _ = z1.size()
-        z1 = z1.unsqueeze(1).view(bs, 1, seqlen, self.model_cfg['n_knowledges'], -1)
-        z2 = z2.unsqueeze(0).view(1, bs, seqlen, self.model_cfg['n_knowledges'], -1)
-        if self.model_cfg['projection_alhead_cl']:
+        z1 = z1.unsqueeze(1).view(bs, 1, seqlen, self.modeltpl_cfg['n_knowledges'], -1)
+        z2 = z2.unsqueeze(0).view(1, bs, seqlen, self.modeltpl_cfg['n_knowledges'], -1)
+        if self.modeltpl_cfg['projection_alhead_cl']:
             z1 = self.proj(z1)
             z2 = self.proj(z2)
         return F.cosine_similarity(z1.mean(-2), z2.mean(-2), dim=-1) / 0.05

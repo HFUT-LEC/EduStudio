@@ -44,9 +44,9 @@ class NCDM(GDBaseModel):
         self.Q_mat = kwargs['Q_mat'].to(self.device)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def build_model(self):
         # prediction sub-net
@@ -54,8 +54,8 @@ class NCDM(GDBaseModel):
         self.k_difficulty = nn.Embedding(self.n_item, self.n_cpt)
         self.e_difficulty = nn.Embedding(self.n_item, 1)
         self.pd_net = PosMLP(
-            input_dim=self.n_cpt, output_dim=1, activation=self.model_cfg['activation'],
-            dnn_units=self.model_cfg['dnn_units'], dropout_rate=self.model_cfg['dropout_rate']
+            input_dim=self.n_cpt, output_dim=1, activation=self.modeltpl_cfg['activation'],
+            dnn_units=self.modeltpl_cfg['dnn_units'], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
 
     def forward(self, stu_id, exer_id, **kwargs):
@@ -63,7 +63,7 @@ class NCDM(GDBaseModel):
         stu_emb = self.student_emb(stu_id)
         stat_emb = torch.sigmoid(stu_emb)
         k_difficulty = torch.sigmoid(self.k_difficulty(exer_id))
-        e_difficulty = torch.sigmoid(self.e_difficulty(exer_id)) * self.model_cfg['disc_scale']
+        e_difficulty = torch.sigmoid(self.e_difficulty(exer_id)) * self.modeltpl_cfg['disc_scale']
         # prednet
         input_knowledge_point = self.Q_mat[exer_id]
         input_x = e_difficulty * (stat_emb - k_difficulty) * input_knowledge_point

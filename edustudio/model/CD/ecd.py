@@ -1,3 +1,12 @@
+r"""
+ECD
+##########################################
+
+Reference:
+    Yuqiang Zhou et al. "Modeling Context-aware Features for Cognitive Diagnosis in Student Learning" in KDD 2021.
+
+
+"""
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 from ..utils.components import PosMLP
@@ -5,29 +14,38 @@ import torch
 import torch.nn.functional as F
 
 class ECD(GDBaseModel):
+    r"""
+    ECD
+
+    default_cfg:
+        'dnn_units': [512, 256]  # dimension list of hidden layer in prediction layer
+        'dropout_rate': 0.5      # dropout rate
+        'activation': 'sigmoid'  # activation function in prediction layer
+        'disc_scale': 10         # discrimination scale
+        'emb_dim': 10           # dimension of q,k
+        'con_dim': 1            # dimension of v
+    """
     default_cfg = {
         'dnn_units': [512, 256],
         'dropout_rate': 0.5,
         'activation': 'sigmoid',
         'disc_scale': 10,
-        'max_len': 600,
         'emb_dim': 10,
         'con_dim': 1,
-        'text_embedding_dim': 100
     }
     def __init__(self, cfg):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
-        self.qk_dim = self.model_cfg["emb_dim"]
-        self.con_dim = self.model_cfg["con_dim"]
-        self.batch_size = self.trainfmt_cfg['batch_size']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
+        self.qk_dim = self.modeltpl_cfg["emb_dim"]
+        self.con_dim = self.modeltpl_cfg["con_dim"]
+        self.batch_size = self.traintpl_cfg['batch_size']
 
     def build_model(self):
-        self.con_ans_num = self.datafmt_cfg['dt_info']['qqq_count']
+        self.con_ans_num = self.datatpl_cfg['dt_info']['qqq_count']
         self.stu_q = nn.Embedding(self.n_user, self.qk_dim, padding_idx=0)
         self.qqq_group = [torch.tensor(k).to(self.device) for k in self.qqq_group_list]
         self.group_len = len(self.qqq_group)
@@ -98,7 +116,7 @@ class ECD_IRT(ECD):
     def build_model(self):
         super().build_model()
         self.theta = nn.Embedding(self.n_user, 1)  # student ability
-        self.a = 0.0 if self.model_cfg['fix_a'] else nn.Embedding(self.n_item, 1)  # exer discrimination
+        self.a = 0.0 if self.modeltpl_cfg['fix_a'] else nn.Embedding(self.n_item, 1)  # exer discrimination
         self.b = nn.Embedding(self.n_item, 1)  # exer difficulty
 
     @staticmethod
@@ -113,10 +131,10 @@ class ECD_IRT(ECD):
         b = self.b(exer_id)
         theta_context, dt_w = super().forward(stu_id, stus_qqq)
         theta_all = theta_context * dt_w + theta_inner * (1 - dt_w)
-        if self.model_cfg['diff_range'] is not None:
-            b = self.model_cfg['diff_range'] * (torch.sigmoid(b) - 0.5)
-        if self.model_cfg['a_range'] is not None:
-            a = self.model_cfg['a_range'] * torch.sigmoid(a)
+        if self.modeltpl_cfg['diff_range'] is not None:
+            b = self.modeltpl_cfg['diff_range'] * (torch.sigmoid(b) - 0.5)
+        if self.modeltpl_cfg['a_range'] is not None:
+            a = self.modeltpl_cfg['a_range'] * torch.sigmoid(a)
         else:
             a = F.softplus(a) # 让区分度大于0，保持单调性假设
         if torch.max(theta_inner != theta_inner) or torch.max(a != a) or torch.max(b != b):  # pragma: no cover
@@ -146,7 +164,7 @@ class ECD_IRT(ECD):
         loss_all = F.binary_cross_entropy(input=pd_all, target=label)
         loss_context = F.binary_cross_entropy(input=pd_context, target=label)
         loss_inner = F.binary_cross_entropy(input=pd_inner, target=label)
-        w = self.model_cfg['loss_weight']
+        w = self.modeltpl_cfg['loss_weight']
         # loss = loss_all+w[0]*loss_context+w[1]*loss_inner
         return {
             'loss_main': loss_all,
@@ -165,7 +183,7 @@ class ECD_MIRT(ECD):
     }
     def build_model(self):
         super().build_model()
-        self.emb_dim = self.model_cfg['emb_dim']
+        self.emb_dim = self.modeltpl_cfg['emb_dim']
         self.theta = nn.Embedding(self.n_user, self.emb_dim)  # student ability
         self.a = nn.Embedding(self.n_item, self.emb_dim)  # exer discrimination
         self.b = nn.Embedding(self.n_item, 1)  # exer intercept term
@@ -182,8 +200,8 @@ class ECD_MIRT(ECD):
         b = self.b(exer_id).flatten()
         theta_context, dt_w = super().forward(stu_id, stus_qqq)
         theta_all = theta_context * dt_w + theta_inner * (1 - dt_w)
-        if self.model_cfg['a_range'] is not None:
-            a = self.model_cfg['a_range'] * torch.sigmoid(a)
+        if self.modeltpl_cfg['a_range'] is not None:
+            a = self.modeltpl_cfg['a_range'] * torch.sigmoid(a)
         else:
             a = F.softplus(a) # 让区分度大于0，保持单调性假设
         if torch.max(theta_inner != theta_inner) or torch.max(a != a) or torch.max(b != b):  # pragma: no cover
@@ -213,7 +231,7 @@ class ECD_MIRT(ECD):
         loss_all = F.binary_cross_entropy(input=pd_all, target=label)
         loss_context = F.binary_cross_entropy(input=pd_context, target=label)
         loss_inner = F.binary_cross_entropy(input=pd_inner, target=label)
-        w = self.model_cfg['loss_weight']
+        w = self.modeltpl_cfg['loss_weight']
         # loss = loss_all+w[0]*loss_context+w[1]*loss_inner
         return {
             'loss_main': loss_all,
@@ -238,8 +256,8 @@ class ECD_NCD(ECD):
         self.k_difficulty = nn.Embedding(self.n_item, self.n_cpt)
         self.e_difficulty = nn.Embedding(self.n_item, 1)
         self.pd_net = PosMLP(
-            input_dim=self.n_cpt, output_dim=1, activation=self.model_cfg['activation'],
-            dnn_units=self.model_cfg['dnn_units'], dropout_rate=self.model_cfg['dropout_rate']
+            input_dim=self.n_cpt, output_dim=1, activation=self.modeltpl_cfg['activation'],
+            dnn_units=self.modeltpl_cfg['dnn_units'], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
 
     def forward(self, stu_id, exer_id, Q_mat, QQQ_list):
@@ -249,7 +267,7 @@ class ECD_NCD(ECD):
         stu_emb = self.student_emb(stu_id)
         theta_inner = torch.sigmoid(stu_emb)
         k_difficulty = torch.sigmoid(self.k_difficulty(exer_id))
-        e_difficulty = torch.sigmoid(self.e_difficulty(exer_id)) * self.model_cfg['disc_scale']
+        e_difficulty = torch.sigmoid(self.e_difficulty(exer_id)) * self.modeltpl_cfg['disc_scale']
         # prednet
         input_knowledge_point = items_Q_mat
         theta_context, dt_w = super().forward(stu_id, stus_qqq)
@@ -282,7 +300,7 @@ class ECD_NCD(ECD):
         loss_all = F.binary_cross_entropy(input=pd_all, target=label)
         loss_context = F.binary_cross_entropy(input=pd_context, target=label)
         loss_inner = F.binary_cross_entropy(input=pd_inner, target=label)
-        w = self.model_cfg['loss_weight']
+        w = self.modeltpl_cfg['loss_weight']
         # loss = loss_all+w[0]*loss_context+w[1]*loss_inner
         return {
             'loss_main': loss_all,

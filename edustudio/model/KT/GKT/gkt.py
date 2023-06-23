@@ -44,19 +44,19 @@ class GKT(GDBaseModel):
         pass
 
     def build_cfg(self):
-        self.graph_type = self.model_cfg['graph_type']
-        self.n_stu = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_exer = self.datafmt_cfg['dt_info']['exer_count']
-        self.edge_type_num = self.model_cfg['edge_type_num']
+        self.graph_type = self.modeltpl_cfg['graph_type']
+        self.n_stu = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_exer = self.datatpl_cfg['dt_info']['exer_count']
+        self.edge_type_num = self.modeltpl_cfg['edge_type_num']
 
-        self.hidden_dim = self.model_cfg['hidden_dim']
-        self.emb_dim = self.model_cfg['emb_dim']
+        self.hidden_dim = self.modeltpl_cfg['hidden_dim']
+        self.emb_dim = self.modeltpl_cfg['emb_dim']
 
         assert self.graph_type in ['Dense', 'Transition', 'DKT', 'PAM', 'MHA', 'VAE']
 
     def build_model(self):
-        self.exer_emb = nn.Embedding(self.n_exer * 2, self.model_cfg['emb_dim'])
-        self.cpt_emb = nn.Embedding(self.n_exer, self.model_cfg['emb_dim'])
+        self.exer_emb = nn.Embedding(self.n_exer * 2, self.modeltpl_cfg['emb_dim'])
+        self.cpt_emb = nn.Embedding(self.n_exer, self.modeltpl_cfg['emb_dim'])
 
         if self.graph_type in ['Dense', 'Transition', 'DKT']:
             assert  self.edge_type_num == 2
@@ -69,7 +69,7 @@ class GKT(GDBaseModel):
             else:
                 assert self.graph_model is not None
 
-        dropout = self.model_cfg['dropout']
+        dropout = self.modeltpl_cfg['dropout']
         mlp_input_dim =  self.hidden_dim + self.emb_dim
 
         self.f_self = MLP(mlp_input_dim, self.hidden_dim, self.hidden_dim, dropout=dropout)

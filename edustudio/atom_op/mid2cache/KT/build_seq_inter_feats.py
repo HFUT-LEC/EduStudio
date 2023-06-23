@@ -1,7 +1,7 @@
 from ..common.base_mid2cache import BaseMid2Cache
 import pandas as pd
 import numpy as np
-from edustudio.datafmt.utils import SpliterUtil, PadSeqUtil
+from edustudio.datatpl.utils import SpliterUtil, PadSeqUtil
 from itertools import chain
 
 
@@ -9,7 +9,7 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
     default_cfg = {
         'seed': 2023,
         'divide_by': 'stu',
-        'window_size': -1,
+        'window_size': 100,
         "divide_scale_list": [7,1,2],
         "extra_inter_feats": []
     }
@@ -21,9 +21,9 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
 
     @classmethod
     def from_cfg(cls, cfg):
-        m2c_cfg = cfg.datafmt_cfg.get(cls.__name__)
-        n_folds = cfg.datafmt_cfg.n_folds
-        is_dataset_divided = cfg.datafmt_cfg.is_dataset_divided
+        m2c_cfg = cfg.datatpl_cfg.get(cls.__name__)
+        n_folds = cfg.datatpl_cfg.n_folds
+        is_dataset_divided = cfg.datatpl_cfg.is_dataset_divided
         return cls(m2c_cfg, n_folds, is_dataset_divided)
 
     def _check_params(self):

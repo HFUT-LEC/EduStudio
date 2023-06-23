@@ -138,45 +138,45 @@ class SKVMN(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.window_size = self.datafmt_cfg['dt_info']['real_window_size']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.window_size = self.datatpl_cfg['dt_info']['real_window_size']
         
 
     def build_model(self):
-        self.x_emb_layer = nn.Embedding(2 * self.n_item, self.model_cfg['embed_dim'])
-        self.k_emb_layer = nn.Embedding(self.n_item, self.model_cfg['embed_dim'])
-        self.Mk = nn.Parameter(torch.Tensor(self.model_cfg['memory_size'], self.model_cfg['embed_dim']))
-        self.Mv = nn.Parameter(torch.Tensor(self.model_cfg['memory_size'], self.model_cfg['embed_dim']))
+        self.x_emb_layer = nn.Embedding(2 * self.n_item, self.modeltpl_cfg['embed_dim'])
+        self.k_emb_layer = nn.Embedding(self.n_item, self.modeltpl_cfg['embed_dim'])
+        self.Mk = nn.Parameter(torch.Tensor(self.modeltpl_cfg['memory_size'], self.modeltpl_cfg['embed_dim']))
+        self.Mv = nn.Parameter(torch.Tensor(self.modeltpl_cfg['memory_size'], self.modeltpl_cfg['embed_dim']))
 
         nn.init.kaiming_normal_(self.Mk)
         nn.init.kaiming_normal_(self.Mv)
 
         self.read_embed_linear = nn.Linear(
-            2 * self.model_cfg['embed_dim'],
-            self.model_cfg['embed_dim'],
+            2 * self.modeltpl_cfg['embed_dim'],
+            self.modeltpl_cfg['embed_dim'],
             bias=True
         )
         self.a_embed = nn.Linear(
-            2 * self.model_cfg['embed_dim'],
-            self.model_cfg['embed_dim'],
+            2 * self.modeltpl_cfg['embed_dim'],
+            self.modeltpl_cfg['embed_dim'],
             bias=True
             )
         self.mem = DKVMN(
-            memory_size=self.model_cfg['memory_size'],
-            memory_key_state_dim=self.model_cfg['embed_dim'],
-            memory_value_state_dim=self.model_cfg['embed_dim'],
+            memory_size=self.modeltpl_cfg['memory_size'],
+            memory_key_state_dim=self.modeltpl_cfg['embed_dim'],
+            memory_value_state_dim=self.modeltpl_cfg['embed_dim'],
             init_memory_key=self.Mk,
-            device=self.trainfmt_cfg['device']
+            device=self.traintpl_cfg['device']
         )
-        self.hx = nn.Parameter(torch.Tensor(1, self.model_cfg['embed_dim']))
-        self.cx = nn.Parameter(torch.Tensor(1, self.model_cfg['embed_dim']))
+        self.hx = nn.Parameter(torch.Tensor(1, self.modeltpl_cfg['embed_dim']))
+        self.cx = nn.Parameter(torch.Tensor(1, self.modeltpl_cfg['embed_dim']))
         nn.init.kaiming_normal_(self.hx )
         nn.init.kaiming_normal_(self.cx)
         # modify hop_lstm
-        self.lstm_cell = nn.LSTMCell(self.model_cfg['embed_dim'], self.model_cfg['embed_dim'])
-        self.dropout_layer = nn.Dropout(self.model_cfg['dropout'])
-        self.p_layer = nn.Linear(self.model_cfg['embed_dim'], 1, bias=True)
+        self.lstm_cell = nn.LSTMCell(self.modeltpl_cfg['embed_dim'], self.modeltpl_cfg['embed_dim'])
+        self.dropout_layer = nn.Dropout(self.modeltpl_cfg['dropout'])
+        self.p_layer = nn.Linear(self.modeltpl_cfg['embed_dim'], 1, bias=True)
 
     def ut_mask(self, seq_len):
         return torch.triu(torch.ones(seq_len, seq_len), diagonal=0).to(dtype=torch.bool)
@@ -188,11 +188,11 @@ class SKVMN(GDBaseModel):
         correlation_weight = torch.cat([correlation_weight[i] for i in range(correlation_weight.shape[0])], 0).unsqueeze(0)
         correlation_weight = torch.cat([(correlation_weight-a)/(b-a), (c-correlation_weight)/(c-b)], 0)
         correlation_weight, _ = torch.min(correlation_weight, 0)
-        w0 = torch.zeros(correlation_weight.shape[0]).to(self.trainfmt_cfg['device'])
+        w0 = torch.zeros(correlation_weight.shape[0]).to(self.traintpl_cfg['device'])
         correlation_weight = torch.cat([correlation_weight.unsqueeze(0), w0.unsqueeze(0)], 0)
         correlation_weight, _ = torch.max(correlation_weight, 0)
 
-        identity_vector_batch = torch.zeros(correlation_weight.shape[0]).to(self.trainfmt_cfg['device'])
+        identity_vector_batch = torch.zeros(correlation_weight.shape[0]).to(self.traintpl_cfg['device'])
         # >=0.6 set to 2，0.1-0.6 set to 1，<=0.1 set to 0
         identity_vector_batch = identity_vector_batch.masked_fill(correlation_weight.lt(0.1), 0)
         identity_vector_batch = identity_vector_batch.masked_fill(correlation_weight.ge(0.1), 1)
@@ -210,10 +210,10 @@ class SKVMN(GDBaseModel):
         iv_matrix_product = torch.bmm(identity_vector_batch, identity_vector_batch.transpose(2,1)) # A * A.T 
         # A^2 + B^2 - 2A*B.T
         iv_distances = iv_square_norm + unique_iv_square_norm - 2 * iv_matrix_product
-        iv_distances = torch.where(iv_distances>0.0, torch.tensor(-1e32).to(self.trainfmt_cfg['device']), iv_distances) 
-        masks = self.ut_mask(iv_distances.shape[1]).to(self.trainfmt_cfg['device'])
-        mask_iv_distances = iv_distances.masked_fill(masks, value=torch.tensor(-1e32).to(self.trainfmt_cfg['device'])) 
-        idx_matrix = torch.arange(0,seqlen * seqlen,1).reshape(seqlen,-1).repeat(self.bs,1,1).to(self.trainfmt_cfg['device'])
+        iv_distances = torch.where(iv_distances>0.0, torch.tensor(-1e32).to(self.traintpl_cfg['device']), iv_distances) 
+        masks = self.ut_mask(iv_distances.shape[1]).to(self.traintpl_cfg['device'])
+        mask_iv_distances = iv_distances.masked_fill(masks, value=torch.tensor(-1e32).to(self.traintpl_cfg['device'])) 
+        idx_matrix = torch.arange(0,seqlen * seqlen,1).reshape(seqlen,-1).repeat(self.bs,1,1).to(self.traintpl_cfg['device'])
         final_iv_distance = mask_iv_distances + idx_matrix 
         values, indices = torch.topk(final_iv_distance, 1, dim=2, largest=True) 
 
@@ -228,7 +228,7 @@ class SKVMN(GDBaseModel):
         if len(identity_idx) > 0:
             identity_idx = torch.stack(identity_idx, dim=0)
         else:
-            identity_idx = torch.tensor([]).to(self.trainfmt_cfg['device'])
+            identity_idx = torch.tensor([]).to(self.traintpl_cfg['device'])
 
         return identity_idx 
 
@@ -242,12 +242,12 @@ class SKVMN(GDBaseModel):
         correlation_weight_list = []  # seqlen * bs * mem_size | correlation_weight
         ft = []
         # After atten about new question, Update Memory-value
-        mem_value = self.Mv.unsqueeze(0).repeat(self.bs, 1, 1).to(self.trainfmt_cfg['device'])  # bs * mem_size * dim
+        mem_value = self.Mv.unsqueeze(0).repeat(self.bs, 1, 1).to(self.traintpl_cfg['device'])  # bs * mem_size * dim
         for i in range(self.window_size):
             # k: bs * seqlen * dim
             q = k.permute(1, 0, 2)[i]  # q: bs * dim
             # attention Process
-            correlation_weight = self.mem.attention(q).to(self.trainfmt_cfg['device'])  # bs * memory_size
+            correlation_weight = self.mem.attention(q).to(self.traintpl_cfg['device'])  # bs * memory_size
             
             # Read Process
             read_content = self.mem.read(correlation_weight, mem_value)  # read_count: bs * dim
@@ -264,7 +264,7 @@ class SKVMN(GDBaseModel):
             # Write Process  |  student response + f-vector 
             y = self.x_emb_layer(x[:,i])
             write_embed = torch.cat([f, y], 1) # bz * (f_dim + y_dim)
-            write_embed = self.a_embed(write_embed).to(self.trainfmt_cfg['device']) # bs * dim
+            write_embed = self.a_embed(write_embed).to(self.traintpl_cfg['device']) # bs * dim
             mem_value = self.mem.write(correlation_weight, write_embed, mem_value)
         # w: bs * seqlen * mem_size
         w = torch.cat([correlation_weight_list[i].unsqueeze(1) for i in range(self.window_size)], 1)

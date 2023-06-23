@@ -25,40 +25,40 @@ class QIKT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
-        self.output_c_all_lambda = self.model_cfg['output_c_all_lambda']
-        self.output_c_next_lambda = self.model_cfg['output_c_next_lambda']
-        self.output_q_all_lambda = self.model_cfg['output_q_all_lambda']
-        self.output_q_next_lambda = self.model_cfg['output_q_next_lambda']
-        self.loss_c_all_lambda = self.model_cfg['loss_c_all_lambda']
-        self.loss_c_next_lambda = self.model_cfg['loss_c_next_lambda']
-        self.loss_q_all_lambda = self.model_cfg['loss_q_all_lambda']
-        self.loss_q_next_lambda = self.model_cfg['loss_q_next_lambda']
-        self.output_mode = self.model_cfg['output_mode']
-        self.device = self.trainfmt_cfg['device']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
+        self.output_c_all_lambda = self.modeltpl_cfg['output_c_all_lambda']
+        self.output_c_next_lambda = self.modeltpl_cfg['output_c_next_lambda']
+        self.output_q_all_lambda = self.modeltpl_cfg['output_q_all_lambda']
+        self.output_q_next_lambda = self.modeltpl_cfg['output_q_next_lambda']
+        self.loss_c_all_lambda = self.modeltpl_cfg['loss_c_all_lambda']
+        self.loss_c_next_lambda = self.modeltpl_cfg['loss_c_next_lambda']
+        self.loss_q_all_lambda = self.modeltpl_cfg['loss_q_all_lambda']
+        self.loss_q_next_lambda = self.modeltpl_cfg['loss_q_next_lambda']
+        self.output_mode = self.modeltpl_cfg['output_mode']
+        self.device = self.traintpl_cfg['device']
 
     def build_model(self):
         num_q, num_c = self.n_item, self.n_cpt
         self.exer_emb = nn.Embedding(
-            self.n_item, self.model_cfg['emb_size']
+            self.n_item, self.modeltpl_cfg['emb_size']
         )
         self.cpt_emb = nn.Embedding(
-            self.n_cpt, self.model_cfg['emb_size']
+            self.n_cpt, self.modeltpl_cfg['emb_size']
         )
-        self.que_lstm_layer = nn.LSTM(self.model_cfg['emb_size'] * 4, self.model_cfg['hidden_size'], batch_first=True)
-        self.concept_lstm_layer = nn.LSTM(self.model_cfg['emb_size'] * 2, self.model_cfg['hidden_size'], batch_first=True)
+        self.que_lstm_layer = nn.LSTM(self.modeltpl_cfg['emb_size'] * 4, self.modeltpl_cfg['hidden_size'], batch_first=True)
+        self.concept_lstm_layer = nn.LSTM(self.modeltpl_cfg['emb_size'] * 2, self.modeltpl_cfg['hidden_size'], batch_first=True)
 
-        self.dropout_layer = nn.Dropout(self.model_cfg['dropout_rate'])
+        self.dropout_layer = nn.Dropout(self.modeltpl_cfg['dropout_rate'])
 
-        self.out_question_next = MLP(self.model_cfg['mlp_layer_num'], self.model_cfg['hidden_size'] * 3, 1, self.model_cfg['dropout_rate'])
-        self.out_question_all = MLP(self.model_cfg['mlp_layer_num'], self.model_cfg['hidden_size'], num_q, self.model_cfg['dropout_rate'])
+        self.out_question_next = MLP(self.modeltpl_cfg['mlp_layer_num'], self.modeltpl_cfg['hidden_size'] * 3, 1, self.modeltpl_cfg['dropout_rate'])
+        self.out_question_all = MLP(self.modeltpl_cfg['mlp_layer_num'], self.modeltpl_cfg['hidden_size'], num_q, self.modeltpl_cfg['dropout_rate'])
 
-        self.out_concept_next = MLP(self.model_cfg['mlp_layer_num'], self.model_cfg['hidden_size'] * 3, num_c, self.model_cfg['dropout_rate'])
-        self.out_concept_all = MLP(self.model_cfg['mlp_layer_num'], self.model_cfg['hidden_size'], num_c, self.model_cfg['dropout_rate'])
+        self.out_concept_next = MLP(self.modeltpl_cfg['mlp_layer_num'], self.modeltpl_cfg['hidden_size'] * 3, num_c, self.modeltpl_cfg['dropout_rate'])
+        self.out_concept_all = MLP(self.modeltpl_cfg['mlp_layer_num'], self.modeltpl_cfg['hidden_size'], num_c, self.modeltpl_cfg['dropout_rate'])
 
-        self.que_disc = MLP(self.model_cfg['mlp_layer_num'], self.model_cfg['hidden_size'] * 2, 1, self.model_cfg['dropout_rate'])
+        self.que_disc = MLP(self.modeltpl_cfg['mlp_layer_num'], self.modeltpl_cfg['hidden_size'] * 2, 1, self.modeltpl_cfg['dropout_rate'])
 
     def forward(self, exer_seq, label_seq, cpt_seq, cpt_seq_mask, **kwargs):
 
@@ -67,8 +67,8 @@ class QIKT(GDBaseModel):
         # obtain emb_q, emb_c, emb_qca, emb_qc
         emb_q = self.exer_emb(exer_seq)
         k = self.cpt_emb(cpt_seq)
-        emb_c = torch.sum(k * (cpt_seq_mask.unsqueeze(3).repeat(1, 1, 1, self.model_cfg['emb_size'])),
-                          dim=2) / cpt_seq_mask.sum(dim=2).unsqueeze(2).repeat(1, 1, self.model_cfg['emb_size'])
+        emb_c = torch.sum(k * (cpt_seq_mask.unsqueeze(3).repeat(1, 1, 1, self.modeltpl_cfg['emb_size'])),
+                          dim=2) / cpt_seq_mask.sum(dim=2).unsqueeze(2).repeat(1, 1, self.modeltpl_cfg['emb_size'])
 
 
         e_tmp = torch.cat((emb_q, emb_c), dim=2)
@@ -82,17 +82,17 @@ class QIKT(GDBaseModel):
         emb_qca_current = emb_qca[:, :-1, :]
         # question model
         que_h = self.dropout_layer(self.que_lstm_layer(emb_qca_current)[0])
-        que_outputs = self.get_outputs(emb_qc_shift, que_h, data=exer_seq[:, 1:], add_name="", model_type="question")
+        que_outputs = self.get_outputs(emb_qc_shift, que_h, data=exer_seq[:, 1:], add_name="", modeltpl_type="question")
         outputs = que_outputs
 
         # concept model
-        emb_ca = torch.cat([emb_c.mul((1 - label_seq).unsqueeze(-1).repeat(1, 1, self.model_cfg['emb_size'])),
-                            emb_c.mul((label_seq).unsqueeze(-1).repeat(1, 1, self.model_cfg['emb_size']))], dim=-1)  # s_t 扩展，分别对应正确的错误的情况
+        emb_ca = torch.cat([emb_c.mul((1 - label_seq).unsqueeze(-1).repeat(1, 1, self.modeltpl_cfg['emb_size'])),
+                            emb_c.mul((label_seq).unsqueeze(-1).repeat(1, 1, self.modeltpl_cfg['emb_size']))], dim=-1)  # s_t 扩展，分别对应正确的错误的情况
 
         emb_ca_current = emb_ca[:, :-1, :]
         # emb_c_shift = emb_c[:,1:,:]
         concept_h = self.dropout_layer(self.concept_lstm_layer(emb_ca_current)[0])
-        concept_outputs = self.get_outputs(emb_qc_shift, concept_h, data=(cpt_seq[:, 1:, :], cpt_seq_mask[:, 1:, :]), add_name="", model_type="concept")
+        concept_outputs = self.get_outputs(emb_qc_shift, concept_h, data=(cpt_seq[:, 1:, :], cpt_seq_mask[:, 1:, :]), add_name="", modeltpl_type="concept")
         outputs['y_concept_all'] = concept_outputs['y_concept_all']
         outputs['y_concept_next'] = concept_outputs['y_concept_next']
 
@@ -164,10 +164,10 @@ class QIKT(GDBaseModel):
         return self.get_main_loss(**kwargs)
 
 
-    def get_outputs(self, emb_qc_shift, h, data, add_name="", model_type='question'):
+    def get_outputs(self, emb_qc_shift, h, data, add_name="", modeltpl_type='question'):
         outputs = {}
 
-        if model_type == 'question':
+        if modeltpl_type == 'question':
             h_next = torch.cat([emb_qc_shift, h], axis=-1)
             y_question_next = torch.sigmoid(self.out_question_next(h_next))
             y_question_all = torch.sigmoid(self.out_question_all(h))

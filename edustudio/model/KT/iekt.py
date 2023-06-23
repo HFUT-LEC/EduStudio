@@ -83,35 +83,35 @@ class IEKT(GDBaseModel):
     }
 
     def build_cfg(self):
-        self.n_stu = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_exer = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
-        self.window_size = self.datafmt_cfg['dt_info']['real_window_size']
-        self.n_cog_level = self.model_cfg['n_cog_level']
-        self.n_acq_level = self.model_cfg['n_acq_level']
-        self.d_v = self.model_cfg['d_h'] + self.model_cfg['d_q'] + self.model_cfg['d_c']
-        self.d_r = self.d_v + self.model_cfg['d_m']
-        self.d_i = self.model_cfg['d_q'] + self.model_cfg['d_c'] + self.model_cfg['d_s']
+        self.n_stu = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_exer = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
+        self.window_size = self.datatpl_cfg['dt_info']['real_window_size']
+        self.n_cog_level = self.modeltpl_cfg['n_cog_level']
+        self.n_acq_level = self.modeltpl_cfg['n_acq_level']
+        self.d_v = self.modeltpl_cfg['d_h'] + self.modeltpl_cfg['d_q'] + self.modeltpl_cfg['d_c']
+        self.d_r = self.d_v + self.modeltpl_cfg['d_m']
+        self.d_i = self.modeltpl_cfg['d_q'] + self.modeltpl_cfg['d_c'] + self.modeltpl_cfg['d_s']
 
     def build_model(self):
-        self.exer_emb = nn.Embedding(self.n_exer, self.model_cfg['d_q'])
-        self.cpt_emb = nn.Embedding(self.n_cpt, self.model_cfg['d_c'])
-        self.cog_matrix = nn.Embedding(self.n_cog_level, self.model_cfg['d_m'])
-        self.acq_matrix = nn.Embedding(self.n_acq_level, self.model_cfg['d_s'])
+        self.exer_emb = nn.Embedding(self.n_exer, self.modeltpl_cfg['d_q'])
+        self.cpt_emb = nn.Embedding(self.n_cpt, self.modeltpl_cfg['d_c'])
+        self.cog_matrix = nn.Embedding(self.n_cog_level, self.modeltpl_cfg['d_m'])
+        self.acq_matrix = nn.Embedding(self.n_acq_level, self.modeltpl_cfg['d_s'])
 
         self.pd_layer = MLP(
             input_dim=self.d_r, output_dim=1, 
-            dnn_units=[self.d_r], dropout_rate=self.model_cfg['dropout_rate']
+            dnn_units=[self.d_r], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
         self.f_p = MLP(
             input_dim=self.d_v, output_dim=self.n_cog_level, 
-            dnn_units=[self.d_r], dropout_rate=self.model_cfg['dropout_rate']
+            dnn_units=[self.d_r], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
         self.f_e = MLP(
             input_dim=self.d_v * 4, output_dim=self.n_acq_level,
-            dnn_units=[self.d_r], dropout_rate=self.model_cfg['dropout_rate']
+            dnn_units=[self.d_r], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
-        self.gru_h = mygru(0, self.d_i, self.model_cfg['d_h'])
+        self.gru_h = mygru(0, self.d_i, self.modeltpl_cfg['d_h'])
 
     def get_exer_representation(self, exer_ids, cpt_seq, cpt_seq_mask):
         exer_emb = self.exer_emb(exer_ids) # windows_size x emb size
@@ -146,7 +146,7 @@ class IEKT(GDBaseModel):
 
         batch_size = exer_seq.shape[0]
         seq_len = exer_seq.shape[1]
-        h = torch.zeros(batch_size, self.model_cfg['d_h']).to(self.device)
+        h = torch.zeros(batch_size, self.modeltpl_cfg['d_h']).to(self.device)
         p_action_list, pre_state_list, emb_action_list, states_list, reward_list, predict_list, ground_truth_list = [], [], [], [], [], [], []
 
 
@@ -234,7 +234,7 @@ class IEKT(GDBaseModel):
             advantage_lst_cog = []
             advantage = 0.0
             for delta_t in delta_cog[::-1]:
-                advantage = self.model_cfg['gamma'] * advantage + delta_t[0]
+                advantage = self.modeltpl_cfg['gamma'] * advantage + delta_t[0]
                 advantage_lst_cog.append([advantage])
             advantage_lst_cog.reverse()
             advantage_cog = torch.tensor(advantage_lst_cog, dtype=torch.float).to(self.device)
@@ -249,7 +249,7 @@ class IEKT(GDBaseModel):
             advantage_lst_sens = []
             advantage = 0.0
             for delta_t in delta_sens[::-1]:
-                advantage = self.model_cfg['gamma'] * advantage + delta_t[0]
+                advantage = self.modeltpl_cfg['gamma'] * advantage + delta_t[0]
                 advantage_lst_sens.append([advantage])
             advantage_lst_sens.reverse()
             advantage_sens = torch.tensor(advantage_lst_sens, dtype=torch.float).to(self.device)
@@ -271,7 +271,7 @@ class IEKT(GDBaseModel):
            
         label_len = torch.cat(tracat_ground_truth, dim = 0).size()[0]
         loss_l = sum(loss)
-        loss = self.model_cfg['lambda'] * (loss_l / label_len) +  bce
+        loss = self.modeltpl_cfg['lambda'] * (loss_l / label_len) +  bce
         return {
             'loss_main': loss
         }
@@ -290,7 +290,7 @@ class IEKT(GDBaseModel):
 
         batch_size = exer_seq.shape[0]
         seq_len = exer_seq.shape[1]
-        h = torch.zeros(batch_size, self.model_cfg['d_h']).to(self.device)
+        h = torch.zeros(batch_size, self.modeltpl_cfg['d_h']).to(self.device)
         batch_probs, uni_prob_list =[], []
 
 

@@ -16,30 +16,30 @@ class SAKT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
 
     def build_model(self):
-        self.M = nn.Embedding(self.n_item * 2, self.model_cfg['emb_size'])
-        self.E = nn.Embedding(self.n_item, self.model_cfg['emb_size'])
-        self.P = nn.Parameter(torch.Tensor(self.model_cfg['max_length'] - 1, self.model_cfg['emb_size']))
+        self.M = nn.Embedding(self.n_item * 2, self.modeltpl_cfg['emb_size'])
+        self.E = nn.Embedding(self.n_item, self.modeltpl_cfg['emb_size'])
+        self.P = nn.Parameter(torch.Tensor(self.modeltpl_cfg['max_length'] - 1, self.modeltpl_cfg['emb_size']))
 
         self.attn = nn.MultiheadAttention(
-            self.model_cfg['emb_size'], self.model_cfg['n_attn_heads'], dropout=self.model_cfg['dropout_rate']
+            self.modeltpl_cfg['emb_size'], self.modeltpl_cfg['n_attn_heads'], dropout=self.modeltpl_cfg['dropout_rate']
         )
-        self.attn_dropout = nn.Dropout(self.model_cfg['dropout_rate'])
-        self.attn_layer_norm = nn.LayerNorm(self.model_cfg['emb_size'])
+        self.attn_dropout = nn.Dropout(self.modeltpl_cfg['dropout_rate'])
+        self.attn_layer_norm = nn.LayerNorm(self.modeltpl_cfg['emb_size'])
 
         self.FFN = nn.Sequential(
-            nn.Linear(self.model_cfg['emb_size'], self.model_cfg['emb_size']),
+            nn.Linear(self.modeltpl_cfg['emb_size'], self.modeltpl_cfg['emb_size']),
             nn.ReLU(),
-            nn.Dropout(self.model_cfg['dropout_rate']),
-            nn.Linear(self.model_cfg['emb_size'], self.model_cfg['emb_size']),
-            nn.Dropout(self.model_cfg['dropout_rate']),
+            nn.Dropout(self.modeltpl_cfg['dropout_rate']),
+            nn.Linear(self.modeltpl_cfg['emb_size'], self.modeltpl_cfg['emb_size']),
+            nn.Dropout(self.modeltpl_cfg['dropout_rate']),
         )
-        self.FFN_layer_norm = nn.LayerNorm(self.model_cfg['emb_size'])
+        self.FFN_layer_norm = nn.LayerNorm(self.modeltpl_cfg['emb_size'])
 
-        self.pred = nn.Linear(self.model_cfg['emb_size'], 1)
+        self.pred = nn.Linear(self.modeltpl_cfg['emb_size'], 1)
 
     def forward(self, exer_seq, label_seq, **kwargs):
         q, r, qry = exer_seq[:, :-1].to(torch.int64), label_seq[:, :-1].to(torch.int64), exer_seq[:, 1:].to(torch.int64)

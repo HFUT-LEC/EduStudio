@@ -120,9 +120,9 @@ class RCD(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def add_extra_data(self, **kwargs):
         self.local_map = kwargs.pop('local_map')
@@ -133,7 +133,7 @@ class RCD(GDBaseModel):
         self.emb_num = self.n_user
         self.stu_dim = self.knowledge_dim
         self.prednet_input_len = self.knowledge_dim
-        self.prednet_len1, self.prednet_len2 = self.model_cfg['prednet_len1'], self.model_cfg['prednet_len2']
+        self.prednet_len1, self.prednet_len2 = self.modeltpl_cfg['prednet_len1'], self.modeltpl_cfg['prednet_len2']
         self.directed_g = self.local_map['directed_g'].to(self.device)
         self.undirected_g = self.local_map['undirected_g'].to(self.device)
         self.k_from_e = self.local_map['k_from_e'].to(self.device)

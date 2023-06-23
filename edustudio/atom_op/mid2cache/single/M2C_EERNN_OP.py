@@ -3,7 +3,7 @@ from itertools import chain
 import torch
 import pandas as pd
 import numpy as np
-from edustudio.datafmt.utils import PadSeqUtil
+from edustudio.datatpl.utils import PadSeqUtil
 import copy
 
 

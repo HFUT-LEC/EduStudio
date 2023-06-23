@@ -47,13 +47,13 @@ class MGCD(GDBaseModel):
             self.stu_exe2label[(stu_id, exer_id)] = label
 
     def build_cfg(self):
-        self.group_n = self.datafmt_cfg['dt_info']['group_count']
-        self.exer_n = self.datafmt_cfg['dt_info']['exer_count']
-        self.knowledge_dim = self.datafmt_cfg['dt_info']['cpt_count']
+        self.group_n = self.datatpl_cfg['dt_info']['group_count']
+        self.exer_n = self.datatpl_cfg['dt_info']['exer_count']
+        self.knowledge_dim = self.datatpl_cfg['dt_info']['cpt_count']
         self.stu_dim = self.knowledge_dim
         self.prednet_input_len = self.knowledge_dim
-        self.prednet_len1 = self.model_cfg['prednet_len1']
-        self.prednet_len2 = self.model_cfg['prednet_len2']
+        self.prednet_len1 = self.modeltpl_cfg['prednet_len1']
+        self.prednet_len2 = self.modeltpl_cfg['prednet_len2']
         self.num_hidden = self.stu_dim
 
 

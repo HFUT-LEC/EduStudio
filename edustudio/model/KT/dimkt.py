@@ -1,4 +1,14 @@
-import math
+r"""
+DIMKT
+##########################################
+
+Reference:
+    Shuanghong Shen et al. "Assessing Student’s Dynamic Knowledge State by Exploring the Question Difficulty Effect" in SIGIR 2022.
+
+Reference Code:
+    https://github.com/pykt-team/pykt-toolkit/blob/main/pykt/models/dimkt.py
+
+"""
 from torch.autograd import Variable
 from torch.nn import Embedding, Linear, Sigmoid, Tanh, Dropout
 
@@ -10,6 +20,15 @@ import numpy as np
 from torch.nn.init import xavier_uniform_, constant_
 
 class DIMKT(GDBaseModel):
+    r"""
+    DIMKT
+
+    default_cfg:
+       'emb_size': 128  # dimension of embedding
+       'dropout_rate': 0.2      # dropout rate
+       'num_steps': 199  # num_steps
+       'difficult_levels': 100+2         # difficulty level of the exercises
+    """
     default_cfg = {
         'emb_size': 128,
         'num_steps': 199,
@@ -18,13 +37,13 @@ class DIMKT(GDBaseModel):
     }
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.num_q = self.datafmt_cfg['dt_info']['exer_count']
-        self.num_c = self.datafmt_cfg['dt_info']['cpt_count']
-        self.emb_size = self.model_cfg['emb_size']
-        self.dropout = self.model_cfg['dropout']
-        self.difficult_levels = self.model_cfg['difficult_levels']
-        self.num_steps = self.model_cfg['num_steps']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.num_q = self.datatpl_cfg['dt_info']['exer_count']
+        self.num_c = self.datatpl_cfg['dt_info']['cpt_count']
+        self.emb_size = self.modeltpl_cfg['emb_size']
+        self.dropout = self.modeltpl_cfg['dropout']
+        self.difficult_levels = self.modeltpl_cfg['difficult_levels']
+        self.num_steps = self.modeltpl_cfg['num_steps']
         
     def build_model(self):
         self.sigmoid = Sigmoid()

@@ -1,6 +1,6 @@
 from ..common.base_mid2cache import BaseMid2Cache
 import numpy as np
-from edustudio.datafmt.utils import PadSeqUtil
+from edustudio.datatpl.utils import PadSeqUtil
 
 
 class M2C_GenCptSeq(BaseMid2Cache):

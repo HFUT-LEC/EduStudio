@@ -9,7 +9,7 @@ import os
 def init_all(cfg: UnifyConfig):
     frame_cfg = cfg.frame_cfg
     dataset = cfg.dataset
-    trainfmt_cls =cfg.trainfmt_cfg.cls if isinstance(cfg.trainfmt_cfg.cls, str) else cfg.trainfmt_cfg.cls.__name__
+    traintpl_cls =cfg.traintpl_cfg.cls if isinstance(cfg.traintpl_cfg.cls, str) else cfg.traintpl_cfg.cls.__name__
 
     frame_cfg.data_folder_path = f"{frame_cfg.DATA_FOLDER_PATH}/{dataset}"
     # PathUtil.check_path_exist(frame_cfg.data_folder_path)
@@ -17,8 +17,8 @@ def init_all(cfg: UnifyConfig):
     frame_cfg.TEMP_FOLDER_PATH = os.path.realpath(frame_cfg.TEMP_FOLDER_PATH)
     frame_cfg.ARCHIVE_FOLDER_PATH = os.path.realpath(frame_cfg.ARCHIVE_FOLDER_PATH)
 
-    frame_cfg.temp_folder_path = f"{frame_cfg.TEMP_FOLDER_PATH}/{dataset}/{trainfmt_cls}/{cfg.model_cfg.cls}/{frame_cfg.ID}"
-    frame_cfg.archive_folder_path = f"{frame_cfg.ARCHIVE_FOLDER_PATH}/{dataset}/{trainfmt_cls}/{cfg.model_cfg.cls}"
+    frame_cfg.temp_folder_path = f"{frame_cfg.TEMP_FOLDER_PATH}/{dataset}/{traintpl_cls}/{cfg.modeltpl_cfg.cls}/{frame_cfg.ID}"
+    frame_cfg.archive_folder_path = f"{frame_cfg.ARCHIVE_FOLDER_PATH}/{dataset}/{traintpl_cls}/{cfg.modeltpl_cfg.cls}"
     PathUtil.auto_create_folder_path(
         frame_cfg.temp_folder_path, frame_cfg.archive_folder_path
     )

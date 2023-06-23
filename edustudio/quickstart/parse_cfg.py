@@ -9,10 +9,10 @@ import importlib
 def get_global_cfg(
     dataset:str,
     cfg_file_name:str,
-    trainfmt_cfg_dict: Dict[str, Any],
-    datafmt_cfg_dict:  Dict[str, Any],
-    evalfmt_cfg_dict:  Dict[str, Any],
-    model_cfg_dict: Dict[str, Any],
+    traintpl_cfg_dict: Dict[str, Any],
+    datatpl_cfg_dict:  Dict[str, Any],
+    evaltpl_cfg_dict:  Dict[str, Any],
+    modeltpl_cfg_dict: Dict[str, Any],
     frame_cfg_dict:  Dict[str, Any],
 ):
     parser = argparse.ArgumentParser()
@@ -20,20 +20,20 @@ def get_global_cfg(
                         help='dataset name', dest='dataset', default=dataset)
     parser.add_argument('--cfg_file_name', '-f', type=str,
                         help='config filename', dest='cfg_file_name', default=cfg_file_name)
-    parser.add_argument('--trainfmt_cfg.cls', '-trainfmt_cls', type=str,
-                        dest='trainfmt_cls', default=trainfmt_cfg_dict.get('cls', None))
-    parser.add_argument('--datafmt_cfg.cls', '-datafmt_cls', type=str,
-                        dest='datafmt_cls', default=datafmt_cfg_dict.get('cls', None))
-    parser.add_argument('--model_cfg.cls', '-model_cls', type=str,
-                        dest='model_cls', default=model_cfg_dict.get('cls', None))
-    parser.add_argument('--evalfmt_cfg.clses', '-evalfmt_clses', nargs='+',
-                        dest='evalfmt_clses', default=evalfmt_cfg_dict.get('clses', None))
-    parser.add_argument('--datafmt_cfg.backbone_datafmt_cls', '-datafmt_backbone_cls', type=str,
-                        dest='backbone_datafmt_cls', default=datafmt_cfg_dict.get('backbone_datafmt_cls', None))
-    parser.add_argument('--model_cfg.backbone_model_cls', '-model_backbone_cls', type=str,
-                        dest='backbone_model_cls', default=model_cfg_dict.get('backbone_model_cls', None))
-    parser.add_argument('--datafmt_cfg.mid2cache_op_seq', '-mid2cache_op_seq', type=str,
-                        dest='mid2cache_op_seq', default=datafmt_cfg_dict.get('mid2cache_op_seq', None))   
+    parser.add_argument('--traintpl_cfg.cls', '-traintpl_cls', type=str,
+                        dest='traintpl_cls', default=traintpl_cfg_dict.get('cls', None))
+    parser.add_argument('--datatpl_cfg.cls', '-datatpl_cls', type=str,
+                        dest='datatpl_cls', default=datatpl_cfg_dict.get('cls', None))
+    parser.add_argument('--modeltpl_cfg.cls', '-modeltpl_cls', type=str,
+                        dest='modeltpl_cls', default=modeltpl_cfg_dict.get('cls', None))
+    parser.add_argument('--evaltpl_cfg.clses', '-evaltpl_clses', nargs='+',
+                        dest='evaltpl_clses', default=evaltpl_cfg_dict.get('clses', None))
+    parser.add_argument('--datatpl_cfg.backbone_datatpl_cls', '-datatpl_backbone_cls', type=str,
+                        dest='backbone_datatpl_cls', default=datatpl_cfg_dict.get('backbone_datatpl_cls', None))
+    parser.add_argument('--modeltpl_cfg.backbone_modeltpl_cls', '-modeltpl_backbone_cls', type=str,
+                        dest='backbone_modeltpl_cls', default=modeltpl_cfg_dict.get('backbone_modeltpl_cls', None))
+    parser.add_argument('--datatpl_cfg.mid2cache_op_seq', '-mid2cache_op_seq', type=str,
+                        dest='mid2cache_op_seq', default=datatpl_cfg_dict.get('mid2cache_op_seq', None))   
     args, unknown_args = parser.parse_known_args()
     assert args.dataset is not None
     
@@ -45,14 +45,14 @@ def get_global_cfg(
             assert unknown_args[2 * i].startswith("--"), \
                 "the first term in extra parameter[except dt and cfg_file_name] pair should start with '--'"
             key, value = unknown_args[2 * i][2:], unknown_args[2 * i + 1]
-            if key.startswith('trainfmt_cfg.'):
-                unknown_arg_dict['trainfmt_cfg'][key] = value
-            elif key.startswith('datafmt_cfg.'):
-                unknown_arg_dict['datafmt_cfg'][key] = value
-            elif key.startswith('model_cfg.'):
-                unknown_arg_dict['model_cfg'][key] = value
-            elif key.startswith('evalfmt_cfg.'):
-               unknown_arg_dict['evalfmt_cfg'][key] = value
+            if key.startswith('traintpl_cfg.'):
+                unknown_arg_dict['traintpl_cfg'][key] = value
+            elif key.startswith('datatpl_cfg.'):
+                unknown_arg_dict['datatpl_cfg'][key] = value
+            elif key.startswith('modeltpl_cfg.'):
+                unknown_arg_dict['modeltpl_cfg'][key] = value
+            elif key.startswith('evaltpl_cfg.'):
+               unknown_arg_dict['evaltpl_cfg'][key] = value
             elif key.startswith('frame_cfg.'):
                 unknown_arg_dict['frame_cfg'][key] = value
             else:
@@ -60,8 +60,8 @@ def get_global_cfg(
 
 
     cfg = UnifyConfig({
-        'trainfmt_cfg': UnifyConfig(), 'datafmt_cfg': UnifyConfig(),
-        'model_cfg': UnifyConfig(), 'evalfmt_cfg': UnifyConfig(), 
+        'traintpl_cfg': UnifyConfig(), 'datatpl_cfg': UnifyConfig(),
+        'modeltpl_cfg': UnifyConfig(), 'evaltpl_cfg': UnifyConfig(), 
         'frame_cfg': UnifyConfig()
     })
     cfg.dataset = args.dataset
@@ -78,10 +78,10 @@ def get_global_cfg(
             v = type(cfg.frame_cfg)(literal_eval(v))
         cfg.dot_set(k, v)
 
-    trainfmt_cls = args.trainfmt_cls
-    datafmt_cls = args.datafmt_cls
-    model_cls = args.model_cls
-    evalfmt_clses = args.evalfmt_clses
+    traintpl_cls = args.traintpl_cls
+    datatpl_cls = args.datatpl_cls
+    modeltpl_cls = args.modeltpl_cls
+    evaltpl_clses = args.evaltpl_clses
     if args.cfg_file_name is not None:
         yaml_cfg = UnifyConfig.from_yml_file(
             f"{cfg.frame_cfg['CFG_FOLDER_PATH']}/{cfg.dataset}/{args.cfg_file_name}"
@@ -89,105 +89,128 @@ def get_global_cfg(
         assert 'frame_cfg' not in yaml_cfg
         assert 'dataset' not in yaml_cfg
         assert 'logger' not in yaml_cfg
-        trainfmt_cls = trainfmt_cls or yaml_cfg.get('trainfmt_cfg', {'cls': None}).get("cls")
-        datafmt_cls = datafmt_cls or yaml_cfg.get('datafmt_cfg', {'cls': None}).get("cls")
-        model_cls = model_cls or yaml_cfg.get('model_cfg', {'cls': None}).get("cls")
-        evalfmt_clses = evalfmt_clses or yaml_cfg.get('evalfmt_cfg', {'clses': None}).get("clses")
+        traintpl_cls = traintpl_cls or yaml_cfg.get('traintpl_cfg', {'cls': None}).get("cls")
+        datatpl_cls = datatpl_cls or yaml_cfg.get('datatpl_cfg', {'cls': None}).get("cls")
+        modeltpl_cls = modeltpl_cls or yaml_cfg.get('modeltpl_cfg', {'cls': None}).get("cls")
+        evaltpl_clses = evaltpl_clses or yaml_cfg.get('evaltpl_cfg', {'clses': None}).get("clses")
 
-        args.backbone_model_cls = args.backbone_model_cls or yaml_cfg.get('model_cfg', {'backbone_model_cls': None}).get("backbone_model_cls")
-        args.backbone_datafmt_cls = args.backbone_datafmt_cls or yaml_cfg.get('datafmt_cfg', {'backbone_datafmt_cls': None}).get("backbone_datafmt_cls")
-        args.mid2cache_op_seq = args.mid2cache_op_seq or yaml_cfg.get('datafmt_cfg', {'mid2cache_op_seq': None}).get("mid2cache_op_seq")
+        args.backbone_modeltpl_cls = args.backbone_modeltpl_cls or yaml_cfg.get('modeltpl_cfg', {'backbone_modeltpl_cls': None}).get("backbone_modeltpl_cls")
+        args.backbone_datatpl_cls = args.backbone_datatpl_cls or yaml_cfg.get('datatpl_cfg', {'backbone_datatpl_cls': None}).get("backbone_datatpl_cls")
+        args.mid2cache_op_seq = args.mid2cache_op_seq or yaml_cfg.get('datatpl_cfg', {'mid2cache_op_seq': None}).get("mid2cache_op_seq")
 
-    assert trainfmt_cls is not None
-    assert datafmt_cls is not None
-    assert model_cls is not None
-    assert evalfmt_clses is not None
-    assert len(set(evalfmt_clses)) == len(evalfmt_clses)
+    assert traintpl_cls is not None
+    assert datatpl_cls is not None
+    assert modeltpl_cls is not None
+    assert evaltpl_clses is not None
+    assert len(set(evaltpl_clses)) == len(evaltpl_clses)
 
 
-    cfg.dot_set('trainfmt_cfg.cls', trainfmt_cls)
-    cfg.dot_set('datafmt_cfg.cls', datafmt_cls)
-    cfg.dot_set('model_cfg.cls', model_cls)
-    cfg.dot_set('evalfmt_cfg.clses', evalfmt_clses)
+    cfg.dot_set('traintpl_cfg.cls', traintpl_cls)
+    cfg.dot_set('datatpl_cfg.cls', datatpl_cls)
+    cfg.dot_set('modeltpl_cfg.cls', modeltpl_cls)
+    cfg.dot_set('evaltpl_cfg.clses', evaltpl_clses)
     
-    if isinstance(trainfmt_cls, str):
-        cfg.trainfmt_cfg.update(
-            importlib.import_module("edustudio.trainfmt").
-            __getattribute__(trainfmt_cls).get_default_cfg()
+    if isinstance(traintpl_cls, str):
+        cfg.traintpl_cfg.update(
+            importlib.import_module("edustudio.traintpl").
+            __getattribute__(traintpl_cls).get_default_cfg()
         )
     else:
-        cfg.trainfmt_cfg.update(trainfmt_cls.get_default_cfg())
+        cfg.traintpl_cfg.update(traintpl_cls.get_default_cfg())
     
-    if isinstance(model_cls, str):
-        cfg.model_cfg.update(
+    if isinstance(modeltpl_cls, str):
+        cfg.modeltpl_cfg.update(
             importlib.import_module("edustudio.model").
-            __getattribute__(model_cls).get_default_cfg(backbone_model_cls=args.backbone_model_cls)
+            __getattribute__(modeltpl_cls).get_default_cfg(backbone_modeltpl_cls=args.backbone_modeltpl_cls)
         )
     else:
-        cfg.model_cfg.update(model_cls.get_default_cfg(backbone_model_cls=args.backbone_model_cls))
+        cfg.modeltpl_cfg.update(modeltpl_cls.get_default_cfg(backbone_modeltpl_cls=args.backbone_modeltpl_cls))
     
-    if isinstance(datafmt_cls, str):
-        cfg.datafmt_cfg.update(
-            importlib.import_module("edustudio.datafmt").
-            __getattribute__(datafmt_cls).get_default_cfg(backbone_datafmt_cls=args.backbone_datafmt_cls, mid2cache_op_seq=args.mid2cache_op_seq)
+    if isinstance(datatpl_cls, str):
+        cfg.datatpl_cfg.update(
+            importlib.import_module("edustudio.datatpl").
+            __getattribute__(datatpl_cls).get_default_cfg(backbone_datatpl_cls=args.backbone_datatpl_cls, mid2cache_op_seq=args.mid2cache_op_seq)
         )
     else:
-        cfg.datafmt_cfg.update(datafmt_cls.get_default_cfg(backbone_datafmt_cls=args.backbone_datafmt_cls, mid2cache_op_seq=args.mid2cache_op_seq))
+        cfg.datatpl_cfg.update(datatpl_cls.get_default_cfg(backbone_datatpl_cls=args.backbone_datatpl_cls, mid2cache_op_seq=args.mid2cache_op_seq))
     
-    for evalfmt_cls in evalfmt_clses:
-        if isinstance(evalfmt_cls, str):
-            cfg.evalfmt_cfg[evalfmt_cls] = importlib.import_module("edustudio.evalfmt").\
-                __getattribute__(evalfmt_cls).get_default_cfg()
+    for evaltpl_cls in evaltpl_clses:
+        if isinstance(evaltpl_cls, str):
+            cfg.evaltpl_cfg[evaltpl_cls] = importlib.import_module("edustudio.evaltpl").\
+                __getattribute__(evaltpl_cls).get_default_cfg()
         else:
-            cfg.evalfmt_cfg[evalfmt_cls.__name__] = evalfmt_cls.get_default_cfg()
+            cfg.evaltpl_cfg[evaltpl_cls.__name__] = evaltpl_cls.get_default_cfg()
+
+
+    if args.mid2cache_op_seq is not None:
+        atom_data_op_set = {(op if type(op) is str else op.__name__) for op in args.mid2cache_op_seq}
+    else:
+        atom_data_op_set = {(op if type(op) is str else op.__name__) for op in cfg['datatpl_cfg'].get('mid2cache_op_seq', [])}
 
     # config file
     if args.cfg_file_name is not None:
-        for config_name in ['trainfmt_cfg', 'datafmt_cfg', 'model_cfg']:
+        if config_name == 'datatpl_cfg':
+            for k,v in yaml_cfg[config_name].items():
+                assert k in cfg[config_name], f"invalid key: {k}"
+                if k == 'cls': continue
+                # assert type(v) is None or type(cfg[config_name][k]) is type(v)
+                if k in atom_data_op_set:
+                    for kk,vv in datatpl_cfg_dict[k].items():
+                        assert kk in cfg['datatpl_cfg'][k], f"invalid key: {kk}"
+                        cfg['datatpl_cfg'][k][kk] = vv
+                else:
+                    cfg[config_name][k] = v 
+        for config_name in ['traintpl_cfg', 'modeltpl_cfg']:
             for k,v in yaml_cfg[config_name].items():
                 assert k in cfg[config_name], f"invalid key: {k}"
                 if k == 'cls': continue
                 # assert type(v) is None or type(cfg[config_name][k]) is type(v)
                 cfg[config_name][k] = v
-        for k,v in yaml_cfg['evalfmt_cfg'].items():
+        for k,v in yaml_cfg['evaltpl_cfg'].items():
             if k == 'clses': continue
-            assert k in cfg.evalfmt_cfg['clses'], f"invalid key: {k}"
+            assert k in cfg.evaltpl_cfg['clses'], f"invalid key: {k}"
             assert type(v) is dict
             for kk, vv in v.items():
-                assert kk in cfg.evalfmt_cfg[k], f"invalid key: {kk}"
-                assert type(cfg.evalfmt_cfg[k][kk]) is type(vv)
-                cfg.evalfmt_cfg[k][kk] = vv
+                assert kk in cfg.evaltpl_cfg[k], f"invalid key: {kk}"
+                assert type(cfg.evaltpl_cfg[k][kk]) is type(vv)
+                cfg.evaltpl_cfg[k][kk] = vv
 
     # parameter dict
-    for k,v in trainfmt_cfg_dict.items():
+    for k,v in traintpl_cfg_dict.items():
         if k == 'cls': continue
-        assert k in cfg['trainfmt_cfg'], f"invalid key: {k}"
-        # assert type(v) is None or type(cfg['trainfmt_cfg'][k]) is type(v)
-        cfg['trainfmt_cfg'][k] = v
-    for k,v in datafmt_cfg_dict.items():
-        if k == 'cls' or k == 'backbone_datafmt_cls': continue
-        assert k in cfg['datafmt_cfg'], f"invalid key: {k}"
-        # assert type(v) is None or type(cfg['datafmt_cfg'][k]) is type(v)
-        cfg['datafmt_cfg'][k] = v
-    for k,v in model_cfg_dict.items():
-        if k == 'cls' or k == 'backbone_model_cls': continue
-        assert k in cfg['model_cfg'], f"invalid key: {k}"
-        # assert type(v) is None or type(cfg['model_cfg'][k]) is type(v)
-        cfg['model_cfg'][k] = v
+        assert k in cfg['traintpl_cfg'], f"invalid key: {k}"
+        # assert type(v) is None or type(cfg['traintpl_cfg'][k]) is type(v)
+        cfg['traintpl_cfg'][k] = v
+    
+    for k,v in datatpl_cfg_dict.items():
+        if k == 'cls' or k == 'backbone_datatpl_cls': continue
+        assert k in cfg['datatpl_cfg'], f"invalid key: {k}"
+        # assert type(v) is None or type(cfg['datatpl_cfg'][k]) is type(v)
+        if k in atom_data_op_set:
+            for kk,vv in datatpl_cfg_dict[k].items():
+                assert kk in cfg['datatpl_cfg'][k], f"invalid key: {kk}"
+                cfg['datatpl_cfg'][k][kk] = vv
+        else:
+            cfg['datatpl_cfg'][k] = v
+    for k,v in modeltpl_cfg_dict.items():
+        if k == 'cls' or k == 'backbone_modeltpl_cls': continue
+        assert k in cfg['modeltpl_cfg'], f"invalid key: {k}"
+        # assert type(v) is None or type(cfg['modeltpl_cfg'][k]) is type(v)
+        cfg['modeltpl_cfg'][k] = v
 
-    evalfmt_clses_name = [cls_ if isinstance(cls_, str) else cls_.__name__ for cls_ in cfg.evalfmt_cfg['clses']]
-    for k,v in evalfmt_cfg_dict.items():
+    evaltpl_clses_name = [cls_ if isinstance(cls_, str) else cls_.__name__ for cls_ in cfg.evaltpl_cfg['clses']]
+    for k,v in evaltpl_cfg_dict.items():
         if k == 'clses': continue
-        assert k in evalfmt_clses_name, f"invalid key: {k}"
+        assert k in evaltpl_clses_name, f"invalid key: {k}"
         assert type(v) is dict
         for kk, vv in v.items():
-            assert kk in cfg.evalfmt_cfg[k], f"invalid key: {kk}"
-            # assert type(cfg.evalfmt_cfg[k][kk]) is type(vv)
-            cfg.evalfmt_cfg[k][kk] = vv
+            assert kk in cfg.evaltpl_cfg[k], f"invalid key: {kk}"
+            # assert type(cfg.evaltpl_cfg[k][kk]) is type(vv)
+            cfg.evaltpl_cfg[k][kk] = vv
     
 
     # command line
-    for config_name in ['trainfmt_cfg', 'datafmt_cfg', 'model_cfg']:
+    for config_name in ['traintpl_cfg', 'datatpl_cfg', 'modeltpl_cfg']:
         for k,v in unknown_arg_dict[config_name].items():
             if k == 'cls': continue
             kk = k.split('.')[-1]
@@ -195,9 +218,9 @@ def get_global_cfg(
             if type(cfg[config_name][kk]) is not str:
                 v = type(cfg[config_name][kk])(literal_eval(v))
             cfg.dot_set(k, v)
-    for k,v in unknown_arg_dict["evalfmt_cfg"].items():
+    for k,v in unknown_arg_dict["evaltpl_cfg"].items():
         kk = k.split('.')[-1]
-        assert kk in cfg['evalfmt_cfg'], f"invalid key: {kk}"
+        assert kk in cfg['evaltpl_cfg'], f"invalid key: {kk}"
         if kk == 'clses': continue
         if type(cfg.dot_get(k)) is not str:
             v = type(cfg.dot_get(k))(literal_eval(v))

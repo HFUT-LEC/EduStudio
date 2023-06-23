@@ -1,3 +1,14 @@
+r"""
+CNCD-F
+##########################################
+
+Reference:
+    Fei Wang et al. "Neural Cognitive Diagnosis for Intelligent Education Systems" in AAAI 2020.
+
+Reference Code:
+    https://github.com/bigdata-ustc/Neural_Cognitive_Diagnosis-NeuralCD
+
+"""
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 from ..utils.components import PosMLP
@@ -64,6 +75,17 @@ class TextCNN(nn.Module):
         return ret
 
 class CNCD_F(GDBaseModel):
+    r"""
+    CNCD-F
+
+    default_cfg:
+       'dnn_units': [512, 256]  # dimension list of hidden layer in prediction layer
+       'dropout_rate': 0.5      # dropout rate
+       'activation': 'sigmoid'  # activation function in prediction layer
+       'disc_scale': 10         # discrimination scale
+       'max_len': 600,          # the maximum length of the exercise text
+        'text_embedding_dim': 100 # dimension of text embedding
+    """
     default_cfg = {
         'dnn_units': [512, 256],
         'dropout_rate': 0.5,
@@ -76,11 +98,11 @@ class CNCD_F(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
-        self.text_dim = self.model_cfg["text_embedding_dim"]
-        self.max_len = self.model_cfg["max_len"]
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
+        self.text_dim = self.modeltpl_cfg["text_embedding_dim"]
+        self.max_len = self.modeltpl_cfg["max_len"]
 
     def get_from_text(self):
         x = []
@@ -93,11 +115,11 @@ class CNCD_F(GDBaseModel):
             if len(word_ids) < self.max_len:
                 word_ids += [0] * (self.max_len - len(word_ids))  # padding到self.max_len
             x.append(word_ids)
-        return torch.tensor(x, device=self.trainfmt_cfg['device'])
+        return torch.tensor(x, device=self.traintpl_cfg['device'])
 
     def build_model(self):
         # prediction sub-net
-        self.textcnn = TextCNN(self.trainfmt_cfg["batch_size"], self.n_cpt, self.text_dim)
+        self.textcnn = TextCNN(self.traintpl_cfg["batch_size"], self.n_cpt, self.text_dim)
         self.word2id = self.textcnn.prepare_embedding(self.content_list)
         self.word_ids = self.get_from_text()
         self.out_text_factor = nn.Linear(self.text_dim, 1)
@@ -105,8 +127,8 @@ class CNCD_F(GDBaseModel):
         self.k_difficulty = nn.Embedding(self.n_item, self.n_cpt)
         self.e_difficulty = nn.Embedding(self.n_item, 1)
         self.pd_net = PosMLP(
-            input_dim=self.n_cpt+1, output_dim=1, activation=self.model_cfg['activation'],
-            dnn_units=self.model_cfg['dnn_units'], dropout_rate=self.model_cfg['dropout_rate']
+            input_dim=self.n_cpt+1, output_dim=1, activation=self.modeltpl_cfg['activation'],
+            dnn_units=self.modeltpl_cfg['dnn_units'], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
 
     def add_extra_data(self, **kwargs):
@@ -122,9 +144,9 @@ class CNCD_F(GDBaseModel):
         stat_emb = torch.sigmoid(stu_emb)
         k_difficulty = torch.sigmoid(self.k_difficulty(exer_id))
         k_difficulty = torch.cat((k_difficulty, text_factor), dim=1)
-        e_difficulty = torch.sigmoid(self.e_difficulty(exer_id)) * self.model_cfg['disc_scale']
+        e_difficulty = torch.sigmoid(self.e_difficulty(exer_id)) * self.modeltpl_cfg['disc_scale']
         # prednet
-        text_factor_q = torch.ones((items_Q_mat.shape[0], 1), device=self.trainfmt_cfg['device'])
+        text_factor_q = torch.ones((items_Q_mat.shape[0], 1), device=self.traintpl_cfg['device'])
         input_knowledge_point = torch.cat((items_Q_mat, text_factor_q), dim=1)
         input_x = e_difficulty * (stat_emb - k_difficulty) * input_knowledge_point
         pd = self.pd_net(input_x).sigmoid()

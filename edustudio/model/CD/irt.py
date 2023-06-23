@@ -28,31 +28,31 @@ class IRT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        if self.model_cfg['a_range']  < 0: self.model_cfg['a_range'] = None
-        if self.model_cfg['diff_range'] < 0: self.model_cfg['diff_range'] = None
+        if self.modeltpl_cfg['a_range']  < 0: self.modeltpl_cfg['a_range'] = None
+        if self.modeltpl_cfg['diff_range'] < 0: self.modeltpl_cfg['diff_range'] = None
 
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
 
         # 确保c固定时，a一定不能固定
-        if self.model_cfg['fix_c'] is False: assert self.model_cfg['fix_a'] is False
+        if self.modeltpl_cfg['fix_c'] is False: assert self.modeltpl_cfg['fix_a'] is False
 
     def build_model(self):
         self.theta = nn.Embedding(self.n_user, 1) # student ability
-        self.a = 0.0 if self.model_cfg['fix_a'] else nn.Embedding(self.n_item, 1) # exer discrimination
+        self.a = 0.0 if self.modeltpl_cfg['fix_a'] else nn.Embedding(self.n_item, 1) # exer discrimination
         self.b = nn.Embedding(self.n_item, 1) # exer difficulty
-        self.c = 0.0 if self.model_cfg['fix_c'] else nn.Embedding(self.n_item, 1)
+        self.c = 0.0 if self.modeltpl_cfg['fix_c'] else nn.Embedding(self.n_item, 1)
 
     def forward(self, stu_id, exer_id, **kwargs):
         theta = self.theta(stu_id)
         a = self.a(exer_id)
         b = self.b(exer_id)
-        c = self.c if self.model_cfg['fix_c'] else self.c(exer_id).sigmoid()
+        c = self.c if self.modeltpl_cfg['fix_c'] else self.c(exer_id).sigmoid()
 
-        if self.model_cfg['diff_range'] is not None:
-            b = self.model_cfg['diff_range'] * (torch.sigmoid(b) - 0.5)
-        if self.model_cfg['a_range'] is not None:
-            a = self.model_cfg['a_range'] * torch.sigmoid(a)
+        if self.modeltpl_cfg['diff_range'] is not None:
+            b = self.modeltpl_cfg['diff_range'] * (torch.sigmoid(b) - 0.5)
+        if self.modeltpl_cfg['a_range'] is not None:
+            a = self.modeltpl_cfg['a_range'] * torch.sigmoid(a)
         else:
             a = F.softplus(a) # 让区分度大于0，保持单调性假设
         if torch.max(theta != theta) or torch.max(a != a) or torch.max(b != b):  # pragma: no cover

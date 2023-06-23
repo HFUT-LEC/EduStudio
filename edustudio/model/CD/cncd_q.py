@@ -1,3 +1,15 @@
+r"""
+CNCD-Q
+##########################################
+
+Reference:
+    Fei Wang et al. "Neural Cognitive Diagnosis for Intelligent Education Systems" in AAAI 2020.
+
+Reference Code:
+    https://github.com/bigdata-ustc/Neural_Cognitive_Diagnosis-NeuralCD
+    https://github.com/LegionKing/NeuralCDM_plus
+
+"""
 import numpy as np
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
@@ -7,6 +19,15 @@ import torch.nn.functional as F
 
 
 class CNCD_Q(GDBaseModel):
+    r"""
+    CNCD-Q
+
+    default_cfg:
+       'dnn_units': [512, 256]  # dimension list of hidden layer in prediction layer
+       'dropout_rate': 0.5      # dropout rate
+       'activation': 'sigmoid'  # activation function in prediction layer
+       'disc_scale': 10         # discrimination scale
+    """
     default_cfg = {
         'dnn_units': [512, 256],
         'dropout_rate': 0.5,
@@ -17,9 +38,9 @@ class CNCD_Q(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.n_user = self.datafmt_cfg['dt_info']['stu_count']
-        self.n_item = self.datafmt_cfg['dt_info']['exer_count']
-        self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.n_user = self.datatpl_cfg['dt_info']['stu_count']
+        self.n_item = self.datatpl_cfg['dt_info']['exer_count']
+        self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def build_model(self):
         # prediction sub-net
@@ -27,8 +48,8 @@ class CNCD_Q(GDBaseModel):
         self.k_difficulty = nn.Embedding(self.n_item, self.n_cpt)
         self.e_difficulty = nn.Embedding(self.n_item, 1)
         self.pd_net = PosMLP(
-            input_dim=self.n_cpt, output_dim=1, activation=self.model_cfg['activation'],
-            dnn_units=self.model_cfg['dnn_units'], dropout_rate=self.model_cfg['dropout_rate']
+            input_dim=self.n_cpt, output_dim=1, activation=self.modeltpl_cfg['activation'],
+            dnn_units=self.modeltpl_cfg['dnn_units'], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
         self.e_k_prob = nn.Embedding(self.n_item, self.n_cpt)
 
@@ -40,7 +61,7 @@ class CNCD_Q(GDBaseModel):
         stu_emb = self.student_emb(users)
         stat_emb = torch.sigmoid(stu_emb)
         k_difficulty = torch.sigmoid(self.k_difficulty(items))
-        e_difficulty = torch.sigmoid(self.e_difficulty(items)) * self.model_cfg['disc_scale']
+        e_difficulty = torch.sigmoid(self.e_difficulty(items)) * self.modeltpl_cfg['disc_scale']
         # prednet
         e_k_prob = self.e_k_prob(items)
         e_k_prob_2 = F.sigmoid(e_k_prob)  # knowledge relevancy vectors of the exercises
@@ -61,10 +82,10 @@ class CNCD_Q(GDBaseModel):
         normal_mean, normal_C = 0, 2
         means = torch.ones(self.n_cpt) * normal_mean  # the mean of the multidimensional gaussian distribution
         means.require_grad = False
-        means = means.to(self.trainfmt_cfg['device'])
+        means = means.to(self.traintpl_cfg['device'])
         C = torch.ones(self.n_cpt) * normal_C  # the diagonal of the covariance matrix
         C.require_grad = False
-        C = C.to(self.trainfmt_cfg['device'])
+        C = C.to(self.traintpl_cfg['device'])
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
