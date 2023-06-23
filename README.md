@@ -27,27 +27,28 @@ Install `EduStudio`:
 pip install edustudio
 ```
 
-Example: Run `NCDM` model:
+Example: Run `KaNCD` model:
 
 ```python
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='assist-0910',
+    dataset='ASSIST_0910',
     cfg_file_name=None,
-    trainfmt_cfg_dict={
-        'cls': 'CDInterTrainFmt',
+    traintpl_cfg_dict={
+        'cls': 'CDInterTrainTPL',
     },
-    datafmt_cfg_dict={
-        'cls': 'CDInterDataFmtExtendsQ',
+    datatpl_cfg_dict={
+        'cls': 'CDInterExtendsQDataTPL'
     },
-    model_cfg_dict={
-        'cls': 'NCDM',
+    modeltpl_cfg_dict={
+        'cls': 'KaNCD',
     },
-    evalfmt_cfg_dict={
-        'clses': ['BinaryClassificationEvalFmt']
+    evaltpl_cfg_dict={
+        'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
     }
 )
+
 ```
 
 ## License

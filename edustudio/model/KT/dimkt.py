@@ -26,12 +26,10 @@ class DIMKT(GDBaseModel):
     default_cfg:
        'emb_size': 128  # dimension of embedding
        'dropout_rate': 0.2      # dropout rate
-       'num_steps': 199  # num_steps
        'difficult_levels': 100+2         # difficulty level of the exercises
     """
     default_cfg = {
         'emb_size': 128,
-        'num_steps': 199,
         'difficult_levels': 100+2,
         'dropout':0.2
     }
@@ -43,7 +41,6 @@ class DIMKT(GDBaseModel):
         self.emb_size = self.modeltpl_cfg['emb_size']
         self.dropout = self.modeltpl_cfg['dropout']
         self.difficult_levels = self.modeltpl_cfg['difficult_levels']
-        self.num_steps = self.modeltpl_cfg['num_steps']
         
     def build_model(self):
         self.sigmoid = Sigmoid()
@@ -65,10 +62,10 @@ class DIMKT(GDBaseModel):
         self.linear_6 = Linear(4 * self.emb_size, self.emb_size)
 
     def forward(self, exer_seq, label_seq,  **kwargs):
-
+        self.num_steps = exer_seq.shape[1]-1
         self.bs = len(exer_seq)
         q = exer_seq[:,:-1]
-        c = kwargs['cpt_seq'][:,:-1]
+        c = kwargs['cpt_unfold_seq'][:,:-1]
         sd = kwargs['cd_seq'][:,:-1].int()
         qd = kwargs['qd_seq'][:,:-1].int()
         a = label_seq[:,:-1].int()
@@ -79,7 +76,7 @@ class DIMKT(GDBaseModel):
         a_emb = self.a_emb(Variable(a))
 
         qshft = exer_seq[:, 1:]
-        cshft = kwargs['cpt_seq'][:, 1:]
+        cshft = kwargs['cpt_unfold_seq'][:, 1:]
         sdshft = kwargs['cd_seq'][:, 1:].int()
         qdshft = kwargs['qd_seq'][:, 1:].int()
         target_q = self.q_emb(Variable(qshft))

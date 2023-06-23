@@ -2,7 +2,7 @@
 
 ## CD models
 
-| Modle   |               Data TPL |    Train TPL    | Eval TPL                                               |
+| Model   |               DataTPL |    TrainTPL    | EvalTPL                                               |
 | :------ | ---------------------: | :-------------: | ------------------------------------------------------ |
 | IRT     |         CDInterDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
 | MIRT    |         CDInterDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
@@ -22,7 +22,7 @@
 
 ## KT models
 
-| Modle        |                Data TPL |    Train TPL    | Eval TPL                    |
+| Model        |                DataTPL |    TrainTPL    | EvalTPL                    |
 | :----------- | ----------------------: | :-------------: | --------------------------- |
 | AKT          | KTInterDataTPLCptUnfold | KTInterTrainTPL | BinaryClassificationEvalTPL |
 | ATKT         | KTInterDataTPLCptUnfold |  AtktTrainTPL   | BinaryClassificationEvalTPL |

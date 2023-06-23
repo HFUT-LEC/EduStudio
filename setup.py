@@ -40,7 +40,7 @@ if on_rtd:
 
 setup(
     name="edustudio",
-    version="v0.0.1-alpha1", 
+    version="v1.0.0-alpha1", 
     description="a Unified and Templatized Framework for Student Assessment Models",
     long_description=long_description,
     python_requires='>=3.8',
@@ -55,4 +55,9 @@ setup(
     extras_require=extras_require,
     zip_safe=False,
     classifiers=classifiers,
+    entry_points={
+        "console_scripts": [
+            "edustudio = EduStudio.quickstart.atom_cmds.entrypoint",
+        ],
+    }
 )
