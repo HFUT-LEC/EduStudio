@@ -7,18 +7,17 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='assist-2017',
+    dataset='assist_0910',
     cfg_file_name=None,
     trainfmt_cfg_dict={
         'cls': 'KTInterTrainFmt',
         'batch_size': 32,
-        'weight_decay': 1e-6,
-        'device': 'cpu',
     },
     datafmt_cfg_dict={
-        'cls': 'LPKTDataFmt',
-        'window_size': 500,
-        'is_dataset_divided': False
+        'cls': 'LPKTDataTPL',
+        'load_data_from': 'rawdata',
+        'raw2mid_op': 'R2M_ASSIST_0910',
+        'is_save_cache': False,
     },
     model_cfg_dict={
         'cls': 'LPKT_S',

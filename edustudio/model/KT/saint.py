@@ -16,7 +16,6 @@ class SAINT(GDBaseModel):
         'emb_size': 256,
         'num_attn_heads': 8,
         'dropout_rate': 0.2,
-        'emb_type': 'qid',
         'n_blocks':4,
     }
 
@@ -25,17 +24,15 @@ class SAINT(GDBaseModel):
         self.n_user = self.datafmt_cfg['dt_info']['stu_count']
         self.num_q = self.datafmt_cfg['dt_info']['exer_count']
         self.num_c = self.datafmt_cfg['dt_info']['cpt_count']
-        self.window_size = self.datafmt_cfg['window_size']
+        self.window_size = self.datafmt_cfg['dt_info']['real_window_size']
         self.dropout_r = self.model_cfg['dropout_rate']
         self.num_attn_heads = self.model_cfg['num_attn_heads']
         self.emb_size = self.model_cfg['emb_size']
-        self.emb_type = self.model_cfg['emb_type']
         self.n_blocks = self.model_cfg['n_blocks']
         
     def build_model(self):
         self.embd_pos = nn.Embedding(self.window_size, embedding_dim=self.emb_size)
-        if self.emb_type.startswith("qid"):
-            self.encoder = get_clones(Encoder_block(self.emb_size, self.num_attn_heads, self.num_q, self.num_c, self.window_size, self.dropout_r, self.device),
+        self.encoder = get_clones(Encoder_block(self.emb_size, self.num_attn_heads, self.num_q, self.num_c, self.window_size, self.dropout_r, self.device),
                                       self.n_blocks)
 
         self.decoder = get_clones(Decoder_block(self.emb_size, 2, self.num_attn_heads, self.window_size, self.dropout_r, self.device), self.n_blocks)
@@ -45,7 +42,6 @@ class SAINT(GDBaseModel):
 
 
     def forward(self, exer_seq, label_seq, cpt_unfold_seq, **kwargs):
-        emb_type = self.emb_type
         label_seq = label_seq.type(torch.int64)
         if self.num_q > 0:
             in_pos = torch.arange(exer_seq.shape[1]).unsqueeze(0).to(self.device)
@@ -56,8 +52,7 @@ class SAINT(GDBaseModel):
         for i in range(self.n_blocks):
             if i >= 1:
                 first_block = False
-            if emb_type == "qid":
-                exer_seq = self.encoder[i](exer_seq, cpt_unfold_seq, in_pos, first_block=first_block)
+            exer_seq = self.encoder[i](exer_seq, cpt_unfold_seq, in_pos, first_block=first_block)
             cpt_unfold_seq = exer_seq
         first_block = True
         for i in range(self.n_blocks):

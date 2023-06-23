@@ -7,7 +7,7 @@ from .akt import AKT
 from .ckt import CKT
 from .hawkeskt import HawkesKT
 from .kqn import KQN
-from .deep_irt import DEEP_IRT
+from .deep_irt import DeepIRT
 from .sakt import SAKT
 from .dkt_dsc import DKTDSC
 from .lpkt import LPKT

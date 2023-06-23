@@ -17,7 +17,7 @@ class BaseEvalFmt(object):
         self.trainfmt_cfg: UnifyConfig = cfg.trainfmt_cfg
         self.frame_cfg: UnifyConfig = cfg.frame_cfg
         self.model_cfg: UnifyConfig = cfg.model_cfg
-        self.logger: logging.Logger = cfg.logger
+        self.logger: logging.Logger = logging.getLogger("edustudio")
 
     @classmethod
     def get_default_cfg(cls):
@@ -36,9 +36,9 @@ class BaseEvalFmt(object):
     def set_callback_list(self, callbacklist: CallbackList):
         self.callback_list = callbacklist
 
-    def set_dataloaders(self, train_loader, test_loader, val_loader=None):
+    def set_dataloaders(self, train_loader, test_loader, valid_loader=None):
         self.train_loader = train_loader
-        self.val_loader = val_loader
+        self.valid_loader = valid_loader
         self.test_loader = test_loader
 
     def add_extra_data(self, **kwargs):

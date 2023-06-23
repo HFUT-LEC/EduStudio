@@ -64,5 +64,7 @@ class History(Callback):
         
     @staticmethod
     def dump_json(data, filepath):
+        if not os.path.exists(os.path.dirname(filepath)):
+            os.makedirs(os.path.dirname(filepath))
         with open(filepath, 'w', encoding='utf8') as f:
             json.dump(data, fp=f, indent=2, ensure_ascii=False, cls=NumpyEncoder)

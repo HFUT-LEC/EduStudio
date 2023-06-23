@@ -140,6 +140,7 @@ class SKVMN(GDBaseModel):
     def build_cfg(self):
         self.n_user = self.datafmt_cfg['dt_info']['stu_count']
         self.n_item = self.datafmt_cfg['dt_info']['exer_count']
+        self.window_size = self.datafmt_cfg['dt_info']['real_window_size']
         
 
     def build_model(self):
@@ -242,7 +243,7 @@ class SKVMN(GDBaseModel):
         ft = []
         # After atten about new question, Update Memory-value
         mem_value = self.Mv.unsqueeze(0).repeat(self.bs, 1, 1).to(self.trainfmt_cfg['device'])  # bs * mem_size * dim
-        for i in range(self.datafmt_cfg['window_size']):
+        for i in range(self.window_size):
             # k: bs * seqlen * dim
             q = k.permute(1, 0, 2)[i]  # q: bs * dim
             # attention Process
@@ -266,13 +267,13 @@ class SKVMN(GDBaseModel):
             write_embed = self.a_embed(write_embed).to(self.trainfmt_cfg['device']) # bs * dim
             mem_value = self.mem.write(correlation_weight, write_embed, mem_value)
         # w: bs * seqlen * mem_size
-        w = torch.cat([correlation_weight_list[i].unsqueeze(1) for i in range(self.datafmt_cfg['window_size'])], 1)
-        idx_values = self.triangular_layer(w, self.datafmt_cfg['window_size'])
+        w = torch.cat([correlation_weight_list[i].unsqueeze(1) for i in range(self.window_size)], 1)
+        idx_values = self.triangular_layer(w, self.window_size)
         ft = torch.stack(ft, dim=0)
 
         hidden_state, cell_state = [], []
         hx, cx = self.hx.repeat(self.bs, 1), self.cx.repeat(self.bs, 1)
-        for i in range(self.datafmt_cfg['window_size']):
+        for i in range(self.window_size):
             for j in range(self.bs):
                 if idx_values.shape[0] != 0 and i == idx_values[0][0] and j == idx_values[0][1]:
                     hx[j,:] = hidden_state[idx_values[0][2]][j]

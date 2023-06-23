@@ -82,7 +82,7 @@ class CKT(GDBaseModel):
         return self.get_main_loss(**kwargs)
 
     def data_helper(self, exer_seq, label_seq):
-        num_steps = self.datafmt_cfg['window_size']
+        num_steps = self.datafmt_cfg['dt_info']['real_window_size']
         batch_size = self.trainfmt_cfg['batch_size']
 
         input_data = torch.zeros((batch_size, num_steps), device=self.device)

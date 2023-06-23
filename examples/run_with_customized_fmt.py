@@ -20,6 +20,6 @@ run_edustudio(
         'cls': 'NCDM',
     },
     evalfmt_cfg_dict={
-        'clses': ['BinaryClassificationEvalFmt', 'CognitiveDiagnosisEvalFmt']
+        'clses': ['BinaryClassificationEvalFmt', 'CognitiveDiagnosisDEvalFmt']
     }
 )

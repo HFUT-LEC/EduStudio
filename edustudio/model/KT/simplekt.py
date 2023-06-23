@@ -45,7 +45,7 @@ class SimpleKT(GDBaseModel):
         self.final_fc_dim = self.model_cfg['final_fc_dim']
         self.n_heads = self.model_cfg['n_heads']
         self.d_ff = self.model_cfg['d_ff']
-        self.seq_len = self.datafmt_cfg['window_size']
+        self.seq_len = self.datafmt_cfg['dt_info']['real_window_size']
         self.device = self.trainfmt_cfg['device']
 
     def build_model(self):

@@ -1,7 +1,15 @@
+r"""
+MIRT
+##########################################
+
+Reference:
+    Mark D Reckase et al. "Multidimensional item response theory models". Springer, 2009.
+
+Reference Code:
+    https://github.com/bigdata-ustc/EduCDM/tree/main/EduCDM/MIRT
+
 """
-    # reference: https://github.com/bigdata-ustc/EduCDM/blob/main/EduCDM/MIRT/MIRT.py
-    MIRT经典形式
-"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

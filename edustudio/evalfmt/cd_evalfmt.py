@@ -9,7 +9,7 @@ from edustudio.utils.callback import ModeState
 class CognitiveDiagnosisEvalFmt(BaseEvalFmt):
     default_cfg = {
         'use_metrics': ['doa_all'],
-        'test_only_metrics': ['doa_all']
+        'test_only_metrics': []
     }
     def __init__(self, cfg):
         super().__init__(cfg)
@@ -41,12 +41,14 @@ class CognitiveDiagnosisEvalFmt(BaseEvalFmt):
                     )
                 elif metric_name == "doa_test":
                     metric_result[metric_name] = self._get_metrics(metric_name)(
-                        self.test_loader.dataset.dict_data['stu_id'],
-                        self.test_loader.dataset.dict_data['exer_id'],
-                        self.test_loader.dataset.dict_data['label'],
+                        self.test_loader.dataset.dict_main['stu_id'],
+                        self.test_loader.dataset.dict_main['exer_id'],
+                        self.test_loader.dataset.dict_main['label'],
                         user_emb=stu_stats,
                         Q_mat=Q_mat
                     )
+                else:
+                    raise ValueError(f"unknown metric_name: {metric_name}")
         return metric_result
 
     def _get_metrics(self, metric):
@@ -59,58 +61,58 @@ class CognitiveDiagnosisEvalFmt(BaseEvalFmt):
         else:
             raise NotImplementedError
         
-    def set_dataloaders(self, train_loader, test_loader, val_loader=None):
-        super().set_dataloaders(train_loader, test_loader, val_loader)
+    def set_dataloaders(self, train_loader, test_loader, valid_loader=None):
+        super().set_dataloaders(train_loader, test_loader, valid_loader)
 
-        if self.val_loader:
+        if self.valid_loader:
             self.stu_id_total = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['stu_id'],
-                self.val_loader.dataset.dict_data['stu_id'],
-                self.test_loader.dataset.dict_data['stu_id'],
+                self.train_loader.dataset.dict_main['stu_id'],
+                self.valid_loader.dataset.dict_main['stu_id'],
+                self.test_loader.dataset.dict_main['stu_id'],
             ]))
             self.exer_id_total = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['exer_id'],
-                self.val_loader.dataset.dict_data['exer_id'],
-                self.test_loader.dataset.dict_data['exer_id'],
+                self.train_loader.dataset.dict_main['exer_id'],
+                self.valid_loader.dataset.dict_main['exer_id'],
+                self.test_loader.dataset.dict_main['exer_id'],
             ]))
 
             self.label_id_total = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['label'],
-                self.val_loader.dataset.dict_data['label'],
-                self.test_loader.dataset.dict_data['label'],
+                self.train_loader.dataset.dict_main['label'],
+                self.valid_loader.dataset.dict_main['label'],
+                self.test_loader.dataset.dict_main['label'],
             ]))
 
             self.stu_id_train_val = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['stu_id'],
-                self.val_loader.dataset.dict_data['stu_id'],
+                self.train_loader.dataset.dict_main['stu_id'],
+                self.valid_loader.dataset.dict_main['stu_id'],
             ]))
             self.exer_id_train_val = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['exer_id'],
-                self.val_loader.dataset.dict_data['exer_id'],
+                self.train_loader.dataset.dict_main['exer_id'],
+                self.valid_loader.dataset.dict_main['exer_id'],
             ]))
 
             self.label_id_train_val = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['label'],
-                self.val_loader.dataset.dict_data['label'],
+                self.train_loader.dataset.dict_main['label'],
+                self.valid_loader.dataset.dict_main['label'],
             ]))
         else:
             self.stu_id_total = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['stu_id'],
-                self.test_loader.dataset.dict_data['stu_id'],
+                self.train_loader.dataset.dict_main['stu_id'],
+                self.test_loader.dataset.dict_main['stu_id'],
             ]))
             self.exer_id_total = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['exer_id'],
-                self.test_loader.dataset.dict_data['exer_id'],
+                self.train_loader.dataset.dict_main['exer_id'],
+                self.test_loader.dataset.dict_main['exer_id'],
             ]))
 
             self.label_id_total = tensor2npy(torch.cat([
-                self.train_loader.dataset.dict_data['label'],
-                self.test_loader.dataset.dict_data['label'],
+                self.train_loader.dataset.dict_main['label'],
+                self.test_loader.dataset.dict_main['label'],
             ]))
 
-            self.stu_id_train_val = tensor2npy(self.train_loader.dataset.dict_data['stu_id'])
-            self.exer_id_train_val = tensor2npy(self.train_loader.dataset.dict_data['exer_id'])
-            self.label_id_train_val = tensor2npy(self.train_loader.dataset.dict_data['label'])
+            self.stu_id_train_val = tensor2npy(self.train_loader.dataset.dict_main['stu_id'])
+            self.exer_id_train_val = tensor2npy(self.train_loader.dataset.dict_main['exer_id'])
+            self.label_id_train_val = tensor2npy(self.train_loader.dataset.dict_main['label'])
 
     def doa_report(self, stu_id, exer_id, label, user_emb, Q_mat):
         knowledges = []

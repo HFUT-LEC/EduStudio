@@ -1,3 +1,15 @@
+r"""
+KaNCD
+##########################################
+
+Reference:
+    Fei Wang et al. "NeuralCD: A General Framework for Cognitive Diagnosis" in TKDE 2022.
+
+Reference Code:
+    https://github.com/bigdata-ustc/EduCDM/tree/main/EduCDM/KaNCD
+
+"""
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 from ..utils.components import PosLinear
@@ -16,6 +28,9 @@ class KaNCD(GDBaseModel):
     def __init__(self, cfg):
         super().__init__(cfg)
         assert self.model_cfg['mf_type'] in ['mf', 'gmf', 'ncf1', 'ncf2']
+
+    def add_extra_data(self, **kwargs):
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
 
     def build_cfg(self):
         self.knowledge_n = self.datafmt_cfg['dt_info']['cpt_count']
@@ -52,9 +67,9 @@ class KaNCD(GDBaseModel):
 
         nn.init.xavier_normal_(self.knowledge_emb)
 
-    def forward(self, stu_id, exer_id, Q_mat, **kwargs):
+    def forward(self, stu_id, exer_id, **kwargs):
         input_exercise = exer_id
-        input_knowledge_point = Q_mat[exer_id]
+        input_knowledge_point = self.Q_mat[exer_id]
         # before prednet
         stu_emb = self.student_emb(stu_id)
         exer_emb = self.exercise_emb(input_exercise)
@@ -98,8 +113,7 @@ class KaNCD(GDBaseModel):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        pd = self(stu_id, exer_id, Q_mat).flatten()
+        pd = self(stu_id, exer_id).flatten()
         loss = F.binary_cross_entropy(input=pd, target=label)
         return {
             'loss_main': loss
@@ -109,9 +123,9 @@ class KaNCD(GDBaseModel):
         return self.get_main_loss(**kwargs)
     
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id,**kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
 
     def get_stu_status(self, stu_id=None):

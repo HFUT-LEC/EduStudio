@@ -1,3 +1,15 @@
+r"""
+GKT
+##########################################
+
+Reference:
+    Hiromi Nakagawa et al. "Graph-based Knowledge Tracing: Modeling Student Proficiency Using Graph Neural Network" in WI 2019.
+
+Reference Code:
+    https://github.com/jhljx/GKT
+
+"""
+
 from ...gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch

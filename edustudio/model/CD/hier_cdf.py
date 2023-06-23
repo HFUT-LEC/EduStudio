@@ -1,3 +1,16 @@
+r"""
+HierCDF
+##########################################
+
+Reference:
+    Jiatong Li et al. "HierCDF: A Bayesian Network-Based Hierarchical Cognitive Diagnosis Framework" in KDD 2022.
+
+Reference Code:
+    https://github.com/CSLiJT/HCD-code
+
+"""
+
+
 import torch
 import torch.nn as nn
 import networkx as nx

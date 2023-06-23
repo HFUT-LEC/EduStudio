@@ -1,3 +1,15 @@
+r"""
+KSCD
+##########################################
+
+Reference:
+    Haiping Ma et al. "Knowledge-Sensed Cognitive Diagnosis for Intelligent Education Platforms" in CIKM 2022.
+
+Reference Code:
+    https://github.com/BIMK/Intelligent-Education/tree/main/KSCD_Code_F
+
+"""
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch
@@ -22,6 +34,9 @@ class KSCD(GDBaseModel):
     }
     def __init__(self, cfg):
         super().__init__(cfg)    
+
+    def add_extra_data(self, **kwargs):
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
 
     def build_cfg(self):
         self.stu_count = self.datafmt_cfg['dt_info']['stu_count']
@@ -54,11 +69,11 @@ class KSCD(GDBaseModel):
         else:
             raise ValueError(f"unknown interaction_type: {self.model_cfg['interaction_type']}")
 
-    def forward(self, stu_id, exer_id, Q_mat, **kwargs):
+    def forward(self, stu_id, exer_id, **kwargs):
         
         stu_emb = self.stu_emb(stu_id)
         exer_emb = self.exer_emb(exer_id)
-        exer_q_mat = Q_mat[exer_id]
+        exer_q_mat = self.Q_mat[exer_id]
 
         stu_ability = torch.mm(stu_emb, self.cpt_emb.weight.T).sigmoid()
         exer_diff = torch.mm(exer_emb, self.cpt_emb.weight.T).sigmoid()
@@ -91,8 +106,7 @@ class KSCD(GDBaseModel):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        pd = self(stu_id=stu_id, exer_id=exer_id, Q_mat=Q_mat).flatten()
+        pd = self(stu_id=stu_id, exer_id=exer_id).flatten()
         loss = F.binary_cross_entropy(input=pd, target=label)
         return {
             'loss_main': loss
@@ -102,9 +116,9 @@ class KSCD(GDBaseModel):
         return self.get_main_loss(**kwargs)
     
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id=stu_id, exer_id=exer_id, Q_mat=Q_mat).flatten(),
+            'y_pd': self(stu_id=stu_id, exer_id=exer_id).flatten(),
         }
 
     def get_stu_status(self, stu_id=None):

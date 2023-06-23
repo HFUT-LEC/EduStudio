@@ -1,3 +1,12 @@
+r"""
+DKT
+##########################################
+
+Reference:
+    Chris Piech et al. "Deep knowledge tracing" in NIPS 2015.
+
+"""
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch

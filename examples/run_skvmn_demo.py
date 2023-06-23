@@ -7,22 +7,27 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='assist-2015-cpt',
+    dataset='ASSIST_0910',
     cfg_file_name=None,
+    datafmt_cfg_dict={
+        'cls': 'KTInterCptAsExerDataTPL',
+        'load_data_from': 'middata',
+        'raw2mid_op': 'R2M_ASSIST_0910',
+        'is_save_cache': False,
+        'M2C_BuildSeqInterFeats': {
+            'seed': 2023,
+            'divide_by': 'stu',
+            'window_size': 100,
+            "divide_scale_list": [7,1,2],
+            "extra_inter_feats": []
+        }
+    },
     trainfmt_cfg_dict={
         'cls': 'KTInterTrainFmt',
-        'batch_size': 64,
-    },
-    datafmt_cfg_dict={
-        'cls': 'KTInterDataFmt',
-        'window_size': 100,
-        'is_dataset_divided': True
+        'batch_size': 32
     },
     model_cfg_dict={
         'cls': 'SKVMN',
-        'memory_size': 50,
-        'embed_dim': 200,
-        'param_init_type': 'kaiming_normal',
     },
     evalfmt_cfg_dict={
         'clses': ['BinaryClassificationEvalFmt'],

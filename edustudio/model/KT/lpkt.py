@@ -1,3 +1,15 @@
+r"""
+LPKT
+##########################################
+
+Reference:
+    Shuanghong Sheng et al. "Learning Process-consistent Knowledge Tracing" in KDD 2021.
+
+Reference Code:
+    https://github.com/bigdata-ustc/EduKTM/tree/main/EduKTM/LPKT
+
+"""
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch

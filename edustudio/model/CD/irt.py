@@ -1,7 +1,12 @@
+r"""
+IRT
+##########################################
+
+Reference Code:
+    https://github.com/bigdata-ustc/EduCDM/tree/main/EduCDM/IRT
+
 """
-    # reference: https://github.com/bigdata-ustc/EduCDM/blob/main/EduCDM/IRT/GD/IRT.py
-    IRT 三种形式
-"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,10 +14,8 @@ from ..gd_basemodel import GDBaseModel
 
 
 class IRT(GDBaseModel):
-    """
-        第一种: fix_a = True, fix_c = True
-        第二种: fix_a = False, fix_c = True
-        第三种: fix_a = False, fix_c = False
+    r"""
+    IRT
     """
     default_cfg = {
         "a_range": -1.0, # disc range

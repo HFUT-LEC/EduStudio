@@ -4,29 +4,24 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='assist-2015-cpt',
+    dataset='assist_0910',
     cfg_file_name=None,
+    datafmt_cfg_dict={
+        'cls': 'KTInterCptAsExerDataTPL',
+        'load_data_from': 'rawdata',
+        'raw2mid_op': 'R2M_ASSIST_0910',
+        'is_save_cache': False,
+    },
     trainfmt_cfg_dict={
         'cls': 'KTInterTrainFmt',
-        'batch_size': 256,  
-        'epoch_num':200,
-    },
-    datafmt_cfg_dict={
-        'cls': 'KTInterDataFmt',
-        'window_size': 100,  
-        'is_dataset_divided': True,
-        'divide_scale_list': (8, 1, 1),
     },
     model_cfg_dict={
         'cls': 'SAKT',
-        'emb_size': 128,  
-        'param_init_type': 'kaiming_normal'
     },
     evalfmt_cfg_dict={
-        'clses': ['BinaryClassificationEvalFmt'], 
+        'clses': ['BinaryClassificationEvalFmt'],
     }
 )

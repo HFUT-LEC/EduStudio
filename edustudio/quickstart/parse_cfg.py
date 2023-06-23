@@ -32,6 +32,8 @@ def get_global_cfg(
                         dest='backbone_datafmt_cls', default=datafmt_cfg_dict.get('backbone_datafmt_cls', None))
     parser.add_argument('--model_cfg.backbone_model_cls', '-model_backbone_cls', type=str,
                         dest='backbone_model_cls', default=model_cfg_dict.get('backbone_model_cls', None))
+    parser.add_argument('--datafmt_cfg.mid2cache_op_seq', '-mid2cache_op_seq', type=str,
+                        dest='mid2cache_op_seq', default=datafmt_cfg_dict.get('mid2cache_op_seq', None))   
     args, unknown_args = parser.parse_known_args()
     assert args.dataset is not None
     
@@ -68,7 +70,7 @@ def get_global_cfg(
     cfg.frame_cfg = UnifyConfig.from_py_module(settings)
     for k,v in frame_cfg_dict.items():
         assert k in cfg.frame_cfg
-        assert type(cfg.frame_cfg[k]) is type(v)
+        assert type(v) is None or type(cfg.frame_cfg[k]) is type(v)
         cfg.frame_cfg[k] = v
     for k,v in unknown_arg_dict['frame_cfg'].items():
         assert k in cfg.frame_cfg
@@ -91,6 +93,10 @@ def get_global_cfg(
         datafmt_cls = datafmt_cls or yaml_cfg.get('datafmt_cfg', {'cls': None}).get("cls")
         model_cls = model_cls or yaml_cfg.get('model_cfg', {'cls': None}).get("cls")
         evalfmt_clses = evalfmt_clses or yaml_cfg.get('evalfmt_cfg', {'clses': None}).get("clses")
+
+        args.backbone_model_cls = args.backbone_model_cls or yaml_cfg.get('model_cfg', {'backbone_model_cls': None}).get("backbone_model_cls")
+        args.backbone_datafmt_cls = args.backbone_datafmt_cls or yaml_cfg.get('datafmt_cfg', {'backbone_datafmt_cls': None}).get("backbone_datafmt_cls")
+        args.mid2cache_op_seq = args.mid2cache_op_seq or yaml_cfg.get('datafmt_cfg', {'mid2cache_op_seq': None}).get("mid2cache_op_seq")
 
     assert trainfmt_cls is not None
     assert datafmt_cls is not None
@@ -123,10 +129,10 @@ def get_global_cfg(
     if isinstance(datafmt_cls, str):
         cfg.datafmt_cfg.update(
             importlib.import_module("edustudio.datafmt").
-            __getattribute__(datafmt_cls).get_default_cfg(backbone_datafmt_cls=args.backbone_datafmt_cls)
+            __getattribute__(datafmt_cls).get_default_cfg(backbone_datafmt_cls=args.backbone_datafmt_cls, mid2cache_op_seq=args.mid2cache_op_seq)
         )
     else:
-        cfg.datafmt_cfg.update(datafmt_cls.get_default_cfg(backbone_datafmt_cls=args.backbone_datafmt_cls))
+        cfg.datafmt_cfg.update(datafmt_cls.get_default_cfg(backbone_datafmt_cls=args.backbone_datafmt_cls, mid2cache_op_seq=args.mid2cache_op_seq))
     
     for evalfmt_cls in evalfmt_clses:
         if isinstance(evalfmt_cls, str):
@@ -141,7 +147,7 @@ def get_global_cfg(
             for k,v in yaml_cfg[config_name].items():
                 assert k in cfg[config_name], f"invalid key: {k}"
                 if k == 'cls': continue
-                assert type(cfg[config_name][k]) is type(v)
+                # assert type(v) is None or type(cfg[config_name][k]) is type(v)
                 cfg[config_name][k] = v
         for k,v in yaml_cfg['evalfmt_cfg'].items():
             if k == 'clses': continue
@@ -156,17 +162,17 @@ def get_global_cfg(
     for k,v in trainfmt_cfg_dict.items():
         if k == 'cls': continue
         assert k in cfg['trainfmt_cfg'], f"invalid key: {k}"
-        assert type(cfg['trainfmt_cfg'][k]) is type(v)
+        # assert type(v) is None or type(cfg['trainfmt_cfg'][k]) is type(v)
         cfg['trainfmt_cfg'][k] = v
     for k,v in datafmt_cfg_dict.items():
         if k == 'cls' or k == 'backbone_datafmt_cls': continue
         assert k in cfg['datafmt_cfg'], f"invalid key: {k}"
-        assert type(cfg['datafmt_cfg'][k]) is type(v)
+        # assert type(v) is None or type(cfg['datafmt_cfg'][k]) is type(v)
         cfg['datafmt_cfg'][k] = v
     for k,v in model_cfg_dict.items():
         if k == 'cls' or k == 'backbone_model_cls': continue
         assert k in cfg['model_cfg'], f"invalid key: {k}"
-        assert type(cfg['model_cfg'][k]) is type(v)
+        # assert type(v) is None or type(cfg['model_cfg'][k]) is type(v)
         cfg['model_cfg'][k] = v
 
     evalfmt_clses_name = [cls_ if isinstance(cls_, str) else cls_.__name__ for cls_ in cfg.evalfmt_cfg['clses']]
@@ -176,7 +182,7 @@ def get_global_cfg(
         assert type(v) is dict
         for kk, vv in v.items():
             assert kk in cfg.evalfmt_cfg[k], f"invalid key: {kk}"
-            assert type(cfg.evalfmt_cfg[k][kk]) is type(vv)
+            # assert type(cfg.evalfmt_cfg[k][kk]) is type(vv)
             cfg.evalfmt_cfg[k][kk] = vv
     
 

@@ -1,3 +1,15 @@
+r"""
+IEKT
+##########################################
+
+Reference:
+    Ting Long et al. "Tracing Knowledge State with Individual Cognition and Acquisition Estimation" in SIGIR 2021.
+
+Reference Code:
+    https://github.com/ApexEDM/iekt
+
+"""
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch
@@ -74,6 +86,7 @@ class IEKT(GDBaseModel):
         self.n_stu = self.datafmt_cfg['dt_info']['stu_count']
         self.n_exer = self.datafmt_cfg['dt_info']['exer_count']
         self.n_cpt = self.datafmt_cfg['dt_info']['cpt_count']
+        self.window_size = self.datafmt_cfg['dt_info']['real_window_size']
         self.n_cog_level = self.model_cfg['n_cog_level']
         self.n_acq_level = self.model_cfg['n_acq_level']
         self.d_v = self.model_cfg['d_h'] + self.model_cfg['d_q'] + self.model_cfg['d_c']
@@ -192,7 +205,7 @@ class IEKT(GDBaseModel):
         p_action_tensor = torch.stack(p_action_list, dim = 1) # ce的sample操作
         state_tensor = torch.stack(states_list, dim = 1) # 输出的groudtruth和predict合并
         pre_state_tensor = torch.stack(pre_state_list, dim = 1)
-        reward_tensor = torch.stack(reward_list, dim = 1).float() / (seq_num.unsqueeze(-1).repeat(1, self.datafmt_cfg['window_size'])).float()
+        reward_tensor = torch.stack(reward_list, dim = 1).float() / (seq_num.unsqueeze(-1).repeat(1, self.window_size)).float()
         logits_tensor = torch.stack(predict_list, dim = 1)
         ground_truth_tensor = torch.stack(ground_truth_list, dim = 1)
         loss = []

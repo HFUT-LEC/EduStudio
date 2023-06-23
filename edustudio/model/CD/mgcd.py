@@ -1,3 +1,9 @@
+r"""
+MGCD
+##################################
+Reference:
+    Huang et al. "Group-level cognitive diagnosis: A multi-task learning perspective." in ICDM 2021.
+"""
 import numpy as np
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
@@ -7,6 +13,10 @@ import torch.nn.functional as F
 
 
 class MGCD(GDBaseModel):
+    """
+    prednet_len1: The dimension of the first hidden layer of the fully connected layer before predicting the score
+    prednet_len2: The dimension of the second hidden layer of the fully connected layer before predicting the score
+    """
     default_cfg = {
         'prednet_len1': 128,
         'prednet_len2': 64,
@@ -184,6 +194,9 @@ class MGCD(GDBaseModel):
 
 
 class NoneNegClipper(object):
+    """
+    Make the parameters of the fully connected layer non-negative
+    """
     def __init__(self):
         super(NoneNegClipper, self).__init__()
 

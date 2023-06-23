@@ -2,11 +2,13 @@ from .base_trainfmt import BaseTrainFmt
 from edustudio.utils.common import UnifyConfig
 import torch
 from torch.utils.data import DataLoader
+from edustudio.utils.callback import History
+from collections import defaultdict
+import numpy as np
 
 class GDTrainFmt(BaseTrainFmt):
     default_cfg = {
         'device': 'cuda:0',
-        'seed': 2022,
         'epoch_num': 100,
         'batch_size': 2048,
         'eval_batch_size': 2048,
@@ -20,6 +22,9 @@ class GDTrainFmt(BaseTrainFmt):
 
     def __init__(self, cfg: UnifyConfig):
         super().__init__(cfg)
+        self.train_loader_list = []
+        self.valid_loader_list = []
+        self.test_loader_list = []
     
     def _get_optim(self):
         optimizer = self.trainfmt_cfg['optim']
@@ -39,25 +44,51 @@ class GDTrainFmt(BaseTrainFmt):
 
         return optim
 
-    # def batch_dict2device(self, batch_dict):
-    #     return {
-    #         k: v.to(self.trainfmt_cfg['device']) for k,v in batch_dict.items()
-    #     }
-
     def start(self):
         super().start()
         self.build_loaders()
-        self.model.build_cfg()
-        extra_data = self.datafmt.get_extra_data() 
-        if len(extra_data):
+
+        best_metric_value_dict = defaultdict(list)
+
+        for fold_id in range(self.datafmt_cfg['n_folds']):
+            self.train_loader = self.train_loader_list[fold_id]
+            self.train_loader.dataset.set_info_for_fold(fold_id)
+            self.datafmt.set_info_for_fold(fold_id)
+
+            self.valid_loader = None
+            if self.datafmt.hasValidDataset:
+                self.valid_loader = self.valid_loader_list[fold_id]
+                self.valid_loader.dataset.set_info_for_fold(fold_id)
+            self.test_loader = self.test_loader_list[fold_id]
+            self.test_loader.dataset.set_info_for_fold(fold_id)
+
+            extra_data = self.datafmt.get_extra_data() 
+
+            self.model = self.get_model_obj()
+            self.model.build_cfg()
             self.model.add_extra_data(**extra_data)
-        else:
-            self.model.add_extra_data()
-        for evalfmt in self.evalfmts:
-            evalfmt.add_extra_data(**extra_data)
-        self.model.build_model()
-        self.model._init_params()
-        self.model.to(self.model.device)
+            for evalfmt in self.evalfmts:
+                evalfmt.add_extra_data(**extra_data)
+            self.model.build_model()
+            self.model._init_params()
+            self.model.to(self.model.device)
+
+
+            metrics = self.one_fold_start(fold_id)
+            for m in metrics:
+                best_metric_value_dict[m].append(metrics[m])
+            self.logger.info("=="*10)
+        
+        best_metric_value_dict_mean = {}
+        for metric_name, val_list in best_metric_value_dict.items():
+            best_metric_value_dict_mean[metric_name] = np.mean(val_list)
+            self.logger.info(f"All Fold Mean {metric_name} = {best_metric_value_dict_mean[metric_name]}")
+
+        History.dump_json(best_metric_value_dict, f"{self.frame_cfg.temp_folder_path}/result-list.json")
+        History.dump_json(best_metric_value_dict_mean, f"{self.frame_cfg.temp_folder_path}/result.json")
+    
+    def one_fold_start(self, fold_id):
+        self.logger.info(f"====== [FOLD ID]: {fold_id} ======")
 
     def batch_dict2device(self, batch_dict):
         dic = {}
@@ -73,15 +104,17 @@ class GDTrainFmt(BaseTrainFmt):
         num_workers = self.trainfmt_cfg['num_workers']
         eval_batch_size = self.trainfmt_cfg['eval_batch_size']
         if hasattr(self.datafmt, 'build_dataloaders'):
-            train_loader, val_loader, test_loader = self.datafmt.build_dataloaders()
+            self.train_loader_list, self.valid_loader_list, self.test_loader_list = self.datafmt.build_dataloaders()
         else:
-            train_dataset, val_dataset, test_dataset = self.datafmt.build_datasets()
-            train_loader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
-            if val_dataset is not None:
-                val_loader = DataLoader(val_dataset, shuffle=False, batch_size=eval_batch_size, num_workers=num_workers)
-            test_loader = DataLoader(test_dataset, shuffle=False, batch_size=eval_batch_size, num_workers=num_workers)
-
-        self.train_loader = train_loader
-        self.val_loader = val_loader
-        self.test_loader = test_loader
-        return train_loader, val_loader, test_loader
+            train_dt_list, valid_dt_list, test_dt_list = self.datafmt.build_datasets()
+            for fid in range(self.datafmt_cfg['n_folds']):
+                train_loader = DataLoader(dataset=train_dt_list[fid], shuffle=True, batch_size=batch_size, 
+                                          num_workers=num_workers, collate_fn=train_dt_list[fid].collate_fn)
+                self.train_loader_list.append(train_loader)
+                if self.hasValidDataset:
+                    valid_loader = DataLoader(dataset=valid_dt_list[fid], shuffle=False, batch_size=eval_batch_size,
+                                               num_workers=num_workers, collate_fn=valid_dt_list[fid].collate_fn)
+                    self.valid_loader_list.append(valid_loader)
+                test_loader = DataLoader(dataset=test_dt_list[fid], shuffle=False, batch_size=eval_batch_size, 
+                                         num_workers=num_workers, collate_fn=test_dt_list[fid].collate_fn)
+                self.test_loader_list.append(test_loader)

@@ -1,3 +1,15 @@
+r"""
+EKT
+##########################################
+
+Reference:
+    Qi Liu et al. "EKT: Exercise-Aware Knowledge Tracing for Student Performance Prediction" in TKDE 2019.
+
+Reference Code:
+    https://github.com/bigdata-ustc/ekt
+
+"""
+
 from ..gd_basemodel import GDBaseModel
 from .eernn import EERNNM, EERNNA
 import torch.nn as nn

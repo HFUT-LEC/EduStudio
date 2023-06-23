@@ -17,7 +17,7 @@ class BaseDataFmt(Dataset):
         self.trainfmt_cfg: UnifyConfig = cfg.trainfmt_cfg
         self.frame_cfg: UnifyConfig = cfg.frame_cfg
         self.model_cfg: UnifyConfig = cfg.model_cfg
-        self.logger: logging.Logger = cfg.logger
+        self.logger: logging.Logger = logging.getLogger("edustudio")
         self._check_params()
         self._init_data_before_dt_info()
         self.datafmt_cfg['dt_info'] = {}

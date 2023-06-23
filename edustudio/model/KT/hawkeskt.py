@@ -41,12 +41,12 @@ class HawkesKT(GDBaseModel):
         torch.nn.init.normal_(self.beta_inter_embeddings.weight, mean=0.0, std=0.01)
         torch.nn.init.normal_(self.beta_skill_embeddings.weight, mean=0.0, std=0.01)
 
-    def forward(self, exer_seq, time_lag_seq, cpt_unfold_seq, **kwargs):
+    def forward(self, exer_seq, start_timestamp_seq, cpt_unfold_seq, **kwargs):
         skills = cpt_unfold_seq     # [batch_size, seq_len] 一个习题对应一个知识点
         problems = exer_seq  # [batch_size, seq_len] batch_size个学生的序列
-        # time = [i for i in range(time_lag_seq.shape[1])]
-        # times = torch.Tensor([time for i in range(time_lag_seq.shape[0])])
-        times = time_lag_seq - time_lag_seq[:,[0]]        # [batch_size, seq_len]
+        # time = [i for i in range(start_timestamp_seq.shape[1])]
+        # times = torch.Tensor([time for i in range(start_timestamp_seq.shape[0])])
+        times = start_timestamp_seq - start_timestamp_seq[:,[0]]        # [batch_size, seq_len]
 
         mask_labels = kwargs['mask_seq'].long()
         inters = skills + mask_labels * self.skill_num

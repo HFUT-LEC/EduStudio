@@ -4,7 +4,7 @@ from sklearn.model_selection import StratifiedKFold, KFold
 
 class SpliterUtil:
     @staticmethod
-    def divide_data_df(df, divide_scale_list, seed, label_field=None, shuffle=True):
+    def divide_data_df_one_fold(df, divide_scale_list, seed, label_field=None, shuffle=True):
         n_split_1, n_split_2 = None, None
         if len(divide_scale_list) == 2:
             n_split_1 = np.sum(divide_scale_list) / divide_scale_list[-1]
@@ -46,7 +46,26 @@ class SpliterUtil:
         else:
             train_df = train_df_tmp
         return train_df, val_df, test_df
+    
+    @staticmethod
+    def divide_data_df_multi_folds(df, n_folds, seed, label_field=None, shuffle=True):
+        if label_field:
+            skf = StratifiedKFold(n_splits=int(n_folds),
+                                shuffle=shuffle, random_state=seed)
+            splits = skf.split(df, df[label_field])
+        else:
+            skf = KFold(n_splits=int(n_folds),
+                                shuffle=shuffle, random_state=seed)
+            splits = skf.split(df)
 
+        train_df_list, test_df_list = [], [], []
+        for train_index, test_index in splits:
+            train_df = df.iloc[train_index].reset_index(drop=True)
+            test_df = df.iloc[test_index].reset_index(drop=True)
+            train_df_list.append(train_df)
+            test_df_list.append(test_df)
+
+        return train_df_list, test_df_list
 
     @staticmethod
     def divide_data_dict(dic, divide_scale_list, seed, label_field=None, shuffle=True):

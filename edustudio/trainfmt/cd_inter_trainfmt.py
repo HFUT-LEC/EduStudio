@@ -28,15 +28,18 @@ class CDInterTrainFmt(GDTrainFmt):
     def start(self):
         super().start()
 
+    def one_fold_start(self, fold_id):
+        super().one_fold_start(fold_id)
         # callbacks
         num_stop_rounds = self.trainfmt_cfg['num_stop_rounds']
         es_metrics = self.trainfmt_cfg["early_stop_metrics"]
         modelCheckPoint = ModelCheckPoint(
-            es_metrics, save_folder_path=f"{self.frame_cfg.temp_folder_path}/pths/"
+            es_metrics, save_folder_path=f"{self.frame_cfg.temp_folder_path}/pths/{fold_id}/"
         )
-        earlystopping = EarlyStopping(es_metrics, num_stop_rounds=num_stop_rounds, start_round=1)
+        es_cb = EarlyStopping(es_metrics, num_stop_rounds=num_stop_rounds, start_round=1)
+        history_cb = History(folder_path=f"{self.frame_cfg.temp_folder_path}/history/{fold_id}", plot_curve=True)
         callbacks = [
-            modelCheckPoint, earlystopping, History(folder_path=f"{self.frame_cfg.temp_folder_path}/history/", plot_curve=True), 
+            modelCheckPoint, es_cb, history_cb,
             BaseLogger(self.logger, group_by_contains=['loss'])
         ]
         self.callback_list = CallbackList(callbacks=callbacks, model=self.model, logger=self.logger)
@@ -44,29 +47,33 @@ class CDInterTrainFmt(GDTrainFmt):
         for evalfmt in self.evalfmts: 
             evalfmt.set_callback_list(self.callback_list)
             evalfmt.set_dataloaders(train_loader=self.train_loader, 
-                                    val_loader=self.val_loader, 
+                                    valid_loader=self.valid_loader, 
                                     test_loader=self.test_loader
                                     )
         # train
         set_same_seeds(self.trainfmt_cfg['seed'])
-        if self.val_loader is not None:
-            self.fit(train_loader=self.train_loader, val_loader=self.val_loader)
+        if self.valid_loader is not None:
+            self.fit(train_loader=self.train_loader, valid_loader=self.valid_loader)
         else:
-            self.fit(train_loader=self.train_loader, val_loader=self.test_loader)
+            self.fit(train_loader=self.train_loader, valid_loader=self.test_loader)
         
-        if self.val_loader is not None:
+        metric_name = self.trainfmt_cfg['best_epoch_metric']
+        metric = [m for m in modelCheckPoint.metric_list if m.name == metric_name][0]
+        if self.valid_loader is not None:
             # load best params
-            metric_name = self.trainfmt_cfg['best_epoch_metric']
-            metric = [m for m in modelCheckPoint.metric_list if m.name == metric_name][0]
-            fpth =  f"{self.frame_cfg.temp_folder_path}/pths/best-epoch-{metric.best_epoch:03d}-for-{metric.name}.pth"
+            fpth =  f"{self.frame_cfg.temp_folder_path}/pths/{fold_id}/best-epoch-{metric.best_epoch:03d}-for-{metric.name}.pth"
             self.model.load_state_dict(torch.load(fpth))
+
             metrics = self.inference(self.test_loader)
             for name in metrics: self.logger.info(f"{name}: {metrics[name]}")
-            History.dump_json(metrics, f"{self.frame_cfg.temp_folder_path}/result.json")
+            History.dump_json(metrics, f"{self.frame_cfg.temp_folder_path}/{fold_id}/result.json")
+        else:
+            metrics = history_cb.log_as_time[metric.best_epoch]
 
         if self.trainfmt_cfg['unsave_best_epoch_pth']: shutil.rmtree(f"{self.frame_cfg.temp_folder_path}/pths/")
+        return metrics
 
-    def fit(self, train_loader, val_loader):
+    def fit(self, train_loader, valid_loader):
         self.model.train()
         self.optimizer = self._get_optim()
         self.callback_list.on_train_begin()
@@ -86,8 +93,8 @@ class CDInterTrainFmt(GDTrainFmt):
 
             for name in logs: logs[name] = float(np.nanmean(logs[name]))
 
-            if val_loader is not None:
-                val_metrics = self.evaluate(val_loader)
+            if valid_loader is not None:
+                val_metrics = self.evaluate(valid_loader)
                 logs.update({f"{metric}": val_metrics[metric] for metric in val_metrics})
 
             self.callback_list.on_epoch_end(epoch + 1, logs=logs)
@@ -117,9 +124,9 @@ class CDInterTrainFmt(GDTrainFmt):
             eval_data_dict.update({
                 'stu_stats': tensor2npy(self.model.get_stu_status()),
             })
-        if hasattr(loader.dataset, 'Q_mat'):
+        if hasattr(self.datafmt, 'Q_mat'):
             eval_data_dict.update({
-                'Q_mat': tensor2npy(loader.dataset.Q_mat)
+                'Q_mat': tensor2npy(self.datafmt.Q_mat)
             })
         eval_result = {}
         for evalfmt in self.evalfmts: eval_result.update(
@@ -148,9 +155,9 @@ class CDInterTrainFmt(GDTrainFmt):
             eval_data_dict.update({
                 'stu_stats': tensor2npy(self.model.get_stu_status()),
             })
-        if hasattr(loader.dataset, 'Q_mat'):
+        if hasattr(self.datafmt, 'Q_mat'):
             eval_data_dict.update({
-                'Q_mat': tensor2npy(loader.dataset.Q_mat)
+                'Q_mat': tensor2npy(self.datafmt.Q_mat)
             })
         eval_result = {}
         for evalfmt in self.evalfmts: eval_result.update(evalfmt.eval(**eval_data_dict))

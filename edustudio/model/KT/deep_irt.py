@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 
 
-class DEEP_IRT(GDBaseModel):
+class DeepIRT(GDBaseModel):
     default_cfg = {
         'dim_s': 200,  # 序列长度
         'size_m': 50,

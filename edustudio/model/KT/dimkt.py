@@ -45,8 +45,6 @@ class DIMKT(GDBaseModel):
         self.linear_5 = Linear(2 * self.emb_size, self.emb_size)
         self.linear_6 = Linear(4 * self.emb_size, self.emb_size)
 
-
-
     def forward(self, exer_seq, label_seq,  **kwargs):
 
         self.bs = len(exer_seq)

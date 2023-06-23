@@ -1,3 +1,15 @@
+r"""
+DKTForget
+##########################################
+
+Reference:
+    Koki Nagatani et al. "Augmenting Knowledge Tracing by Considering Forgetting Behavior" in WWW 2019.
+
+Reference Code:
+    https://github.com/pykt-team/pykt-toolkit/blob/main/pykt/models/dkt_forget.py
+
+"""
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch

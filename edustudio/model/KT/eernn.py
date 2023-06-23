@@ -1,3 +1,15 @@
+r"""
+EERNN
+##########################################
+
+Reference:
+    Yu Su et al. "Exercise-Enhanced Sequential Modeling for Student Performance Prediction" in AAAI 2018.
+
+Reference Code:
+    https://github.com/shaoliangliang1996/EERNN
+
+"""
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch

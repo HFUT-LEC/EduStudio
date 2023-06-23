@@ -1,9 +1,16 @@
+r"""
+IRR
+##################################
+Reference:
+    Tong et al. "Item Response Ranking for Cognitive Diagnosis." in IJCAI 2021.
+"""
 from ..basemodel import BaseProxyModel
 import torch
 import torch.nn as nn
 
 
 class PairSCELoss(nn.Module):
+    """IRR loss function"""
     def __init__(self):
         super(PairSCELoss, self).__init__()
         self._loss = nn.CrossEntropyLoss()
@@ -20,6 +27,9 @@ class PairSCELoss(nn.Module):
 
 
 class IRR(BaseProxyModel):
+    """
+    backbone_model_cls: The backbone model of IRR
+    """
     default_cfg = {
         "backbone_model_cls": "IRT",
     }

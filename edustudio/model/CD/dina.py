@@ -1,5 +1,13 @@
-"""
-    # reference: https://github.com/bigdata-ustc/EduCDM/blob/main/EduCDM/DINA/GD/DINA.py
+r"""
+DINA
+##########################################
+
+Reference:
+    Jimmy De La Torre. Dina model and parameter estimation: A didactic. Journal of educational and behavioral statistics, 34(1):115–130, 2009
+
+Reference Code:
+    https://github.com/bigdata-ustc/EduCDM/blob/main/EduCDM/DINA/
+
 """
 
 import torch
@@ -20,6 +28,9 @@ class DINA(GDBaseModel):
     def __init__(self, cfg):
         super().__init__(cfg)
     
+    def add_extra_data(self, **kwargs):
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
+
     def build_cfg(self):
         self.n_user = self.datafmt_cfg['dt_info']['stu_count']
         self.n_item = self.datafmt_cfg['dt_info']['exer_count']
@@ -36,8 +47,8 @@ class DINA(GDBaseModel):
         self.slip = nn.Embedding(self.n_item, 1)
         self.theta = nn.Embedding(self.n_user, self.emb_dim)
 
-    def forward(self, stu_id, exer_id, Q_mat, **kwargs):
-        items_Q_mat = Q_mat[exer_id]
+    def forward(self, stu_id, exer_id, **kwargs):
+        items_Q_mat = self.Q_mat[exer_id]
         theta = self.theta(stu_id)
         slip = torch.squeeze(torch.sigmoid(self.slip(exer_id)) * self.max_slip)
         guess = torch.squeeze(torch.sigmoid(self.guess(exer_id)) * self.max_guess)
@@ -59,8 +70,7 @@ class DINA(GDBaseModel):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        pd = self(stu_id, exer_id, Q_mat).flatten()
+        pd = self(stu_id, exer_id).flatten()
         loss = F.binary_cross_entropy(input=pd, target=label)
         return {
             'loss_main': loss
@@ -70,9 +80,9 @@ class DINA(GDBaseModel):
         return self.get_main_loss(**kwargs)
     
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
                 
     def get_stu_status(self, stu_id=None):
@@ -118,11 +128,10 @@ class STEDINA(DINA):
         self.max_guess =  self.model_cfg['max_guess']
         self.emb_dim = self.n_cpt
 
-    def forward(self, stu_id, exer_id, items_Q_mat):
+    def forward(self, stu_id, exer_id):
         theta = self.theta(stu_id)
-        items_Q_mat = items_Q_mat[exer_id]
         theta = self.sign(self.theta(stu_id))
-        knowledge = items_Q_mat
+        knowledge = self.Q_mat[exer_id]
         slip = torch.squeeze(torch.sigmoid(self.slip(exer_id)) * self.max_slip)
         guess = torch.squeeze(torch.sigmoid(self.guess(exer_id)) * self.max_guess)
         mask_theta = (knowledge == 0) + (knowledge == 1) * theta
