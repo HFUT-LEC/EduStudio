@@ -9,7 +9,7 @@
 project = 'EduStudio'
 copyright = '2023, HFUT-LEC'
 author = 'HFUT-LEC'
-release = 'v1.0.0-alpha1'
+release = 'v1.0.0-alpha2'
 
 import sphinx_rtd_theme
 import os
