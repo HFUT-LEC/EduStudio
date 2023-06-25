@@ -2,15 +2,22 @@ from .raw2mid import BaseRaw2Mid
 import pandas as pd
 pd.set_option("mode.chained_assignment", None) # ingore warning
 
-class R2M_FrcSub(BaseRaw2Mid):
-    def process(self):
+r"""
+R2M_FrcSub
+#####################################
+FrcSub dataset preprocess
+"""
 
+class R2M_FrcSub(BaseRaw2Mid):
+    """R2M_FrcSub is to preprocess FrcSub dataset"""
+    def process(self):
+        super().process()
         # # Preprocess
         # 
         # 此处对数据集进行处理
 
         # 读取文本文件转换为 dataframe
-        df_inter = pd.read_csv(f"{self.rawpath}/data.txt", sep='\t', names=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',\
+        df_inter = pd.read_csv(f"{self.rawpath}/data.txt", sep='\t', names=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                                                                         '10', '11', '12', '13', '14', '15', '16', '17', '18', '19']) 
         df_inter.insert(0, 'stu_id:token', range(len(df_inter)))
         df_exer = pd.read_csv(f"{self.rawpath}/q.txt", sep='\t', names=['0', '1', '2', '3', '4', '5', '6', '7'])

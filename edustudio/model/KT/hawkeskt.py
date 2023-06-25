@@ -1,9 +1,12 @@
-# -*- coding: UTF-8 -*-
-
+r"""
+CT_NCM
+##################################
+Reference:
+    Chenyang Wang et al. "Temporal cross-effects in knowledge tracing." in WSDM 2021.
+"""
 import numpy as np
 from ..gd_basemodel import GDBaseModel
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
 
@@ -15,25 +18,32 @@ class HawkesKT(GDBaseModel):
     }
 
     def __init__(self, cfg):
+        """Pass parameters from other templates into the model
+
+        Args:
+            cfg (UnifyConfig): parameters from other templates
+        """
         super().__init__(cfg)
 
     def build_cfg(self):
-        self.problem_num = self.datatpl_cfg['dt_info']['exer_count']  # 习题数量
-        self.skill_num = self.datatpl_cfg['dt_info']['cpt_count']  # 知识点数量
+        """Initialize the parameters of the model"""
+        self.problem_num = self.datatpl_cfg['dt_info']['exer_count']
+        self.skill_num = self.datatpl_cfg['dt_info']['cpt_count']
         self.emb_size = self.modeltpl_cfg['emb_size']
         self.time_log = self.modeltpl_cfg['time_log']
 
     def build_model(self):
+        """Initialize the various components of the model"""
         self.problem_base = torch.nn.Embedding(self.problem_num, 1)
         self.skill_base = torch.nn.Embedding(self.skill_num, 1)
 
-        self.alpha_inter_embeddings = torch.nn.Embedding(self.skill_num * 2, self.emb_size)  # 对应论文中的PA吧
+        self.alpha_inter_embeddings = torch.nn.Embedding(self.skill_num * 2, self.emb_size)  # Corresponding to the PA in the paper
         self.alpha_skill_embeddings = torch.nn.Embedding(self.skill_num, self.emb_size)
         self.beta_inter_embeddings = torch.nn.Embedding(self.skill_num * 2, self.emb_size)
         self.beta_skill_embeddings = torch.nn.Embedding(self.skill_num, self.emb_size)
 
     def _init_params(self):
-        #  super()._init_params()
+        """Parameter initialization of each component of the model"""
         torch.nn.init.normal_(self.problem_base.weight, mean=0.0, std=0.01)
         torch.nn.init.normal_(self.skill_base.weight, mean=0.0, std=0.01)
         torch.nn.init.normal_(self.alpha_inter_embeddings.weight, mean=0.0, std=0.01)
@@ -42,8 +52,18 @@ class HawkesKT(GDBaseModel):
         torch.nn.init.normal_(self.beta_skill_embeddings.weight, mean=0.0, std=0.01)
 
     def forward(self, exer_seq, start_timestamp_seq, cpt_unfold_seq, **kwargs):
-        skills = cpt_unfold_seq     # [batch_size, seq_len] 一个习题对应一个知识点
-        problems = exer_seq  # [batch_size, seq_len] batch_size个学生的序列
+        """A function of how well the model predicts students' responses to exercise questions
+
+        Args:
+            exer_seq (torch.Tensor): Sequence of exercise id. Shape of [batch_size, seq_len]
+            start_timestamp_seq (torch.Tensor): The time the student started answering the question. Shape of [batch_size, seq_len]
+            cpt_unfold_seq (torch.Tensor): Knowledge concepts corresponding to exercises. Shape of [batch_size, seq_len]
+
+        Returns:
+            torch.Tensor: The predictions of the model
+        """
+        skills = cpt_unfold_seq     # [batch_size, seq_len] One exercise corresponds to one knowledge point
+        problems = exer_seq  # [batch_size, seq_len] sequence of batch_size students
         # time = [i for i in range(start_timestamp_seq.shape[1])]
         # times = torch.Tensor([time for i in range(start_timestamp_seq.shape[0])])
         times = start_timestamp_seq - start_timestamp_seq[:,[0]]        # [batch_size, seq_len]
@@ -58,12 +78,11 @@ class HawkesKT(GDBaseModel):
         beta_target_emb = self.beta_skill_embeddings(skills)
         betas = torch.matmul(beta_src_emb, beta_target_emb.transpose(-2, -1))  # [bs, seq_len, seq_len]
         betas = torch.clamp(betas + 1, min=0, max=10)  
-        # torch.clamp把betas+1所有元素变为0~10，即betas+1小于0的元素变为0，betas+1大于10的元素变为10，其余不变
 
-        delta_t = (times[:, :, None] - times[:, None, :]).abs().double()  # 得到不同时间步的时间的绝对值
+        delta_t = (times[:, :, None] - times[:, None, :]).abs().double()  # Get the absolute value of the time at different time steps
         delta_t = torch.log(delta_t + 1e-10) / np.log(self.time_log)
 
-        cross_effects = alphas * torch.exp(-betas * delta_t)  # 论文(4)式的cross_effects
+        cross_effects = alphas * torch.exp(-betas * delta_t)  # The cross_effects of the paper (4)
 
         seq_len = skills.shape[1]
         valid_mask = np.triu(np.ones((1, seq_len, seq_len)), k=1)
@@ -79,6 +98,11 @@ class HawkesKT(GDBaseModel):
 
     @torch.no_grad()
     def predict(self, **kwargs):
+        """A function of get how well the model predicts students' responses to exercise questions and the groundtruth
+
+        Returns:
+            dict: The predictions of the model and the real situation
+        """
         y_pd = self(**kwargs)
         y_pd = y_pd[:, :-1]
         y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
@@ -92,6 +116,11 @@ class HawkesKT(GDBaseModel):
         }
 
     def get_main_loss(self, **kwargs):
+        """
+
+        Returns:
+            dict: {'loss_main': loss_value}
+        """
         y_pd = self(**kwargs)
         y_pd = y_pd[:, :-1]
         y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
@@ -105,4 +134,9 @@ class HawkesKT(GDBaseModel):
         }
 
     def get_loss_dict(self, **kwargs):
+        """
+
+        Returns:
+            dict: {'loss_main': loss_value}
+        """
         return self.get_main_loss(**kwargs)

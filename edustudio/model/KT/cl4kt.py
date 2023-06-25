@@ -1,3 +1,14 @@
+r"""
+CL4KT
+################################################
+Reference:
+
+    Wongsung Lee et al. "Contrastive Learning for Knowledge Tracing." in WWW2022.
+
+Reference Code:
+
+    https://github.com/UpstageAI/cl4kt
+"""
 from ..gd_basemodel import GDBaseModel
 import random
 import math
@@ -10,6 +21,10 @@ from ...datatpl.utils import PadSeqUtil
 
 
 class CL4KT(GDBaseModel):
+    """
+    CL4KT introduces a contrastive learning framework for knowledge tracing that learns effective representations by 
+    pulling similar learning histories together and pushing dissimilar learning histories apart in representation space.
+    """
     default_cfg = {
         'emb_size': 100,
         'hidden_size': 100,
@@ -34,10 +49,16 @@ class CL4KT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
+        """
+        Get exercise nums and concepts nums.
+        """
         self.n_item = self.datatpl_cfg['dt_info']['exer_count']
         self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
 
     def build_model(self):
+        """
+        Initial model operator.
+        """
         self.question_embed = nn.Embedding(
             self.n_cpt  + 2, self.modeltpl_cfg['emb_size']
         )
@@ -113,6 +134,9 @@ class CL4KT(GDBaseModel):
         return y_pd, att
     
     def get_interaction_embed(self, cpts, responses, attention_mask):
+        """
+        Get interaction embedding by concepts and responses.
+        """
         # masked_responses = responses * (attention_mask > 0).long()
         interactions = cpts + self.n_cpt * responses
 
@@ -133,6 +157,30 @@ class CL4KT(GDBaseModel):
         }
 
     def get_main_loss(self, **kwargs):
+        """Loss calculation entry, including response prediciton loss and contrastive loss.
+
+        Parameters
+        ----------
+
+            kwargs: dict
+                kwargs is input feature embedding tensor including stu_id、exer_seq、cpt_unfold_seq、label_seq and mask_seq.
+            stu_id: list
+                Student id information.
+            exer_seq: list
+                Exercise is done by students.
+            cpt_unfold_seq: list
+                Concepts is done by students.
+            label_seq: list
+                It reprsents whether the exercise is done correctly.
+            mask_seq: list
+                Real data location.
+
+        Returns
+        -------
+        torch.FloatTensor
+
+            Response Prediction Loss and Contrastive Loss.
+        """
         _, aug_c_seq_1, aug_r_seq_1, negative_r_seq, attention_mask_1 = self.augment_kt_seqs(**kwargs)
         _, aug_c_seq_2, aug_r_seq_2, _, attention_mask_2 = self.augment_kt_seqs(seed_change=True,**kwargs)
         aug_r_seq_1, aug_r_seq_2, negative_r_seq = aug_r_seq_1.long(), aug_r_seq_2.long(), negative_r_seq.long()
@@ -164,7 +212,7 @@ class CL4KT(GDBaseModel):
         pool_inter_i_score = (inter_i_score * attention_mask_1.unsqueeze(-1)).sum(1) / attention_mask_1.sum(-1).unsqueeze(-1)
         pool_inter_j_score = (inter_j_score * attention_mask_2.unsqueeze(-1)).sum(1) / attention_mask_2.sum(-1).unsqueeze(-1)
         inter_cos_sim = self.sim(pool_inter_i_score.unsqueeze(1), pool_inter_j_score.unsqueeze(0))
-        if self.modeltpl_cfg['hard_negative']: 
+        if self.modeltpl_cfg['hard_negative']:
             pool_inter_k_score = (inter_k_embed * kwargs['mask_seq'].unsqueeze(-1)).sum(1) / kwargs['mask_seq'].sum(-1).unsqueeze(-1)
             neg_inter_cos_sim = self.sim(pool_inter_i_score.unsqueeze(1), pool_inter_k_score.unsqueeze(0))
             inter_cos_sim = torch.cat([inter_cos_sim, neg_inter_cos_sim], 1)
@@ -204,6 +252,21 @@ class CL4KT(GDBaseModel):
         return self.get_main_loss(**kwargs)
 
     def augment_kt_seqs(self, seed_change=False, **kwargs):
+        """ Get augmental data, including four methods: Question mask、Interaction crop、Interaction permute、Question replac.
+
+        * **Question mask**: replace some questions in the original history with a special token [mask], without changing their responses.
+        * **Interaction crop**: create a random subset of original data.
+        * **Interaction permute**: re-order interactions in a sub-sequence of the original history.
+        * **Question replac**: convert original questions to easier or more difficult questions based on their responses.
+
+        Returns: 
+            tuple:
+                - exer_seq_final: augmental exercise sequence.
+                - cpt_seq_fianl: augmental concept sequence.
+                - label_seq_final: new label after augment.
+                - label_seq_flip: flipping the label for hard negative.
+                - mask: new mask matrix after augment.
+        """
         if seed_change:
             random.Random(self.traintpl_cfg['seed'] + 1)
             np.random.seed(self.traintpl_cfg['seed'] + 1)
@@ -229,7 +292,7 @@ class CL4KT(GDBaseModel):
         label_seq_flip = kwargs['label_seq'].clone() if self.modeltpl_cfg['hard_negative'] else label_seq_
         for b in range(bs):
             if self.datatpl_cfg['sequence_option'] == 'recent':
-                idx = torch.arange(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']) 
+                idx = torch.arange(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size'])
             else:
                 idx = torch.arange(lens[b])
             for i in idx:
@@ -278,6 +341,8 @@ class CL4KT(GDBaseModel):
         return exer_seq_final, cpt_seq_fianl, label_seq_final, label_seq_flip, mask
 
 class Similarity(nn.Module):
+    """ Calculate cosine similarity between data x and data y.
+    """
     def __init__(self, temp):
         super().__init__()
         self.temp = temp
@@ -288,6 +353,11 @@ class Similarity(nn.Module):
 
 
 class CL4KTTransformerLayer(nn.Module):
+    """
+    This is a Basic Block of Transformer paper. It contains one Multi-head attention object.
+
+    Followed by layer norm and position-wise feed-forward net and dropotu layer.
+    """
     def __init__(self, d_model, d_feature, d_ff, n_heads, dropout, kq_same):
         super(CL4KTTransformerLayer, self).__init__()
         # Multi-Head Attention Block
@@ -333,6 +403,11 @@ class CL4KTTransformerLayer(nn.Module):
 
 
 class MultiHeadAttentionWithIndividualFeatures(nn.Module):
+    """
+    It has projection layer for getting keys, queries, and values. 
+    
+    Followed by attention and a connected layer.
+    """
     def __init__(self, d_model, d_feature, n_heads, dropout, kq_same, bias=True):
         super(MultiHeadAttentionWithIndividualFeatures, self).__init__()
         self.d_model = d_model

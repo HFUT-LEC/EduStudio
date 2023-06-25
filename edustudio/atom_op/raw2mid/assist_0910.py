@@ -1,13 +1,19 @@
 from .raw2mid import BaseRaw2Mid
 import pandas as pd
 
+r"""
+R2M_ASSIST_0910
+#####################################
+ASSIST_0910 dataset preprocess
+"""
 
 
 class R2M_ASSIST_0910(BaseRaw2Mid):
+    """R2M_ASSIST_0910 is to preprocess ASSIST_0910 dataset"""
     def process(self):
         super().process()
         pd.set_option("mode.chained_assignment", None) # ingore warning
-        df = pd.read_csv(f"{self.rawpath}/skill_builder_data.csv", encoding='ISO-8859-1')
+        df = pd.read_csv(f"{self.rawpath}/skill_builder_data.csv", encoding='utf-8', low_memory=False)
         # 去除空值
         df = df.dropna(subset=['skill_id'])
 
@@ -75,29 +81,29 @@ class R2M_ASSIST_0910(BaseRaw2Mid):
             return data
 
         # 处理各列
-        df = sort(df,'user_id')
-        df = sort(df,'assignment_id')
-        df = sort(df,'problem_id')
-        df = sort(df,'skill_id')
-        df = sort(df,'class_id')
-        df = sort(df,'ms_first_response')
+        df = sort(df, 'user_id')
+        df = sort(df, 'assignment_id')
+        df = sort(df, 'problem_id')
+        df = sort(df, 'skill_id')
+        df = sort(df, 'class_id')
+        df = sort(df, 'ms_first_response')
         del df['school_id']
         del df['group_id']
         # print(df)
         
         # 修改列名
-        df = df.rename(columns = {'new_user_id' : 'stu_id:token', 'new_problem_id' : 'exer_id:token', 'correct' : 'label:float',\
-                                        'ms_first_response':'start_timestamp:float', 'new_class_id':'class_id:token',\
-                                       'new_skill_id':'cpt_seq:token_seq', 'overlap_time':'answer_time:float',\
+        df = df.rename(columns = {'new_user_id' : 'stu_id:token', 'new_problem_id' : 'exer_id:token', 'correct' : 'label:float',
+                                  'ms_first_response':'start_timestamp:float', 'new_class_id':'class_id:token',
+                                  'new_skill_id':'cpt_seq:token_seq', 'overlap_time':'cost_time:float',
                                   'new_assignment_id':'assignment_id:token_seq', 'new_order_id':'order_id:token'})
         # 指定列的新顺序
-        new_column_order = ['stu_id:token','exer_id:token','label:float','start_timestamp:float','answer_time:float','order_id:token',\
+        new_column_order = ['stu_id:token','exer_id:token','label:float','start_timestamp:float','cost_time:float','order_id:token',
                             'class_id:token', 'cpt_seq:token_seq','assignment_id:token_seq']
         df = df.reindex(columns=new_column_order)
         # print(df)
 
         # df_inter 相关处理
-        df_inter = df[['stu_id:token','exer_id:token','label:float','start_timestamp:float','answer_time:float','order_id:token']]
+        df_inter = df[['stu_id:token','exer_id:token','label:float','start_timestamp:float','cost_time:float','order_id:token']]
         df_inter.drop_duplicates(inplace=True)
         df_inter.sort_values('stu_id:token', inplace=True)
         # print(df_inter)
@@ -137,19 +143,9 @@ class R2M_ASSIST_0910(BaseRaw2Mid):
         df_exer.sort_values(by='exer_id:token', inplace=True)
         # print(df_exer)
 
-        # # Stat dataset
-        # 
-        # 此处统计数据集，保存到cfg对象中
-        
-        # cfg.stu_count = len(df_user)
-        # cfg.exer_count = len(df_exer)
-        # cfg.cpt_count = len(df['cpt_seq:token_seq'].unique())
-        # cfg.interaction_count = len(df_inter)
-        # cfg
-
         # # Save MidData
         
         df_inter.to_csv(f"{self.midpath}/{self.dt}.inter.csv", index=False, encoding='utf-8')
         df_user.to_csv(f"{self.midpath}/{self.dt}.stu.csv", index=False, encoding='utf-8')
         df_exer.to_csv(f"{self.midpath}/{self.dt}.exer.csv", index=False, encoding='utf-8')
-        pd.set_option("mode.chained_assignment", "warn") # ingore warning
+        pd.set_option("mode.chained_assignment", "warn") # igore warning

@@ -1,27 +1,26 @@
 from .raw2mid import BaseRaw2Mid
 import pandas as pd
+r"""
+R2M_Math1
+#####################################
+Math1 dataset preprocess
+"""
 
 
 class R2M_Math1(BaseRaw2Mid):
+    """R2M_Math1 is to preprocess Math1 dataset"""
     def process(self):
-
+        super().process()
         # 读取文本文件转换为 dataframe
-        df_inter = pd.read_csv(f"{self.rawpath}/data.txt", sep='\t', names=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',\
+        df_inter = pd.read_csv(f"{self.rawpath}/data.txt", sep='\t', names=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                                                                         '10', '11', '12', '13', '14', '15', '16', '17', '18', '19']) 
         df_exer = pd.read_csv(f"{self.rawpath}/q.txt", sep='\t', names=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9','10'])
-
-        # print(df_inter)
-        # print(df_exer)
-
-        # 统计知识点个数
-        cpt_count = df_exer.shape[1]
 
         # 处理 df_inter 拆成很多行
         df_inter.insert(0, 'stu_id:token', range(len(df_inter)))
         df_inter = df_inter.melt(id_vars=['stu_id:token'], var_name='exer_id:token', value_name='label:float')
         df_inter['exer_id:token'] = df_inter['exer_id:token'].astype(int)
         df_inter .sort_values(by = ['stu_id:token','exer_id:token'],inplace=True)
-        # print(df_inter)
 
         # 处理 df_exer 先拆成很多行，再合并
         
@@ -41,10 +40,7 @@ class R2M_Math1(BaseRaw2Mid):
         # 按 exer_id:token 进行排序
         df_exer['exer_id:token'] = df_exer['exer_id:token'].astype(int)
         df_exer.sort_values(by='exer_id:token', inplace=True)
-        # print(df_exer)
 
-        # # Save MidData
-        # 
         # 此处将数据保存到`self.midpath`中
 
         df_inter.to_csv(f"{self.midpath}/{self.dt}.inter.csv", index=False, encoding='utf-8')

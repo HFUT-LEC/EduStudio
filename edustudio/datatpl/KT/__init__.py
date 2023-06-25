@@ -7,3 +7,4 @@ from .DKTForgetDataTPL import DKTForgetDataTPL
 from .KTInterCptUnfoldDataTPL import KTInterCptUnfoldDataTPL
 from .DKTDSCDataTPL import DKTDSCDataTPL
 from .DIMKTDataTPL import DIMKTDataTPL
+from .QDKTDataTPL import QDKTDataTPL
