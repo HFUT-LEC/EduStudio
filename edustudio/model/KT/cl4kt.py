@@ -26,8 +26,8 @@ class CL4KT(GDBaseModel):
     pulling similar learning histories together and pushing dissimilar learning histories apart in representation space.
     """
     default_cfg = {
-        'emb_size': 100,
-        'hidden_size': 100,
+        'emb_size': 64,
+        'hidden_size': 64,
         'num_blocks': 2,
         'num_attn_heads': 8,
         'kq_same': True,
@@ -129,7 +129,8 @@ class CL4KT(GDBaseModel):
             x, att = block(mask=0, query=x, key=x, values=y, apply_pos=True)
         
         retrieved_knowledge = torch.cat([x, cpt_embed], dim=-1)
-        y_pd = torch.sigmoid(self.out(retrieved_knowledge)).squeeze()
+        # y_pd = torch.sigmoid(self.out(retrieved_knowledge)).squeeze()
+        y_pd = torch.sigmoid(self.out(retrieved_knowledge))
 
         return y_pd, att
     
@@ -146,7 +147,7 @@ class CL4KT(GDBaseModel):
     def predict(self, **kwargs):
         y_pd,_ = self(**kwargs)
         y_pd = y_pd[:, 1:]
-        y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
+        y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1].squeeze()
         y_gt = None
         if kwargs.get('label_seq', None) is not None:
             y_gt = kwargs['label_seq'][:, 1:]
@@ -237,7 +238,7 @@ class CL4KT(GDBaseModel):
         y_pd, _ = self(**kwargs)
 
         y_pd = y_pd[:, 1:]
-        y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
+        y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1].squeeze()
         y_gt = kwargs['label_seq'][:, 1:]
         y_gt = y_gt[kwargs['mask_seq'][:, 1:] == 1]
         loss = F.binary_cross_entropy(
@@ -281,8 +282,8 @@ class CL4KT(GDBaseModel):
         # Manipulate order: Question mask
         if self.modeltpl_cfg['mask_prob'] > 0:
            for b in range(bs):
-                if self.datatpl_cfg['sequence_option'] == 'recent':
-                    idx = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-1), max(1, int(lens[b] * self.modeltpl_cfg['mask_prob'])))
+                if self.datatpl_cfg['M2C_CL4KT_OP']['sequence_truncation'] == 'recent':
+                    idx = random.sample(range(self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-lens[b], self.datatpl_cfg['M2C_CL4KT_OP']['window_size']), max(1, int(lens[b] * self.modeltpl_cfg['mask_prob'])))
                 else:
                     idx = random.sample(range(lens[b]-1), max(1, int(lens[b] * self.modeltpl_cfg['mask_prob'])))
                 for i in idx:
@@ -291,8 +292,8 @@ class CL4KT(GDBaseModel):
         # Hard negative
         label_seq_flip = kwargs['label_seq'].clone() if self.modeltpl_cfg['hard_negative'] else label_seq_
         for b in range(bs):
-            if self.datatpl_cfg['sequence_option'] == 'recent':
-                idx = torch.arange(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size'])
+            if self.datatpl_cfg['M2C_CL4KT_OP']['sequence_truncation'] == 'recent':
+                idx = torch.arange(self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-lens[b], self.datatpl_cfg['M2C_CL4KT_OP']['window_size'])
             else:
                 idx = torch.arange(lens[b])
             for i in idx:
@@ -300,8 +301,8 @@ class CL4KT(GDBaseModel):
         # Manipulate order:Question replace
         if self.modeltpl_cfg['replace_prob'] > 0:
             for b in range(bs):
-                if self.datatpl_cfg['sequence_option'] == 'recent':
-                    idx = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-1), max(1, int(lens[b] * self.modeltpl_cfg['replace_prob'])))
+                if self.datatpl_cfg['M2C_CL4KT_OP']['sequence_truncation'] == 'recent':
+                    idx = random.sample(range(self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-lens[b], self.datatpl_cfg['M2C_CL4KT_OP']['window_size']), max(1, int(lens[b] * self.modeltpl_cfg['replace_prob'])))
                 else:
                     idx = random.sample(range(lens[b]-1), max(1, int(lens[b] * self.modeltpl_cfg['replace_prob'])))
                 for i in idx:
@@ -311,8 +312,8 @@ class CL4KT(GDBaseModel):
         if self.modeltpl_cfg['permute_prob'] > 0:
             for b in range(bs):
                 reorder_seq_len = int(lens[b] * self.modeltpl_cfg['permute_prob'])
-                if self.datatpl_cfg['sequence_option'] == 'recent':
-                    start_pos = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-reorder_seq_len-1), 1)
+                if self.datatpl_cfg['M2C_CL4KT_OP']['sequence_truncation'] == 'recent':
+                    start_pos = random.sample(range(self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-lens[b], self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-reorder_seq_len), 1)
                 else:
                     start_pos = random.sample(range(lens[b]-reorder_seq_len-1), 1)
 
@@ -325,14 +326,14 @@ class CL4KT(GDBaseModel):
         if self.modeltpl_cfg['crop_prob'] > 0:
             for b in range(bs):
                 crop_seq_len = 1 if int(lens[b] * self.modeltpl_cfg['permute_prob']) == 0 else int(lens[b] * self.modeltpl_cfg['permute_prob'])
-                if self.datatpl_cfg['sequence_option'] == 'recent':
-                    start_pos = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-crop_seq_len-1), 1)
+                if self.datatpl_cfg['M2C_CL4KT_OP']['sequence_truncation'] == 'recent':
+                    start_pos = random.sample(range(self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-lens[b], self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-crop_seq_len + 1), 1)
                     exer_seq_final[b, -crop_seq_len:] = exer_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     cpt_seq_fianl[b, -crop_seq_len:] = cpt_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     label_seq_final[b, -crop_seq_len:] = label_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     mask[b, -crop_seq_len:] = 1
                 else:
-                    start_pos = random.sample(range(self.datatpl_cfg['window_size']-lens[b], self.datatpl_cfg['window_size']-crop_seq_len-1), 1)
+                    start_pos = random.sample(range(self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-lens[b], self.datatpl_cfg['M2C_CL4KT_OP']['window_size']-crop_seq_len-1), 1)
                     exer_seq_final[b, :crop_seq_len] = exer_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     cpt_seq_fianl[b, :crop_seq_len] = cpt_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]
                     label_seq_final[b, :crop_seq_len] = label_seq_[b, start_pos[0]:start_pos[0] + crop_seq_len]

@@ -34,10 +34,10 @@ class PairSCELoss(nn.Module):
 
 class IRR(BaseProxyModel):
     """
-    backbone_model_cls: The backbone model of IRR
+    backbone_modeltpl_cls: The backbone model of IRR
     """
     default_cfg = {
-        "backbone_model_cls": "IRT",
+        "backbone_modeltpl_cls": "IRT",
     }
 
     def __init__(self, cfg):

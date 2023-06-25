@@ -17,15 +17,15 @@ class PairDataLoader(DataLoader):
 
 class IRRDataTPL(BaseProxyDataTPL):
     default_cfg = {
-        'backbone_datafmt_cls': 'CDInterDataTPL',
+        'backbone_datatpl_cls': 'CDInterDataTPL',
         'num_observed': 10,
         'num_unobserved': 10
     }
 
     def sample(self):
-        self.stu_count = self.datafmt_cfg['dt_info']['stu_count']
-        self.num_observed = self.datafmt_cfg['num_observed']
-        self.num_unobserved = self.datafmt_cfg['num_unobserved']
+        self.stu_count = self.datatpl_cfg['dt_info']['stu_count']
+        self.num_observed = self.datatpl_cfg['num_observed']
+        self.num_unobserved = self.datatpl_cfg['num_unobserved']
         stu_id = self.dict_main['stu_id'].numpy()
         exer_id = self.dict_main['exer_id'].numpy()
         label = self.dict_main['label'].numpy()
@@ -95,13 +95,13 @@ class IRRDataTPL(BaseProxyDataTPL):
                     self.dict_main['pair_neg_stu'].append(numpy.int64(self.pair_neg_stu))
 
     def build_dataloaders(self):
-        batch_size = self.trainfmt_cfg['batch_size']
-        num_workers = self.trainfmt_cfg['num_workers']
-        eval_batch_size = self.trainfmt_cfg['eval_batch_size']
+        batch_size = self.traintpl_cfg['batch_size']
+        num_workers = self.traintpl_cfg['num_workers']
+        eval_batch_size = self.traintpl_cfg['eval_batch_size']
         train_dt_list, valid_dt_list, test_dt_list = self.build_datasets()
         train_loader_list, valid_loader_list, test_loader_list = [], [], []
 
-        for fid in range(self.datafmt_cfg['n_folds']):
+        for fid in range(self.datatpl_cfg['n_folds']):
             train_loader = PairDataLoader(dataset=train_dt_list[fid], shuffle=True, batch_size=batch_size, num_workers=num_workers, collate_fn=self.collate_fn)
             train_loader_list.append(train_loader)
             if self.hasValidDataset:
