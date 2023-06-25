@@ -33,9 +33,9 @@ The overall structure is illustrated as follows:
    :caption: Framework Features
 
    features/inheritable_config
+   features/atomic_files
    features/dataset_folder_protocol
    features/atomic_operations
-   features/atomic_files
 
 .. toctree::
    :maxdepth: 1

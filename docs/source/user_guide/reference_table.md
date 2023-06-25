@@ -6,13 +6,13 @@
 | :------ | ---------------------: | :-------------: | ------------------------------------------------------ |
 | IRT     |         CDInterDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
 | MIRT    |         CDInterDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
-| NCDM    | CDInterDataTPLExtendsQ | CDInterTrainTPL | BinaryClassificationEvalTPL、CognitiveDiagnosisEvalTPL |
+| NCDM    | CDInterExtendsQDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL、CognitiveDiagnosisEvalTPL |
 | CNCD_Q  |           CNCDQDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
 | CNCD_F  |           CNCDFDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
 | DINA    | CDInterExtendsQDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL、CognitiveDiagnosisEvalTPL |
 | HierCDF |         HierCDFDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL、CognitiveDiagnosisEvalTPL |
 | CDGK    |            CDGKDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL、CognitiveDiagnosisEvalTPL |
-| CDMFKC  | CDInterDataTPLExtendsQ | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
+| CDMFKC  | CDInterExtendsQDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
 | ECD     |             ECDDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
 | IRR     |             IRRDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL                            |
 | KaNCD   | CDInterExtendsQDataTPL | CDInterTrainTPL | BinaryClassificationEvalTPL、CognitiveDiagnosisEvalTPL |
