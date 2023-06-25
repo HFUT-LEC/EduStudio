@@ -5,6 +5,7 @@ The first atomic operation, inheriting the protocol class `BaseRaw2Mid`, is the 
 The following atomic operations, inheriting the protocol class `BaseMid2Cache`,  construct the process from middle data to cache data.
 
 ## BaseRaw2Mid
+
 The atomic operations inheriting `BaseRaw2Mid` preprocess the raw dataset into middle dataset (standardized data files).
 
 ### Protocols
@@ -27,9 +28,9 @@ The following example illustrates the process of `Assistment 2019-2010 ` dataset
 class R2M_ASSIST_0910(BaseRaw2Mid):
     def process(self):
         df = pd.read_csv(f"{self.rawpath}/skill_builder_data.csv", encoding='ISO-8859-1')
-		
-		......
-        
+
+        ......
+
         df_inter.to_csv(f"{self.midpath}/{self.dt}.inter.csv", index=False, encoding='utf-8')
         df_user.to_csv(f"{self.midpath}/{self.dt}.stu.csv", index=False, encoding='utf-8')
         df_exer.to_csv(f"{self.midpath}/{self.dt}.exer.csv", index=False, encoding='utf-8')
@@ -45,13 +46,13 @@ The atomic operations inheriting `BaseMid2Cache` preprocess the middle dataset i
 
 The protocols in `BaseMid2Cache` are listed as follows:
 
-| name          | description                                                  | type               | note                    |
-| ------------- | ------------------------------------------------------------ | ------------------ | ----------------------- |
-| default_cfg   | the default configuration of operation                       | class variable     |                         |
-| self.logger   | logger object                                                | instance variable  | given in BaseMid2Cache  |
-| self.m2c_cfg  | actual configuration in running process                      | instance variable  | given in BaseMid2Cache  |
-| _check_params | check validation of default configuration                    | function interface | implemented by subclass |
-| process       | preprocess the raw dataset into middle dataset               | function interface | implemented by subclass |
+| name          | description                                                       | type               | note                    |
+| ------------- | ----------------------------------------------------------------- | ------------------ | ----------------------- |
+| default_cfg   | the default configuration of operation                            | class variable     |                         |
+| self.logger   | logger object                                                     | instance variable  | given in BaseMid2Cache  |
+| self.m2c_cfg  | actual configuration in running process                           | instance variable  | given in BaseMid2Cache  |
+| _check_params | check rationality of configuration                                | function interface | implemented by subclass |
+| process       | preprocess the raw dataset into middle dataset                    | function interface | implemented by subclass |
 | set_dt_info   | store dataset information in the process (such as student number) | function interface | implemented by subclass |
 
 ### Example
@@ -64,7 +65,7 @@ class M2C_RandomDataSplit4CD(BaseMid2Cache):
         'seed': 2023,
         "divide_scale_list": [7,1,2],
     }
-    
+
     def _check_params(self):
         super()._check_params()
         assert 2 <= len(self.m2c_cfg['divide_scale_list']) <= 3
@@ -91,5 +92,4 @@ class M2C_RandomDataSplit4CD(BaseMid2Cache):
     def set_dt_info(self, dt_info, **kwargs):
         if 'stu_id:token' in kwargs['df'].columns:
             dt_info['stu_count'] = int(kwargs['df']['stu_id:token'].max() + 1)
-
 ```

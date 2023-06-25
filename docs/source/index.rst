@@ -1,5 +1,5 @@
 .. EduStudio documentation master file.
-.. title:: EduStudio v0.0.1-alpha1
+.. title:: EduStudio v1.0.0-alpha2
 .. image:: assets/logo.png
 
 =========================================================
@@ -27,13 +27,23 @@ The overall structure is illustrated as follows:
    get_started/install
    get_started/quick_start
 
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Framework Features
+
+   features/inheritable_config
+   features/dataset_folder_protocol
+   features/atomic_operations
+   features/atomic_files
+
 .. toctree::
    :maxdepth: 1
    :caption: User Guide
 
-   user_guide/inheritable_config
-   user_guide/reference_table
+   user_guide/datasets
    user_guide/atomic_ops
+   user_guide/reference_table
    user_guide/usage
 
 .. toctree::
@@ -46,7 +56,7 @@ The overall structure is illustrated as follows:
    developer_guide/customize_traintpl
    developer_guide/customize_evaltpl
 
-
+   
 Indices and tables
 ==================
 

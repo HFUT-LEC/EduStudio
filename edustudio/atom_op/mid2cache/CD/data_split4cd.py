@@ -3,6 +3,7 @@ from ..common.base_mid2cache import BaseMid2Cache
 from edustudio.datatpl.utils import SpliterUtil
 from sklearn.model_selection import StratifiedKFold, KFold
 from itertools import chain
+import numpy as np
 
 
 class M2C_RandomDataSplit4CD(BaseMid2Cache):
@@ -72,4 +73,4 @@ class M2C_RandomDataSplit4CD(BaseMid2Cache):
             dt_info['exer_count'] = int(kwargs['df']['exer_id:token'].max() + 1)
         if kwargs.get('df_exer', None) is not None:
             if 'cpt_seq:token_seq' in kwargs['df_exer']:
-                dt_info['cpt_count'] = len(set(list(chain(*kwargs['df_exer']['cpt_seq:token_seq'].to_list()))))
+                dt_info['cpt_count'] = np.max(list(chain(*kwargs['df_exer']['cpt_seq:token_seq'].to_list()))) + 1

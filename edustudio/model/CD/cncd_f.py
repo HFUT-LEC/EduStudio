@@ -132,11 +132,16 @@ class CNCD_F(GDBaseModel):
         )
 
     def add_extra_data(self, **kwargs):
-        self.content_list = kwargs['content']
+        cl = kwargs['content']
+        self.content_list=[]
+        for ls in cl:
+            s = ",".join(map(str, ls))
+            self.content_list.append(s)
+        self.Q_mat = kwargs['Q_mat']
 
-    def forward(self, stu_id, exer_id, Q_mat):
+    def forward(self, stu_id, exer_id):
         # before prednet
-        items_Q_mat = Q_mat[exer_id]
+        items_Q_mat = self.Q_mat[exer_id]
         items_content = self.word_ids[exer_id]
         text_embedding = self.textcnn(items_content)
         text_factor = torch.sigmoid(self.out_text_factor(text_embedding))
@@ -153,17 +158,16 @@ class CNCD_F(GDBaseModel):
         return pd
 
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
 
     def get_main_loss(self, **kwargs):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        pd = self(stu_id, exer_id, Q_mat).flatten()
+        pd = self(stu_id, exer_id).flatten()
         loss = F.binary_cross_entropy(input=pd, target=label)
         return {
             'loss_main': loss
