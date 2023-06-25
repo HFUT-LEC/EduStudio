@@ -7,17 +7,16 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='ASSIST_0910',
+    dataset='JunyiExerAsCpt',
     cfg_file_name=None,
-    datatpl_cfg_dict={
-        'cls': 'DIMKTDataTPL',
-    },
     traintpl_cfg_dict={
-        'cls': 'KTInterTrainTPL',
-        'device': 'cpu',
+        'cls': 'CDInterTrainTPL',
+    },
+    datatpl_cfg_dict={
+        'cls': 'HierCDFDataTPL'
     },
     modeltpl_cfg_dict={
-        'cls': 'DIMKT',
+        'cls': 'HierCDF',
     },
     evaltpl_cfg_dict={
         'clses': ['BinaryClassificationEvalTPL'],

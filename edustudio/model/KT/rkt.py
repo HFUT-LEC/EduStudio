@@ -85,10 +85,10 @@ class RKT(GDBaseModel):
     def add_extra_data(self, **kwargs):
         self.pro_pro_dense = kwargs['pro_pro_dense']
 
-    def forward(self, exer_seq, label_seq,  time_seq, **kwargs):
-        time = computeRePos(time_seq)
-        item_inputs = kwargs['item_inputs']
-        label_inputs = kwargs['label_inputs']
+    def forward(self, exer_seq, label_seq,  start_timestamp_seq, **kwargs):
+        time = computeRePos(start_timestamp_seq)
+        item_inputs = torch.cat((torch.zeros((exer_seq.shape[0], 1)).to(self.device), exer_seq[:, :-1]), dim=1)
+        label_inputs = torch.cat((torch.zeros((exer_seq.shape[0], 1)).to(self.device), label_seq[:, :-1]), dim=1)
         item_inputs = item_inputs.long().cpu()
         exer_seq = exer_seq.cpu()
         rel = self.pro_pro_dense[

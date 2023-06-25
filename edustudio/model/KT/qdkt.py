@@ -76,10 +76,10 @@ class QDKT(GDBaseModel):
         self.fasttext_model = fasttext.train_unsupervised("tmp.txt",  dim = self.modeltpl_cfg['emb_size'],minCount=1, wordNgrams=2)
 
     def train_fasttext(self):
-        stu_ids = self.train_dict['stu_id'].cpu().numpy()
-        exer_ids = self.train_dict['exer_seq'].cpu().numpy()
-        label_ids = self.train_dict['label_seq'].cpu().numpy()
-        mask_ids = self.train_dict['mask_seq'].cpu().numpy()
+        stu_ids = self.train_dict['stu_id'].numpy()
+        exer_ids = self.train_dict['exer_seq'].numpy()
+        label_ids = self.train_dict['label_seq'].numpy()
+        mask_ids = self.train_dict['mask_seq'].numpy()
         len_s = len(stu_ids)
         ex_stuid = -1
         all_str = []

@@ -14,13 +14,13 @@ class M2C_QDKT_OP(BaseMid2Cache):
         self.num_q = dt_info['exer_count']
         self.num_c = dt_info['cpt_count']
         self.Q_mat = kwargs['Q_mat']
-
         graph = self.generate_graph()
         laplacian_matrix = self.laplacian_matrix(graph)
         kwargs['laplacian_matrix'] = laplacian_matrix
         return kwargs
 
     def generate_graph(self):
+
         graph = nx.Graph()
         len1 = len(self.Q_mat)
         graph.add_nodes_from([i for i in range(1, len1 + 1)])

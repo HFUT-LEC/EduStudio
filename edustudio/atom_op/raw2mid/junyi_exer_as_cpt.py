@@ -4,13 +4,13 @@ import time
 from .raw2mid import BaseRaw2Mid
 
 r"""
-R2M_Junyi_Exercise_As_Cpt
+R2M_JunyiExerAsCpt
 ########################
 """
 
 
-class R2M_Junyi_Exercise_As_Cpt(BaseRaw2Mid):
-    """R2M_Junyi_Exercise_As_Cpt is a class used to handle the Junyi dataset, where we consider the exercise's KC(Exercise) as the basis for constructing the cpt_seq (concept sequence)."""
+class R2M_JunyiExerAsCpt(BaseRaw2Mid):
+    """R2M_JunyiExerAsCpt is a class used to handle the Junyi dataset, where we consider the exercise's KC(Exercise) as the basis for constructing the cpt_seq (concept sequence)."""
 
     def process(self, **kwargs):
         super().process()
@@ -40,8 +40,6 @@ class R2M_Junyi_Exercise_As_Cpt(BaseRaw2Mid):
             name2id = dict(zip(l, range(len(l))))
             id2name = dict(zip(range(len(l)), l))
             return name2id, id2name
-
-        # In[164]:
 
         exer_parent = exercise[['name', 'prerequisites']].copy()
 
@@ -125,9 +123,8 @@ class R2M_Junyi_Exercise_As_Cpt(BaseRaw2Mid):
 
         # 此处将数据保存到`self.midpath`中
 
+        df_inter = df_inter.rename(columns={'order:token': 'order_id:token'})
         df_inter.to_csv(f"{self.midpath}/{self.dt}.inter.csv", index=False, encoding='utf-8')
         # df_stu.to_csv(f"{self.midpath}/{self.dt}.stu.csv", index=False, encoding='utf-8')
         df_exer.to_csv(f"{self.midpath}/{self.dt}.exer.csv", index=False, encoding='utf-8')
-        df_hier.to_csv(f"{self.midpath}/{self.dt}.hier.csv", index=False, encoding='utf-8')
-
-        return
+        df_hier.to_csv(f"{self.midpath}/{self.dt}.cpt_relation.prerequisite.csv", index=False, encoding='utf-8')

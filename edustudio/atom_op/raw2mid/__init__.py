@@ -11,7 +11,7 @@ from .assist_2017 import R2M_ASSIST_2017
 from .bridge2006 import R2M_Bridge2006
 from .ednet_kt1 import R2M_EdNet_KT1
 from .junyi_area_topic_as_cpt import R2M_Junyi_Area_Topic_As_Cpt
-from .junyi_exer_as_cpt import R2M_Junyi_Exercise_As_Cpt
+from .junyi_exer_as_cpt import R2M_JunyiExerAsCpt
 from .nips12 import R2M_NIPS12
 from .nips34 import R2M_NIPS34
 from .simulated5 import R2M_Simulated5
@@ -31,7 +31,7 @@ _cli_api_dict_['R2M_ASSIST_2017'] = R2M_ASSIST_2017.from_cli
 _cli_api_dict_['R2M_Bridge2006'] = R2M_Bridge2006.from_cli
 _cli_api_dict_['R2M_EdNet_KT1'] = R2M_EdNet_KT1.from_cli
 _cli_api_dict_['R2M_Junyi_Area_Topic_As_Cpt'] = R2M_Junyi_Area_Topic_As_Cpt.from_cli
-_cli_api_dict_['R2M_Junyi_Exercise_As_Cpt'] = R2M_Junyi_Exercise_As_Cpt.from_cli
+_cli_api_dict_['R2M_JunyiExerAsCpt'] = R2M_JunyiExerAsCpt.from_cli
 _cli_api_dict_['R2M_NIPS12'] = R2M_NIPS12.from_cli
 _cli_api_dict_['R2M_NIPS34'] = R2M_NIPS34.from_cli
 _cli_api_dict_['R2M_Simulated5'] = R2M_Simulated5.from_cli

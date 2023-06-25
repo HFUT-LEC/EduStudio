@@ -10,14 +10,13 @@ run_edustudio(
     dataset='ASSIST_0910',
     cfg_file_name=None,
     datatpl_cfg_dict={
-        'cls': 'DIMKTDataTPL',
+        'cls': 'QDKTDataTPL',
     },
     traintpl_cfg_dict={
         'cls': 'KTInterTrainTPL',
-        'device': 'cpu',
     },
     modeltpl_cfg_dict={
-        'cls': 'DIMKT',
+        'cls': 'QDKT',
     },
     evaltpl_cfg_dict={
         'clses': ['BinaryClassificationEvalTPL'],
