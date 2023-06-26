@@ -10,6 +10,14 @@ Introduction
 -------------------------
 EduStudio is a Unified and Templatized Framework for Student Assessment Models including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
 
+EduStudio first decomposes the general algorithmic workflow into five steps: ``configuration reading``, ``data processing``, ``model implementation``, ``training control``, and ``result evaluation``. Subsequently, to enhance the ``reusability`` of each step, we extract the commonalities of each algorithm at each step into individual templates for templatization.
+
+As illustrated in the Figure below, to better implement a templatized framework, we implement an ``inheritance-style`` EduStudio that contains basic architecture and inherited architecture with different responsibilities. 
+
+The **basic architecture emphasizes domain-irrelevant content and strives to build templatized protocols**. 
+The **inherited architecture obeys the protocol in the basic architecture and focuses on domain-relevant content**. 
+The inheritance-style separates domainrelevant and domain-irrelevant content, greatly simplifying framework structure and enhancing ``readability``.
+
 The overall structure is illustrated as follows:
 
 .. image:: assets/framework.png
@@ -42,6 +50,7 @@ The overall structure is illustrated as follows:
    :caption: User Guide
 
    user_guide/datasets
+   user_guide/models
    user_guide/atomic_ops
    user_guide/reference_table
    user_guide/usage

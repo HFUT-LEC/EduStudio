@@ -11,13 +11,18 @@
 EduStudio is a Unified and Templatized Framework for Student Assessment Models including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
 
 # Description
+EduStudio first decomposes the general algorithmic workflow into five steps: `configuration reading`, `data processing`, `model implementation`, `training control`, and `result evaluation`. Subsequently, to enhance the `reusability `of each step, we extract the commonalities of each algorithm at each step into individual templates for templatization.
 
+As illustrated in the Figure below, to better implement a templatized framework, we implement an `inheritance-style` EduStudio that contains basic architecture and inherited architecture with different responsibilities. The **basic architecture emphasizes domain-irrelevant content and strives to build templatized protocols**. The **inherited architecture obeys the protocol in the basic architecture and focuses on domain-relevant content**. The inheritance-style separates domainrelevant and domain-irrelevant content, greatly simplifying framework structure and enhancing `readability`.
+
+The documentation is available [here](https://edustudio.readthedocs.io).
 
 <p align="center">
   <img src="assets/framework.svg" alt="EduStudio Architecture" width="600">
   <br>
-  <b>Figure</b>: EduStudio Overall Architecture
+  <b>Figure</b>: Overall Architecture of EduStudio
 </p>
+
 
 ## Quick Start
 
@@ -27,13 +32,13 @@ Install `EduStudio`:
 pip install edustudio
 ```
 
-Example: Run `KaNCD` model:
+Example: Run `NCDM` model:
 
 ```python
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='ASSIST_0910',
+    dataset='FrcSub',
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'CDInterTrainTPL',
@@ -42,7 +47,7 @@ run_edustudio(
         'cls': 'CDInterExtendsQDataTPL'
     },
     modeltpl_cfg_dict={
-        'cls': 'KaNCD',
+        'cls': 'NCDM',
     },
     evaltpl_cfg_dict={
         'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
