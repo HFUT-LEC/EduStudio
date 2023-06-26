@@ -7,7 +7,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='ASSIST_0910',
+    dataset='FrcSub',
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'CDInterTrainTPL',

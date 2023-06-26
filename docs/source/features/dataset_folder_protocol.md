@@ -5,7 +5,7 @@ In `Edustudio`, we view the dataset as three stages: `rawdata`, `middata`, `cach
 
 ## Dataset Folder Format Example
 
-All datasets are required to store in a unified folder. The below example illustrated the `FrcSub` dataset folder format.
+All datasets are required to store in a unified folder. The example below illustrated the `FrcSub` dataset folder format.
 
 ```
 data/
@@ -57,8 +57,4 @@ With the `middata` of following atomic file protocol, we can implement some othe
 - M2C_ReMapId: ReMap feature Id
 - M2C_RandomDataSplit4CD: Split Datasets
 - M2C_GenQMat: Generate Q-matrix
-
-
-
-
 

@@ -53,10 +53,7 @@ default_cfg = {
 }
 ```
 
-The final `default_cfg` following two rules:
+The final `default_cfg` follows two rules:
 
 - The subclass would incorporate the `default_cfg` of all parent classes.
 - When a conflict happened for the same key, the subclass would dominate the priority.
-
-
-
