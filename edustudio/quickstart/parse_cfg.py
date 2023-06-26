@@ -1,5 +1,6 @@
 from typing import Dict, Any
 import edustudio.settings as settings
+from edustudio.utils.common import IDUtil as idUtil
 from edustudio.utils.common import UnifyConfig
 import argparse
 from ast import literal_eval
@@ -56,7 +57,8 @@ def get_global_cfg(
             elif key.startswith('frame_cfg.'):
                 unknown_arg_dict['frame_cfg'][key] = value
             else:
-                raise ValueError(f"unsupported key: {key}")
+                pass
+                # raise ValueError(f"unsupported key: {key}")
 
 
     cfg = UnifyConfig({
@@ -68,6 +70,7 @@ def get_global_cfg(
         
     # process frame cfg
     cfg.frame_cfg = UnifyConfig.from_py_module(settings)
+    cfg.frame_cfg.ID = idUtil.get_random_id_bytime()
     for k,v in frame_cfg_dict.items():
         assert k in cfg.frame_cfg
         assert type(v) is None or type(cfg.frame_cfg[k]) is type(v)

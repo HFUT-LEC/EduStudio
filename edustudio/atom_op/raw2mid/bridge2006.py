@@ -3,13 +3,13 @@ import time
 from .raw2mid import BaseRaw2Mid
 
 r"""
-R2M_Bridge2006
+R2M_Bridge2Algebra_0607
 ########################
 """
 
 
-class R2M_Bridge2006(BaseRaw2Mid):
-    """R2M_Bridge2006 is a class used to handle the Bridge2006 dataset."""
+class R2M_Bridge2Algebra_0607(BaseRaw2Mid):
+    """R2M_Bridge2Algebra_0607 is a class used to handle the Bridge2Algebra 2006-2007 dataset."""
 
     def process(self):
         super().process()

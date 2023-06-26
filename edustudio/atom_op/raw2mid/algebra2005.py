@@ -3,13 +3,13 @@ import time
 from .raw2mid import BaseRaw2Mid
 
 r"""
-R2M_Algebra2005
+R2M_Algebra_0506
 ########################
 """
 
 
-class R2M_Algebra2005(BaseRaw2Mid):
-    """R2M_Algebra2005 is a class used to handle the Algebra2005 dataset."""
+class R2M_Algebra_0506(BaseRaw2Mid):
+    """R2M_Algebra2005 is a class used to handle the Algebra 2005-2006 dataset."""
 
     def process(self):
         super().process()

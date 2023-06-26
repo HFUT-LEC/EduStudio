@@ -39,7 +39,12 @@ class Logger(object):
         ch = logging.StreamHandler(sys.stdout)
         ch.setLevel(level)
         ch.setFormatter(formatter)
-        self.logger.addHandler(ch)
+        flag = False
+        for handler in self.logger.handlers:
+            if type(handler) is logging.StreamHandler:
+                flag = True
+        if flag is False:
+            self.logger.addHandler(ch)
 
     def _flush(self):
         for handler in self.logger.handlers:

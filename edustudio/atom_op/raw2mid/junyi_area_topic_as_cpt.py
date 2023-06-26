@@ -7,7 +7,7 @@ R2M_Junyi_Area_Topic_As_Cpt
 """
 
 
-class R2M_Junyi_Area_Topic_As_Cpt(BaseRaw2Mid):
+class R2M_Junyi_AreaTopicAsCpt(BaseRaw2Mid):
     """R2M_Junyi_Area_Topic_As_Cpt is a class used to handle the Junyi dataset, where we consider the exercise's KC(Area) and KC(Topic) as the basis for constructing the cpt_seq (concept sequence)."""
 
     def process(self):

@@ -26,6 +26,7 @@ def run_edustudio(
         datatpl_cfg_dict, evaltpl_cfg_dict, modeltpl_cfg_dict, frame_cfg_dict
     )
     init_all(cfg)
+    ret = None
     try:
         cfg.logger.info("====" * 15)
         cfg.logger.info(f"[ID]: {cfg.frame_cfg.ID}")
@@ -42,18 +43,25 @@ def run_edustudio(
         traintpl = cls(cfg)
         traintpl.start()
         cfg.logger.info(f"Task: {cfg.frame_cfg.ID} Completed!")
-        logging.shutdown()
+        
+        for handler in cfg.logger.handlers:
+            handler.close()
+            cfg.logger.removeHandler(handler)
+
+        for handler in cfg.logger.handlers:
+            handler.close()
+            cfg.logger.removeHandler(handler)
+
         shutil.move(cfg.frame_cfg.temp_folder_path, cfg.frame_cfg.archive_folder_path)
     except Exception as e:
         cfg.logger.error(traceback.format_exc())
         raise e
     
-    if return_cfg_and_result:
-        return cfg, read_exp_result(cfg)
-
+    if return_cfg_and_result: ret = (cfg, read_exp_result(cfg))
+    return ret
 
 def read_exp_result(cfg):
-    with open(f"{cfg.archive_folder_path}/result.json", 'r', encoding='utf-8') as f:
+    with open(f"{cfg.frame_cfg.archive_folder_path}/{cfg.frame_cfg.ID}/result.json", 'r', encoding='utf-8') as f:
         import json
         return json.load(f)
 

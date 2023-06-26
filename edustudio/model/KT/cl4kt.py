@@ -147,7 +147,7 @@ class CL4KT(GDBaseModel):
     def predict(self, **kwargs):
         y_pd,_ = self(**kwargs)
         y_pd = y_pd[:, 1:]
-        y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1].squeeze()
+        y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1].squeeze(dim=1)
         y_gt = None
         if kwargs.get('label_seq', None) is not None:
             y_gt = kwargs['label_seq'][:, 1:]
@@ -238,7 +238,7 @@ class CL4KT(GDBaseModel):
         y_pd, _ = self(**kwargs)
 
         y_pd = y_pd[:, 1:]
-        y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1].squeeze()
+        y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1].squeeze(dim=1)
         y_gt = kwargs['label_seq'][:, 1:]
         y_gt = y_gt[kwargs['mask_seq'][:, 1:] == 1]
         loss = F.binary_cross_entropy(

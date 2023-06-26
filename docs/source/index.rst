@@ -40,6 +40,7 @@ The overall structure is illustrated as follows:
    :maxdepth: 1
    :caption: Framework Features
 
+   features/global_cfg_obj
    features/inheritable_config
    features/atomic_files
    features/dataset_folder_protocol
@@ -51,7 +52,6 @@ The overall structure is illustrated as follows:
 
    user_guide/datasets
    user_guide/models
-   user_guide/atomic_ops
    user_guide/reference_table
    user_guide/usage
 

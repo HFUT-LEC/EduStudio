@@ -34,7 +34,7 @@ class CDInterTrainTPL(GDTrainTPL):
             es_metrics, save_folder_path=f"{self.frame_cfg.temp_folder_path}/pths/{fold_id}/"
         )
         es_cb = EarlyStopping(es_metrics, num_stop_rounds=num_stop_rounds, start_round=1)
-        history_cb = History(folder_path=f"{self.frame_cfg.temp_folder_path}/history/{fold_id}", plot_curve=True)
+        history_cb = History(folder_path=f"{self.frame_cfg.temp_folder_path}/history/{fold_id}", plot_curve=False)
         callbacks = [
             modelCheckPoint, es_cb, history_cb,
             BaseLogger(self.logger, group_by_contains=['loss'])

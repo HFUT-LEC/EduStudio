@@ -8,7 +8,7 @@ R2M_ASSIST_1516
 
 
 class R2M_ASSIST_1516(BaseRaw2Mid):
-    """R2M_ASSIST_1516 is a class used to handle the ASSIST2015 dataset."""
+    """R2M_ASSIST_1516 is a class used to handle the ASSISTment 2015-2016 dataset."""
 
     def process(self):
         super().process()

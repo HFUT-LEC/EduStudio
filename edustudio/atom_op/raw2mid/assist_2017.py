@@ -7,8 +7,8 @@ ASSIST_2017 dataset preprocess
 """
 
 
-class R2M_ASSIST_2017(BaseRaw2Mid):
-    """R2M_ASSIST_2017 is to preprocess ASSIST_2017 dataset"""
+class R2M_ASSIST_17(BaseRaw2Mid):
+    """R2M_ASSIST_17 is to preprocess ASSISTment 2017 dataset"""
     def process(self):
         super().process()
         # pd.set_option("mode.chained_assignment", None)  # ingore warning

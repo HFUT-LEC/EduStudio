@@ -1,14 +1,14 @@
 from .raw2mid import BaseRaw2Mid
 import pandas as pd
 r"""
-R2M_NIPS34
+R2M_Eedi_20_T34
 #####################################
 NIPS34 dataset preprocess
 """
 
 
-class R2M_NIPS34(BaseRaw2Mid):
-    """R2M_NIPS34 is to preprocess NIPS34 dataset"""
+class R2M_Eedi_20_T34(BaseRaw2Mid):
+    """R2M_Eedi_20_T34 is to preprocess NIPS 2020 challenge Task 3&4 dataset"""
     def process(self):
         super().process()
         # 读入数据 查看

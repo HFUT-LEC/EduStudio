@@ -13,10 +13,10 @@ run_edustudio(
         'cls': 'CDInterTrainTPL',
     },
     datatpl_cfg_dict={
-        'cls': 'CDInterExtendsQDataTPL',
+        'cls': 'CDInterDataTPL',
     },
     modeltpl_cfg_dict={
-        'cls': 'KSCD',
+        'cls': 'IRT',
     },
     evaltpl_cfg_dict={
         'clses': ['BinaryClassificationEvalTPL'],

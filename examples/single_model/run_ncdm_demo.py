@@ -16,7 +16,7 @@ run_edustudio(
         'cls': 'CDInterExtendsQDataTPL',
     },
     modeltpl_cfg_dict={
-        'cls': 'KSCD',
+        'cls': 'NCDM',
     },
     evaltpl_cfg_dict={
         'clses': ['BinaryClassificationEvalTPL'],

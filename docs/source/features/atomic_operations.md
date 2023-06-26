@@ -24,8 +24,8 @@ In the following, we give a table to display existing atomic operations.
 | R2M_Math1       | The atomic operation that process the Math1dataset from rawdata into midata |
 | R2M_Math2       | The atomic operation that process the Math2 dataset from rawdata into midata |
 | R2M_AAAI_2023   | The atomic operation that process the AAAI 2023 challenge dataset from rawdata into midata |
-| R2M_Algebra2005 | The atomic operation that process the Algebra2005 dataset from rawdata into midata |
-| R2M_ASSIST_1516 | The atomic operation that process the Assistment__1516 dataset from rawdata into midata |
+| R2M_Algebra_0506 | The atomic operation that process the Algebra 2005-2006 dataset from rawdata into midata |
+| R2M_ASSIST_1516 | The atomic operation that process the Assistment 2015-2016 dataset from rawdata into midata |
 
 ### Mid2Cache
 

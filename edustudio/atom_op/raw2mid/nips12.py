@@ -7,8 +7,8 @@ NIPS12 dataset preprocess
 """
 
 
-class R2M_NIPS12(BaseRaw2Mid):
-    """R2M_NIPS12 is to preprocess NIPS12 dataset"""
+class R2M_Eedi_20_T12(BaseRaw2Mid):
+    """R2M_NIPS12 is to preprocess NIPS 2020 challenge Task 1&2 dataset"""
     def process(self):
         super().process()
         # 读入数据 查看

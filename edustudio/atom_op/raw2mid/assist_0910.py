@@ -9,7 +9,7 @@ ASSIST_0910 dataset preprocess
 
 
 class R2M_ASSIST_0910(BaseRaw2Mid):
-    """R2M_ASSIST_0910 is to preprocess ASSIST_0910 dataset"""
+    """R2M_ASSIST_0910 is to preprocess ASSISTment 2009-2010 dataset"""
     def process(self):
         super().process()
         pd.set_option("mode.chained_assignment", None) # ingore warning

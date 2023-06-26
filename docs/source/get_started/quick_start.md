@@ -1,6 +1,6 @@
 # Quick Start
 
-Here is a quick-start example for using EduStudio. EduStudio supports 3 ways to run model, i.e.,create a python file to run, run with command and run with config file run.
+Here is a quick-start example for using EduStudio.
 
 ## Create a python file to run
 
@@ -10,7 +10,7 @@ create a python file (e.g., *run.py*) anywhere, the content is as follows:
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='ASSIST_0910',
+    dataset='FrcSub',
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'CDInterTrainTPL',
@@ -31,38 +31,4 @@ Then run the following command:
 
 ```bash
 python run.py
-```
-
-## Run with command
-
-You can run the following command with parameters based on created file above.
-
-```bash
-cd examples
-python run.py -dt ASSIST_0910 --modeltpl_cfg.cls NCDM --traintpl_cfg.batch_size 512
-```
-
-## Run with config file
-
-create a yaml file `conf/ASSIST_0910/NCDM.yaml`:
-```yaml
-datatpl_cfg:
-  cls: CDInterDataTPL
-
-traintpl_cfg:
-  cls: CDTrainTPL
-  batch_size: 512
-
-modeltpl_cfg:
-  cls: NCDM
-
-evaltpl_cfg:
-  clses: [BinaryClassificationEvalTPL, CognitiveDiagnosisEvalTPL]
-```
-
-then, run command:
-
-```bash
-cd examples
-python run.py -f NCDM.yaml
 ```

@@ -6,3 +6,5 @@ Usage
 
    usage/run_edustudio
    usage/aht
+   usage/atomic_cmds
+
