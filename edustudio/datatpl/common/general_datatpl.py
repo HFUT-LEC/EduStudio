@@ -457,6 +457,12 @@ class GeneralDataTPL(BaseDataTPL):
             else:
                 raise ValueError(f"unknown field type of {col_type}")
 
+    @staticmethod
+    def _unwrap_feat(df:pd.DataFrame):
+        for col in df.columns:
+            col_name, col_type = col.split(":")
+            df.rename(columns={col:col_name}, inplace=True)
+        
     @classmethod
     def get_default_cfg(cls, **kwargs):
         cfg = UnifyConfig()

@@ -51,7 +51,7 @@ class R2M_ASSIST_1213(BaseRaw2Mid):
         df_stu = df[['user_id', 'class_id', 'teacher_id']]
         df_stu = df_stu.drop_duplicates(subset=['user_id'])
         df_stu = df_stu.rename(
-            columns={'user_id': 'user_id:token', 'class_id': 'class_id:token',
+            columns={'user_id': 'stu_id:token', 'class_id': 'class_id:token',
                      'teacher_id': 'teacher_id:token'})
         cpt_ls = []
         df['cpt_seq'].astype(str).apply(lambda x: cpt_ls.extend(x.split(',')))

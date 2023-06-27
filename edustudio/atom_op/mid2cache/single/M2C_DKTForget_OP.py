@@ -1,4 +1,4 @@
-from ..common.base_mid2cache import BaseMid2Cache
+from ..common import BaseMid2Cache
 import numpy as np
 from collections import defaultdict
 

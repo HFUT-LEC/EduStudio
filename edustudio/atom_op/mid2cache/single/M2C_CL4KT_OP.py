@@ -1,4 +1,4 @@
-from ..KT.build_seq_inter_feats import M2C_BuildSeqInterFeats
+from ..KT import M2C_BuildSeqInterFeats
 import torch 
 import pandas as pd
 import numpy as np

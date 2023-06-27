@@ -1,8 +1,7 @@
-from edustudio.atom_op.mid2cache import BaseMid2Cache
+from ..common import BaseMid2Cache
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
-
 
 
 class M2C_LPKT_OP(BaseMid2Cache):

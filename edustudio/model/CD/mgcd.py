@@ -24,28 +24,12 @@ class MGCD(GDBaseModel):
     def __init__(self, cfg):
         super().__init__(cfg)
 
-    def add_extra_data(self, inter_student, df_G):
-        # extra_dict['inter_student'], extra_dict['df_G']
-        self.stu_n = torch.max(inter_student['stu_id']).item()
-        self.df_G = {}
-        for index, row in df_G.iterrows():
-            self.df_G[row['group_id']] = row['stu_seq']
-            max_stu_id = max(row['stu_seq'])
-            if max_stu_id > self.stu_n:
-                self.stu_n = max_stu_id
-        self.stu_n = self.stu_n + 1
-        self.stu2exe = {}
-        self.stu_exe2label = {}
-        for i in range(len(inter_student['stu_id'])):
-            stu_id = int(inter_student['stu_id'][i])
-            exer_id = int(inter_student['exer_id'][i])
-            label = float(inter_student['label'][i])
-            if stu_id not in self.stu2exe:
-                self.stu2exe[stu_id] = [exer_id]
-            else:
-                self.stu2exe[stu_id].append(exer_id)
-            self.stu_exe2label[(stu_id, exer_id)] = label
-
+    def add_extra_data(self, inter_student, df_G, **kwargs):
+        self.stu_n = inter_student['stu_id'].max() + 1
+        self.df_G = df_G[['stu_id', 'group_id']].set_index('stu_id')['group_id'].to_dict()
+        self.stu_exe2label = inter_student.set_index(['stu_id', 'exer_id'])['label'].to_dict()
+        self.Q_mat = kwargs['Q_mat']
+    
     def build_cfg(self):
         self.group_n = self.datatpl_cfg['dt_info']['group_count']
         self.exer_n = self.datatpl_cfg['dt_info']['exer_count']
@@ -55,7 +39,6 @@ class MGCD(GDBaseModel):
         self.prednet_len1 = self.modeltpl_cfg['prednet_len1']
         self.prednet_len2 = self.modeltpl_cfg['prednet_len2']
         self.num_hidden = self.stu_dim
-
 
     def build_model(self):
         self.R = nn.Embedding(self.stu_n, self.stu_dim)
@@ -86,7 +69,7 @@ class MGCD(GDBaseModel):
             if 'weight' in name:
                 nn.init.xavier_normal_(param)
 
-    def forward(self, stu_id, exer_id, Q_mat, **kwargs):  # 这里应该得到group对exercise作答正确的概率
+    def forward(self, group_id, exer_id, **kwargs):  # 这里应该得到group对exercise作答正确的概率
         # before prednet
         self.apply_clipper()
 
@@ -97,15 +80,14 @@ class MGCD(GDBaseModel):
         :param kn_emb: FloatTensor, the knowledge relevancy vectors  batch_size*knowledge_dim
         :return: FloatTensor, the probabilities of answering correctly
         """
-        group_id = stu_id  # 传来的stu_id其实是group_id
         group_member = []
         for i in range(len(group_id)):
             group_member.append(self.df_G[int(group_id[i])])
-        kn_emb = Q_mat[exer_id]
+        kn_emb = self.Q_mat[exer_id]
 
         group_emb_list = []
         for i in range(len(group_member)):
-            stu_emb = self.R(torch.tensor(group_member[i]))
+            stu_emb = self.R(torch.tensor(group_member[i]).to(self.device))
             ci = self.W_c(group_id[i])
             a = torch.matmul(stu_emb, self.W_k)
             b = torch.mv(self.W_q, ci)
@@ -135,18 +117,17 @@ class MGCD(GDBaseModel):
         self.prednet_full3.apply(clipper)
 
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, group_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat).flatten(),
+            'y_pd': self(group_id, exer_id).flatten(),
         }
 
     def get_main_loss(self, **kwargs):
         # 这里的loss跟论文中loss对应
-        group_id = kwargs['stu_id']
+        group_id = kwargs['group_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        pd = self(group_id, exer_id, Q_mat).flatten()
+        pd = self(group_id, exer_id).flatten()
         loss_mse = nn.MSELoss(reduction = 'mean')
         loss_group = loss_mse(pd, label)
 
@@ -166,7 +147,7 @@ class MGCD(GDBaseModel):
         exer_id = torch.tensor(exer_stu)
         label_stu = torch.unsqueeze(torch.tensor(label_stu), dim=1)
 
-        kn_emb = Q_mat[exer_id]
+        kn_emb = self.Q_mat[exer_id]
         stu_emb = self.R(stu_id)
         stu_emb = torch.sigmoid(torch.matmul(stu_emb, self.A))
         k_difficulty = torch.sigmoid(self.B(exer_id))

@@ -1,7 +1,5 @@
 import networkx as nx
-
-from ..common.base_mid2cache import BaseMid2Cache
-import torch
+from ..common import BaseMid2Cache
 import numpy as np
 
 

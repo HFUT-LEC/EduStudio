@@ -1,4 +1,4 @@
-from edustudio.atom_op.mid2cache import BaseMid2Cache
+from ..common import BaseMid2Cache
 from itertools import chain
 import torch
 import pandas as pd
