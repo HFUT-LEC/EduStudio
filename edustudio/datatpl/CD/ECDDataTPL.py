@@ -7,7 +7,7 @@ class ECDDataTPL(EduDataTPL):
 
 
     def read_QQQ_group(self, cfg):
-        file_path = f'{cfg.frame_cfg.data_folder_path}/{cfg.dataset}_QQQ-group.csv'
+        file_path = f'{cfg.frame_cfg.data_folder_path}/middata/{cfg.dataset}_QQQ-group.csv'
         sep = cfg.datafmt_cfg['seperator']
         df_QQQ_group = pd.read_csv(file_path, sep=sep, encoding='utf-8', usecols=['qqq_id:token', 'group_id:token'])
         feat_name2type, df_QQQ_group = cls._convert_df_to_std_fmt(df_QQQ_group)

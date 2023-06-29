@@ -40,7 +40,7 @@ if on_rtd:
 
 setup(
     name="edustudio",
-    version="v1.0.0-alpha2", 
+    version="v1.0.0-alpha3", 
     description="a Unified and Templatized Framework for Student Assessment Models",
     long_description=long_description,
     python_requires='>=3.8',
