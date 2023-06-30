@@ -7,26 +7,18 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='ASSIST_1213',
+    dataset='FrcSub',
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'CDInterTrainTPL',
-        'early_stop_metrics': [('rmse','min')],
-        'best_epoch_metric': 'rmse',
-        'batch_size': 512
     },
     datatpl_cfg_dict={
-        'cls': 'MGCDDataTPL',
-        # 'load_data_from': 'rawdata',
-        # 'raw2mid_op': 'R2M_ASSIST_1213'
+        'cls': 'RCDDataTPL',
     },
     modeltpl_cfg_dict={
-        'cls': 'MGCD',
+        'cls': 'RCD',
     },
     evaltpl_cfg_dict={
         'clses': ['BinaryClassificationEvalTPL'],
-        'BinaryClassificationEvalTPL': {
-            'use_metrics': ['rmse']
-        }
     }
 )

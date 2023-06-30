@@ -26,9 +26,24 @@ class MGCD(GDBaseModel):
 
     def add_extra_data(self, inter_student, df_G, **kwargs):
         self.stu_n = inter_student['stu_id'].max() + 1
-        self.df_G = df_G[['stu_id', 'group_id']].set_index('stu_id')['group_id'].to_dict()
+        self.df_G = df_G[['stu_id', 'group_id']].set_index('stu_id')['group_id'].to_dict()  # stu2group
+        group2stu = {}
+        for key, value in self.df_G.items():
+            if value not in group2stu:
+                group2stu[value] = [key]
+            else:
+                group2stu[value].append(key)
+        self.df_G = group2stu
         self.stu_exe2label = inter_student.set_index(['stu_id', 'exer_id'])['label'].to_dict()
-        self.Q_mat = kwargs['Q_mat']
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
+        self.stu2exe = {}
+        for i in range(len(inter_student['stu_id'])):
+            stu_id = int(inter_student['stu_id'][i])
+            exer_id = int(inter_student['exer_id'][i])
+            if stu_id not in self.stu2exe:
+                self.stu2exe[stu_id] = [exer_id]
+            else:
+                self.stu2exe[stu_id].append(exer_id)
     
     def build_cfg(self):
         self.group_n = self.datatpl_cfg['dt_info']['group_count']
@@ -143,10 +158,9 @@ class MGCD(GDBaseModel):
                     stu_id.append(stu)
                     exer_stu.append(exer)
                     label_stu.append(self.stu_exe2label[(stu, exer)])
-        stu_id = torch.tensor(stu_id)
-        exer_id = torch.tensor(exer_stu)
-        label_stu = torch.unsqueeze(torch.tensor(label_stu), dim=1)
-
+        stu_id = torch.tensor(stu_id).to(self.device)
+        exer_id = torch.tensor(exer_stu).to(self.device)
+        label_stu = torch.unsqueeze(torch.tensor(label_stu), dim=1).to(self.device)
         kn_emb = self.Q_mat[exer_id]
         stu_emb = self.R(stu_id)
         stu_emb = torch.sigmoid(torch.matmul(stu_emb, self.A))
@@ -156,7 +170,7 @@ class MGCD(GDBaseModel):
         input_x = e_discrimination * (stu_emb - k_difficulty) * kn_emb
         input_x = self.drop_1(torch.tanh(self.prednet_full1(input_x)))
         input_x = self.drop_2(torch.tanh(self.prednet_full2(input_x)))
-        output = torch.sigmoid(self.prednet_full3(input_x))
+        output = torch.sigmoid(self.prednet_full3(input_x)).to(self.device)
 
         loss_stu = F.binary_cross_entropy(input=output, target=label_stu)
 

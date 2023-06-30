@@ -126,6 +126,7 @@ class RCD(GDBaseModel):
 
     def add_extra_data(self, **kwargs):
         self.local_map = kwargs.pop('local_map')
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
 
     def build_model(self):
         self.knowledge_dim = self.n_cpt
@@ -157,7 +158,7 @@ class RCD(GDBaseModel):
         self.prednet_full3 = nn.Linear(1 * self.n_cpt, 1)
 
 
-    def forward(self, stu_id, exer_id, Q_mat, **kwargs):
+    def forward(self, stu_id, exer_id, **kwargs):
         # before prednet
         all_stu_emb = self.student_emb(self.stu_index).to(self.device)
         exer_emb = self.exercise_emb(self.exer_index).to(self.device)
@@ -188,23 +189,22 @@ class RCD(GDBaseModel):
         diff = torch.sigmoid(self.prednet_full2(torch.cat((batch_exer_vector, kn_vector), dim=2)))
         o = torch.sigmoid(self.prednet_full3(preference - diff))
 
-        sum_out = torch.sum(o * Q_mat[exer_id].unsqueeze(2), dim=1)
-        count_of_concept = torch.sum(Q_mat[exer_id], dim=1).unsqueeze(1)
+        sum_out = torch.sum(o * self.Q_mat[exer_id].unsqueeze(2), dim=1)
+        count_of_concept = torch.sum(self.Q_mat[exer_id], dim=1).unsqueeze(1)
         pd = sum_out / count_of_concept
         return pd
 
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
 
     def get_main_loss(self, **kwargs):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        pd = self(stu_id, exer_id, Q_mat).flatten()
+        pd = self(stu_id, exer_id).flatten()
 
         # output_1 = self(stu_id, exer_id, Q_mat)
         # output_0 = torch.ones(output_1.size()).to(self.device) - output_1
