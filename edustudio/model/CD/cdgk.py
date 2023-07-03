@@ -33,8 +33,8 @@ class CDGK_META(nn.Module):
             nn.Sigmoid()
         )
 
-    def forward(self, stu_id, exer_id, Q_mat, **kwargs):
-        items_Q_mat = Q_mat[exer_id]
+    def forward(self, stu_id, exer_id, **kwargs):
+        items_Q_mat = self.Q_mat[exer_id]
         stu_emb = self.stu_emb(stu_id).sigmoid()
         k_difficulty = self.exer_emb(exer_id).sigmoid()
         e_difficulty = self.exer_disc(exer_id).sigmoid()
@@ -50,17 +50,16 @@ class CDGK_META(nn.Module):
         return pd2  + (1 - pd2) * pd1
 
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
 
     def get_main_loss(self, **kwargs):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        pd = self(stu_id, exer_id, Q_mat).flatten()
+        pd = self(stu_id, exer_id).flatten()
         loss = F.binary_cross_entropy(input=pd, target=label)
         return {
             'loss_main': loss
@@ -88,6 +87,11 @@ class CDGK_SINGLE(GDBaseModel):
             exer_count=self.n_item,
             cpt_count=self.n_cpt
         )
+        self.cdgk.Q_mat = self.Q_mat
+
+    def add_extra_data(self, **kwargs):
+        super().add_extra_data(**kwargs)
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
 
     @torch.no_grad()
     def predict(self, **kwargs):

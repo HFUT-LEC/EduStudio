@@ -62,5 +62,5 @@ then, run command:
 
 ```bash
 cd examples
-python run.py -f NCDM.yaml
+python run.py -dt ASSIST_0910 -f NCDM.yaml
 ```

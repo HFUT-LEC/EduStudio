@@ -19,7 +19,7 @@ Python 3.8 (or later), torch 1.10.0 (or later) are required to install our libra
 To install EduStudio from pip, only the following command is needed:
 
 ```bash
-pip install edustudio
+pip install -U edustudio
 ```
 
 ## Install from source

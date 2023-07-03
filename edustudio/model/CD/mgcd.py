@@ -25,26 +25,23 @@ class MGCD(GDBaseModel):
         super().__init__(cfg)
 
     def add_extra_data(self, inter_student, df_G, **kwargs):
-        self.stu_n = inter_student['stu_id'].max() + 1
+        self.stu_n = inter_student['stu_id'].max()
         self.df_G = df_G[['stu_id', 'group_id']].set_index('stu_id')['group_id'].to_dict()  # stu2group
+
         group2stu = {}
+        self.stu_n = max(self.df_G, default=self.stu_n)
         for key, value in self.df_G.items():
-            if value not in group2stu:
-                group2stu[value] = [key]
-            else:
-                group2stu[value].append(key)
+            group2stu.setdefault(value, []).append(key)
+
+        self.stu_n += 1
         self.df_G = group2stu
         self.stu_exe2label = inter_student.set_index(['stu_id', 'exer_id'])['label'].to_dict()
         self.Q_mat = kwargs['Q_mat'].to(self.device)
+
         self.stu2exe = {}
-        for i in range(len(inter_student['stu_id'])):
-            stu_id = int(inter_student['stu_id'][i])
-            exer_id = int(inter_student['exer_id'][i])
-            if stu_id not in self.stu2exe:
-                self.stu2exe[stu_id] = [exer_id]
-            else:
-                self.stu2exe[stu_id].append(exer_id)
-    
+        for stu_id, exer_id in zip(map(int, inter_student['stu_id']), map(int, inter_student['exer_id'])):
+            self.stu2exe.setdefault(stu_id, []).append(exer_id)
+
     def build_cfg(self):
         self.group_n = self.datatpl_cfg['dt_info']['group_count']
         self.exer_n = self.datatpl_cfg['dt_info']['exer_count']
@@ -95,9 +92,7 @@ class MGCD(GDBaseModel):
         :param kn_emb: FloatTensor, the knowledge relevancy vectors  batch_size*knowledge_dim
         :return: FloatTensor, the probabilities of answering correctly
         """
-        group_member = []
-        for i in range(len(group_id)):
-            group_member.append(self.df_G[int(group_id[i])])
+        group_member = [self.df_G[int(group_id[i])] for i in range(len(group_id))]
         kn_emb = self.Q_mat[exer_id]
 
         group_emb_list = []

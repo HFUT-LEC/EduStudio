@@ -29,7 +29,7 @@ The documentation is available [here](https://edustudio.readthedocs.io).
 Install `EduStudio`:
 
 ```bash
-pip install edustudio
+pip install -U edustudio
 ```
 
 Example: Run `NCDM` model:

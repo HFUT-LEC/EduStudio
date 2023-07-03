@@ -1,6 +1,5 @@
 import sys
 import os
-import torch
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../../")
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -12,14 +11,12 @@ run_edustudio(
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'CDInterTrainTPL',
-        'lr': 0.01,
-        'epoch_num': 1000
     },
     datatpl_cfg_dict={
         'cls': 'CDInterExtendsQDataTPL',
     },
     modeltpl_cfg_dict={
-        'cls': 'CDMFKC',
+        'cls': 'CDGK_SINGLE',
     },
     evaltpl_cfg_dict={
         'clses': ['BinaryClassificationEvalTPL'],
