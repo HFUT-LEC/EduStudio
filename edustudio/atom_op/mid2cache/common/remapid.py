@@ -32,6 +32,7 @@ class M2C_ReMapId(BaseMid2Cache):
         feats_group = list(set(feats) - set(chain(*self.m2c_cfg['share_id_columns'])))
         feats_group = [set([v]) for v in feats_group]
         feats_group.extend(self.m2c_cfg['share_id_columns'])
+        kwargs['feats_group'] = feats_group
 
         for feats in feats_group:
             col_arr = self.get_specific_column_into_arr(feats, kwargs.values())

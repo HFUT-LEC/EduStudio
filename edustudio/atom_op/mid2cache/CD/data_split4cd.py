@@ -4,6 +4,7 @@ from edustudio.datatpl.utils import SpliterUtil
 from sklearn.model_selection import StratifiedKFold, KFold
 from itertools import chain
 import numpy as np
+import pandas as pd
 
 
 class M2C_RandomDataSplit4CD(BaseMid2Cache):
@@ -67,10 +68,41 @@ class M2C_RandomDataSplit4CD(BaseMid2Cache):
         return train_list, test_list
 
     def set_dt_info(self, dt_info, **kwargs):
-        if 'stu_id:token' in kwargs['df'].columns:
-            dt_info['stu_count'] = int(kwargs['df']['stu_id:token'].max() + 1)
-        if 'exer_id:token' in kwargs['df'].columns:
-            dt_info['exer_count'] = int(kwargs['df']['exer_id:token'].max() + 1)
-        if kwargs.get('df_exer', None) is not None:
-            if 'cpt_seq:token_seq' in kwargs['df_exer']:
-                dt_info['cpt_count'] = np.max(list(chain(*kwargs['df_exer']['cpt_seq:token_seq'].to_list()))) + 1
+        if 'feats_group' not in kwargs:
+            if 'stu_id:token' in kwargs['df'].columns:
+                dt_info['stu_count'] = int(kwargs['df']['stu_id:token'].max() + 1)
+            if 'exer_id:token' in kwargs['df'].columns:
+                dt_info['exer_count'] = int(kwargs['df']['exer_id:token'].max() + 1)
+            if kwargs.get('df_exer', None) is not None:
+                if 'cpt_seq:token_seq' in kwargs['df_exer']:
+                    dt_info['cpt_count'] = np.max(list(chain(*kwargs['df_exer']['cpt_seq:token_seq'].to_list()))) + 1
+        else:
+            feats_group = kwargs['feats_group']
+            stu_id_group, exer_id_group, cpt_id_group = [], [], []
+            for gp in feats_group:
+                if 'stu_id:token' in gp:
+                    stu_id_group = set(gp)
+                if 'exer_id:token' in gp:
+                    exer_id_group = set(gp)
+                if 'cpt_seq:token_seq' in gp:
+                    cpt_id_group = set(gp)
+            for df in kwargs.values():
+                if type(df) is pd.DataFrame:
+                    for col in df.columns:
+                        if col in stu_id_group:
+                            if col.split(":")[-1] == 'token':
+                                dt_info['stu_count'] = max(dt_info.get('stu_count', -1), df[col].max() + 1)
+                            else:
+                                dt_info['stu_count'] = max(dt_info.get('stu_count', -1), np.max(list(chain(*df[col].to_list()))) + 1)
+                        if col in exer_id_group:
+                            if col.split(":")[-1] == 'token':
+                                dt_info['exer_count'] = max(dt_info.get('exer_count', -1), df[col].max() + 1)
+                            else:
+                                dt_info['exer_count'] = max(dt_info.get('exer_count', -1), np.max(list(chain(*df[col].to_list()))) + 1)
+                        if col in cpt_id_group:
+                            if col.split(":")[-1] == 'token':
+                                dt_info['cpt_count'] = max(dt_info.get('cpt_count', -1), df[col].max() + 1)
+                            else:
+                                dt_info['cpt_count'] = max(dt_info.get('cpt_count', -1), np.max(list(chain(*df[col].to_list()))) + 1)
+
+            a = 1

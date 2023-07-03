@@ -37,7 +37,7 @@ class HierCDFDataTPL(EduDataTPL):
 
     def get_extra_data(self):
         extra_dict = super().get_extra_data()
-        extra_dict['df_cpt_relation'] = self.df_cpt_relation
+        extra_dict['cpt_relation_edges'] = self._unwrap_feat(self.final_kwargs['df_cpt_relation'])
         return extra_dict
         
     @classmethod

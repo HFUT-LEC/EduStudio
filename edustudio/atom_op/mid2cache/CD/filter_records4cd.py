@@ -32,8 +32,19 @@ class M2C_FilterRecords4CD(BaseMid2Cache):
             selected_items = gp_by_iid[gp_by_iid['stu_id:token'] >= exer_least_records].reset_index()['exer_id:token'].to_numpy()
 
             df = df[df['stu_id:token'].isin(selected_users) & df['exer_id:token'].isin(selected_items)]
-        
-        # selected_users = df['stu_id:token'].unique()
-        # selected_items = df['exer_id:token'].unique()
+
+
+        df = df.reset_index(drop=True)
+        selected_users = df['stu_id:token'].unique()
+        selected_items = df['exer_id:token'].unique()
+
+        if kwargs.get('df_exer', None) is not None:
+            kwargs['df_exer'] = kwargs['df_exer'][kwargs['df_exer']['exer_id:token'].isin(selected_items)]
+            kwargs['df_exer'].reset_index(drop=True, inplace=True)
+
+        if kwargs.get('df_stu', None) is not None:
+            kwargs['df_stu'] = kwargs['df_stu'][kwargs['df_stu']['stu_id:token'].isin(selected_users)]
+            kwargs['df_stu'].reset_index(drop=True, inplace=True)
+
         kwargs['df'] = df
         return kwargs

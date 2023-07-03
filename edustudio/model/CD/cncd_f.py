@@ -141,7 +141,7 @@ class CNCD_F(GDBaseModel):
 
     def forward(self, stu_id, exer_id):
         # before prednet
-        items_Q_mat = self.Q_mat[exer_id]
+        items_Q_mat = self.Q_mat[exer_id].to(self.traintpl_cfg['device'])
         items_content = self.word_ids[exer_id]
         text_embedding = self.textcnn(items_content)
         text_factor = torch.sigmoid(self.out_text_factor(text_embedding))

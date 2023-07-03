@@ -1,3 +1,10 @@
+r"""
+CDGK
+##################################
+Reference:
+    Haiping Ma et al. "Using Knowledge Concept Aggregation towards Accurate Cognitive Diagnosis." in CIKM 2021.
+"""
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 import torch

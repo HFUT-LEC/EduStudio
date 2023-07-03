@@ -1,3 +1,14 @@
+r"""
+RCD
+##################################
+Reference:
+    Weibo Gao et al. "RCD: Relation Map Driven Cognitive Diagnosis for Intelligent Education Systems." in SIGIR 2021.
+
+Reference Code:
+    https://github.com/bigdata-ustc/RCD
+"""
+
+
 from ..gd_basemodel import GDBaseModel
 import torch.nn as nn
 from ..utils.components import PosMLP

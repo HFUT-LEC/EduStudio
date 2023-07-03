@@ -84,10 +84,11 @@ class HierCDF(GDBaseModel):
         self.know_edge = nx.DiGraph()  #nx.DiGraph(know_graph.values.tolist())
         for k in range(self.n_cpt):
             self.know_edge.add_node(k)
-        for edge in self.know_graph.values.tolist():
+        for edge in df_cpt_relation[['cpt_head', 'cpt_tail']].to_numpy():
             self.know_edge.add_edge(edge[0],edge[1])
         self.topo_order = list(nx.topological_sort(self.know_edge))
-    
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
+
     def ncd(self, user_emb: torch.Tensor, item_emb: torch.Tensor, item_offset: torch.Tensor):
         input_vec = (user_emb-item_emb)*item_offset
         x_vec=torch.sigmoid(self.cross_layer1(input_vec))
@@ -190,8 +191,8 @@ class HierCDF(GDBaseModel):
         
         return result_tensor
 
-    def forward(self, stu_id: torch.LongTensor, exer_id: torch.LongTensor, Q_mat):
-        Q_mat = Q_mat[exer_id]
+    def forward(self, stu_id: torch.LongTensor, exer_id: torch.LongTensor):
+        Q_mat = self.Q_mat[exer_id]
         user_mastery = self.get_posterior(stu_id)
         item_diff = torch.sigmoid(self.item_diff(exer_id))
         item_disc = torch.sigmoid(self.item_disc(exer_id))
@@ -205,17 +206,16 @@ class HierCDF(GDBaseModel):
 
 
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
 
     def get_main_loss(self, **kwargs):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        pd = self(stu_id, exer_id, Q_mat).flatten()
+        pd = self(stu_id, exer_id).flatten()
         loss = F.binary_cross_entropy(input=pd, target=label)
         return {
             'loss_main': loss
