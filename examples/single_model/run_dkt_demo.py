@@ -9,16 +9,16 @@ from edustudio.quickstart import run_edustudio
 run_edustudio(
     dataset='ASSIST_0910',
     cfg_file_name=None,
-    datafmt_cfg_dict={
+    datatpl_cfg_dict={
         'cls': 'KTInterCptAsExerDataTPL',
     },
-    trainfmt_cfg_dict={
-        'cls': 'KTInterTrainFmt',
+    traintpl_cfg_dict={
+        'cls': 'KTInterTrainTPL',
     },
-    model_cfg_dict={
+    modeltpl_cfg_dict={
         'cls': 'DKT',
     },
-    evalfmt_cfg_dict={
-        'clses': ['BinaryClassificationEvalFmt'],
+    evaltpl_cfg_dict={
+        'clses': ['BinaryClassificationEvalTPL'],
     }
 )

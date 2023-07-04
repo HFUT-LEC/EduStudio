@@ -9,8 +9,6 @@ import pickle
 import json
 from deepdiff import DeepDiff
 import importlib
-from edustudio.atom_op.mid2cache import BaseMid2Cache
-from edustudio.atom_op.raw2mid import BaseRaw2Mid
 import torch
 
 
@@ -365,7 +363,8 @@ class GeneralDataTPL(BaseDataTPL):
             assert mid2cache_op_seq is not None
         
         # cfg.mid2cache_op_seq = mid2cache_op_seq
-
+        from edustudio.atom_op.mid2cache import BaseMid2Cache
+        from edustudio.atom_op.raw2mid import BaseRaw2Mid
         for op in mid2cache_op_seq:
             if isinstance(op, str):
                 op = importlib.import_module('edustudio.atom_op.mid2cache').__getattribute__(op)
@@ -379,6 +378,7 @@ class GeneralDataTPL(BaseDataTPL):
 
     @classmethod
     def _get_r2m_op(cls, cfg):
+        from edustudio.atom_op.raw2mid import BaseRaw2Mid
         r2m_op = cfg.datatpl_cfg['raw2mid_op']
         assert r2m_op is not None
         if isinstance(r2m_op, str):
@@ -390,6 +390,7 @@ class GeneralDataTPL(BaseDataTPL):
         return r2m_op.from_cfg(cfg)
     
     def _get_m2c_op_list(self):
+        from edustudio.atom_op.mid2cache import BaseMid2Cache
         m2c_op_list = self.datatpl_cfg['mid2cache_op_seq']
         op_list = []
         for op in m2c_op_list:

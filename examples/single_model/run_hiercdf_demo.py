@@ -4,7 +4,6 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../../")
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-from edustudio.model.CD import HierCDF
 from edustudio.quickstart import run_edustudio
 from edustudio.atom_op.mid2cache.CD import M2C_FilterRecords4CD
 
