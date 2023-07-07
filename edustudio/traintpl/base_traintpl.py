@@ -60,7 +60,7 @@ class BaseTrainTPL(object):
         return cfg
     
     def start(self):
-        self.logger.info(f"TrainTPL {self.__class__.__base__} Started!")
+        self.logger.info(f"TrainTPL {self.__class__} Started!")
         set_same_seeds(self.traintpl_cfg['seed'])
 
     def _check_params(self):

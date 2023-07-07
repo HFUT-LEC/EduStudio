@@ -41,7 +41,7 @@ def objective_function(args):
 
 
 space = {
-    'traintpl_cfg.cls': hp.choice('traintpl_cfg.cls', ['CDInterTrainTPL']),
+    'traintpl_cfg.cls': hp.choice('traintpl_cfg.cls', ['EduTrainTPL']),
     'datatpl_cfg.cls': hp.choice('datapl_cfg.cls', ['CDInterExtendsQDataTPL']),
     'modeltpl_cfg.cls': hp.choice('modeltpl_cfg.cls', ['KaNCD']),
     'evaltpl_cfg.clses': hp.choice('evaltpl_cfg.clses', [['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL']]),

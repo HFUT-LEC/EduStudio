@@ -13,7 +13,7 @@ run_edustudio(
         'cls': 'KTInterCptUnfoldDataTPL',
     },
     traintpl_cfg_dict={
-        'cls': 'KTInterTrainTPL',
+        'cls': 'EduTrainTPL',
     },
     modeltpl_cfg_dict={
         'cls': 'SimpleKT',

@@ -13,7 +13,7 @@ run_edustudio(
         'cls': 'KTInterExtendsQDataTPL',
     },
     traintpl_cfg_dict={
-        'cls': 'KTInterTrainTPL',
+        'cls': 'EduTrainTPL',
     },
     modeltpl_cfg_dict={
         'cls': 'QIKT',

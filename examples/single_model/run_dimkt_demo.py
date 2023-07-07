@@ -13,7 +13,7 @@ run_edustudio(
         'cls': 'DIMKTDataTPL',
     },
     traintpl_cfg_dict={
-        'cls': 'KTInterTrainTPL',
+        'cls': 'EduTrainTPL',
         'device': 'cpu',
     },
     modeltpl_cfg_dict={

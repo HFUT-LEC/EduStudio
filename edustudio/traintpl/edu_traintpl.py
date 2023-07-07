@@ -9,18 +9,17 @@ from tqdm import tqdm
 import numpy as np
 import shutil
 
-class CDInterTrainTPL(GDTrainTPL):
+
+class EduTrainTPL(GDTrainTPL):
     default_cfg = {
         'num_stop_rounds': 10,
         'early_stop_metrics': [('auc','max')],
         'best_epoch_metric': 'auc',
         'unsave_best_epoch_pth': True,
-        'ignore_metrics_in_train': []
+        'ignore_metrics_in_train': [],
+        'batch_size': 32,
     }
 
-    def __init__(self, cfg: UnifyConfig):
-        super().__init__(cfg)
-        
     def _check_params(self):
         super()._check_params()
         assert self.traintpl_cfg['best_epoch_metric'] in set(i[0] for i in self.traintpl_cfg['early_stop_metrics'])
@@ -109,7 +108,7 @@ class CDInterTrainTPL(GDTrainTPL):
             batch_dict = self.batch_dict2device(batch_dict)
             eval_dict = self.model.predict(**batch_dict)
             pd_list[idx] = eval_dict['y_pd']
-            gt_list[idx] = batch_dict['label']
+            gt_list[idx] = eval_dict['y_gt'] if 'y_gt' in eval_dict else batch_dict['label']
         y_pd = torch.hstack(pd_list)
         y_gt = torch.hstack(gt_list)
 
@@ -140,7 +139,7 @@ class CDInterTrainTPL(GDTrainTPL):
             batch_dict = self.batch_dict2device(batch_dict)
             eval_dict = self.model.predict(**batch_dict)
             pd_list[idx] = eval_dict['y_pd']
-            gt_list[idx] = batch_dict['label']
+            gt_list[idx] = eval_dict['y_gt'] if 'y_gt' in eval_dict else batch_dict['label']
         y_pd = torch.hstack(pd_list)
         y_gt = torch.hstack(gt_list)
 

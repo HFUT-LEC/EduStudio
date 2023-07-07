@@ -10,7 +10,7 @@ run_edustudio(
     dataset='FrcSub',
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'CDInterTrainTPL',
+        'cls': 'EduTrainTPL',
     },
     datatpl_cfg_dict={
         'cls': 'RCDDataTPL',

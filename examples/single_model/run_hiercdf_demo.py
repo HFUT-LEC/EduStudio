@@ -45,7 +45,7 @@ run_edustudio(
     dataset='JunyiExerAsCpt',
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'CDInterTrainTPL',        
+        'cls': 'EduTrainTPL',        
     },
     datatpl_cfg_dict={
         'cls': 'HierCDFDataTPL',
