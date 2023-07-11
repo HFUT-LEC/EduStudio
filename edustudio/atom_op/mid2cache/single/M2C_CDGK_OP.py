@@ -26,32 +26,31 @@ class M2C_CDGK_OP(BaseMid2Cache):
         G = self.get_G_from_cpt_concurrence(df_exer, cpt_count, exer_count)
         number_connected_components = nx.number_connected_components(G)
 
+        cpt_group_list = None
         if subgraph_count == number_connected_components or subgraph_count < 0:
-            cpt2groups = defaultdict(list)
-            for gid, conn_comp in enumerate(nx.connected_components(G)):
-                for cpt_id in conn_comp: cpt2groups[cpt_id].append(gid)
-            
-            kwargs['n_group_of_cpt'] = np.array([len(v) for v in cpt2groups.values()], dtype=np.int64)
-
-            kwargs['gid2exers'] = defaultdict(set)
-            for _, tmp_df in df_exer[['exer_id:token', 'cpt_seq:token_seq']].iterrows():
-                exer_id = tmp_df['exer_id:token']
-                cpt_seq = tmp_df['cpt_seq:token_seq']
-
-                for cpt_id in cpt_seq:
-                    for gid in cpt2groups[cpt_id]:
-                        kwargs['gid2exers'][gid].add(exer_id)
-            kwargs['gid2exers'] = {gid: np.array(list(exers)) for gid, exers in kwargs['gid2exers'].items()}
-            kwargs['dt_info']['n_cpt_group'] = len(kwargs['gid2exers'])
-
+            cpt_group_list = nx.connected_components(G)
         elif subgraph_count < number_connected_components:
             # 小根堆，合并，记录合并索引
             subgraphs = list(nx.connected_components(G))
-            subgraphs = self._merge_nodes_list(subgraphs, subgraph_count)
-            raise NotImplementedError
+            cpt_group_list = self._merge_nodes_list(subgraphs, subgraph_count)
         else:
-            # 大根堆，拆分, 最小割集
             raise NotImplementedError
+
+        cpt2groups = defaultdict(list)
+        for gid, conn_comp in enumerate(cpt_group_list):
+            for cpt_id in conn_comp: cpt2groups[cpt_id].append(gid)
+   
+        kwargs['n_group_of_cpt'] = np.array([len(v) for v in cpt2groups.values()], dtype=np.int64)
+        kwargs['gid2exers'] = defaultdict(set)
+        for _, tmp_df in df_exer[['exer_id:token', 'cpt_seq:token_seq']].iterrows():
+            exer_id = tmp_df['exer_id:token']
+            cpt_seq = tmp_df['cpt_seq:token_seq']
+
+            for cpt_id in cpt_seq:
+                for gid in cpt2groups[cpt_id]:
+                    kwargs['gid2exers'][gid].add(exer_id)
+        kwargs['gid2exers'] = {gid: np.array(list(exers)) for gid, exers in kwargs['gid2exers'].items()}
+        kwargs['dt_info']['n_cpt_group'] = len(kwargs['gid2exers'])
 
         return kwargs
     

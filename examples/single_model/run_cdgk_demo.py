@@ -11,9 +11,13 @@ run_edustudio(
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'EduTrainTPL',
+        'batch_size': 1024
     },
     datatpl_cfg_dict={
         'cls': 'CDGKDataTPL',
+        'M2C_CDGK_OP': {
+            'subgraph_count': 1, 
+        }
     },
     modeltpl_cfg_dict={
         'cls': 'CDGK_MULTI',
