@@ -30,12 +30,11 @@ class M2C_DKTDSC_OP(BaseMid2Cache):
 
         kwargs['cluster_list'] = []
 
-        for train_dict, val_dict, test_dict in zip(
-            df_train_folds, df_valid_folds, df_test_folds
-        ):
+        for idx, (train_dict, test_dict) in enumerate(zip(df_train_folds, df_test_folds)):
             self.train_dict = train_dict
-            self.val_dict = val_dict
             self.test_dict = test_dict
+            if df_valid_folds is not None and len(df_valid_folds) > 0:
+                self.val_dict = df_valid_folds[idx]
 
             self.add_seg_num_features()
             self.cluster = self.construct_cluster_feats()

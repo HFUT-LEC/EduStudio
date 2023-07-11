@@ -18,13 +18,13 @@ class M2C_DKTForget_OP(BaseMid2Cache):
         self.dt_info['n_rgap_list'] = []
         self.dt_info['n_sgap_list'] = []
 
-        for train_dict, val_dict, test_dict in zip(
-            df_train_folds, df_valid_folds, df_test_folds
-        ):
-            self.n_pcount, self.n_rgap, self.n_sgap = 0, 0, 0
+        for idx, (train_dict, test_dict) in enumerate(zip(df_train_folds, df_test_folds)):
             self.train_dict = train_dict
-            self.val_dict = val_dict
             self.test_dict = test_dict
+            if df_valid_folds is not None and len(df_valid_folds) > 0:
+                self.val_dict = df_valid_folds[idx]
+                
+            self.n_pcount, self.n_rgap, self.n_sgap = 0, 0, 0
             self._construct_s_gap(self.train_dict)
             self._construct_r_gap_and_p_count(self.train_dict)
             if self.val_dict:

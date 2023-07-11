@@ -19,12 +19,12 @@ class M2C_LPKT_OP(BaseMid2Cache):
         self.dt_info['answer_time_count_list'] = []
         self.dt_info['interval_time_count_list'] = []
 
-        for train_dict, val_dict, test_dict in zip(
-            df_train_folds, df_valid_folds, df_test_folds
-        ):
+        for idx, (train_dict, test_dict) in enumerate(zip(df_train_folds, df_test_folds)):
             self.train_dict = train_dict
-            self.val_dict = val_dict
             self.test_dict = test_dict
+            if df_valid_folds is not None and len(df_valid_folds) > 0:
+                self.val_dict = df_valid_folds[idx]
+                
             self.construct_answer_time()
             self.construct_interval_time()
 

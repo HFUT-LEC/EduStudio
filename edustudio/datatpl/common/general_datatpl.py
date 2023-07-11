@@ -412,10 +412,11 @@ class GeneralDataTPL(BaseDataTPL):
         
         for tmp_df in self.df_train_folds:
             self.dict_train_folds.append(self._df2dict(tmp_df))
-        
-        for tmp_df in self.df_valid_folds:
-            self.dict_valid_folds.append(self._df2dict(tmp_df))
-        
+            
+        if self.hasValidDataset:
+            for tmp_df in self.df_valid_folds:
+                self.dict_valid_folds.append(self._df2dict(tmp_df))
+            
         for tmp_df in self.df_test_folds:
             self.dict_test_folds.append(self._df2dict(tmp_df))
 

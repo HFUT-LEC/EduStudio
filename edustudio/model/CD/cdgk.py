@@ -14,6 +14,8 @@ from collections import defaultdict
 import pandas as pd
 from edustudio.utils.common import tensor2npy
 import numpy as np
+from typing import Dict
+
 
 class CDGK_META(nn.Module):
     def __init__(self, stu_count, exer_count, cpt_count):
@@ -105,10 +107,10 @@ class CDGK_SINGLE(GDBaseModel):
         return self.cdgk.predict(**kwargs)
 
     def get_main_loss(self, **kwargs):
-        self.cdgk.get_main_loss(**kwargs)
+        return self.cdgk.get_main_loss(**kwargs)
 
     def get_loss_dict(self, **kwargs):
-        return self.cdgk.get_main_loss(**kwargs)
+        return self.get_main_loss(**kwargs)
     
     def get_stu_status(self, stu_id=None):
         return self.cdgk.get_stu_status(stu_id=stu_id)
@@ -119,44 +121,120 @@ class CDGK_MULTI(GDBaseModel):
         self.n_user = self.datatpl_cfg['dt_info']['stu_count']
         self.n_item = self.datatpl_cfg['dt_info']['exer_count']
         self.n_cpt = self.datatpl_cfg['dt_info']['cpt_count']
-
-    
-    def add_extra_data(self, **kwargs):
-        # 1. 知识点与图对应情况
-        # 2. 知识点分组情况
-        self.cpt2group = {}
-        self.df_cpt2group = None
-        self.cpt_group_num_list = [10, 20, 30]
-        self.sub_model_num = len(self.cpt_group_num_list)
+        self.n_cpt_group = self.datatpl_cfg['dt_info']['n_cpt_group']
 
 
     def build_model(self):
         self.cdgk_list = nn.ModuleList(
             [
                 CDGK_META(
-                    stu_count=self.n_user, exer_count=self.n_item, cpt_count=cpt_count
-                ) for cpt_count in self.cpt_group_num_list
+                    stu_count=self.n_user, exer_count=self.n_item, cpt_count=self.n_cpt
+                ) for _ in range(self.n_cpt_group)
             ]
         )
+        for cdgk_meta in self.cdgk_list:
+            cdgk_meta.Q_mat = self.Q_mat
 
+    def add_extra_data(self, **kwargs):
+        super().add_extra_data(**kwargs)
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
 
-    def forward(self, stu_id, exer_id, Q_mat, **kwargs):
-        batch_Q_mat = Q_mat[exer_id]
-        df = pd.DataFrame(tensor2npy(torch.argwhere(batch_Q_mat == 1)), columns=['idx','cpt_id'])
-        df = df.merge(self.df_cpt2group, on='cpt_id', how='left')
-        group2idx = df[['idx','group_id']].groupby('group_id').agg(
-            lambda x: torch.from_numpy(np.array(list(x))).to(self.device)
-        )['idx'].to_dict()
+        self.gid2exers: Dict[int, torch.LongTensor] = {
+            k: torch.from_numpy(v).long().to(self.device) 
+            for k,v in kwargs['gid2exers'].items()
+        }
 
-        pd_dict = {}
-        for mid in range(self.sub_model_num):
-            if mid not in group2idx: continue
-            tmp_stu_id = stu_id[group2idx[mid]]
-            tmp_exer_id = exer_id[group2idx[mid]]
-            pd = self.cdgk_list[mid](stu_id=tmp_stu_id, exer_id=tmp_exer_id, Q_mat=Q_mat[:, self.cpt2group[mid]])
-            pd_dict[mid] = pd
+        self.n_group_of_cpt: torch.LongTensor = torch.from_numpy(
+            kwargs['n_group_of_cpt']
+        ).long().to(self.device) 
         
-        # 合并预测值，割点取均值
+    def forward(self, stu_id, exer_id, **kwargs):
+        g_pd_list, g_order_list = [], []
+        for gid, sub_cdgk in enumerate(self.cdgk_list):
+            g_flag = torch.isin(exer_id, self.gid2exers[gid])
+            if len(g_flag) == 0: continue
+
+            g_stu_id = stu_id[g_flag]
+            g_exer_id = exer_id[g_flag]
+            g_pd = sub_cdgk(g_stu_id, g_exer_id)
+            
+            g_pd_list.append(g_pd)
+            g_order_list.append(torch.argwhere(g_flag).flatten())
+
+        order = torch.concat(g_order_list)
+        pd = torch.concat(g_pd_list)
+
+        pd, _ = self.groupby_mean(pd, labels=order, device=self.device)
+        return pd.flatten()
+    
+    @torch.no_grad()
+    def predict(self, **kwargs):
+        return {"y_pd": self(**kwargs)}
+
+    def get_main_loss(self, **kwargs):
+        stu_id = kwargs['stu_id']
+        exer_id = kwargs['exer_id']
+        label = kwargs['label']
+        pd = self(stu_id, exer_id).flatten()
+        loss = F.binary_cross_entropy(input=pd, target=label)
+        return {
+            'loss_main': loss
+        }
+
+    def get_loss_dict(self, **kwargs):
+        return self.get_main_loss(**kwargs)
+
+    def get_stu_status(self, stu_id=None):
+        if stu_id is not None:
+            stu_emb_mat = torch.stack([sub_cdgk.stu_emb(stu_id) for sub_cdgk in self.cdgk_list], dim=2)
+        else:
+            stu_emb_mat = torch.stack([sub_cdgk.stu_emb.weight for sub_cdgk in self.cdgk_list], dim=2)
         
+        return stu_emb_mat.sum(dim=-1) / self.n_group_of_cpt
 
+    # reference: https://discuss.pytorch.org/t/groupby-aggregate-mean-in-pytorch/45335/9
+    @staticmethod
+    def groupby_mean(value:torch.Tensor, labels:torch.LongTensor, device="cuda:0"):
+        """Group-wise average for (sparse) grouped tensors
+        
+        Args:
+            value (torch.Tensor): values to average (# samples, latent dimension)
+            labels (torch.LongTensor): labels for embedding parameters (# samples,)
+        
+        Returns: 
+            result (torch.Tensor): (# unique labels, latent dimension)
+            new_labels (torch.LongTensor): (# unique labels,)
+            
+        Examples:
+            >>> samples = torch.Tensor([
+                                [0.15, 0.15, 0.15],    #-> group / class 1
+                                [0.2, 0.2, 0.2],    #-> group / class 3
+                                [0.4, 0.4, 0.4],    #-> group / class 3
+                                [0.0, 0.0, 0.0]     #-> group / class 0
+                        ])
+            >>> labels = torch.LongTensor([1, 5, 5, 0])
+            >>> result, new_labels = groupby_mean(samples, labels)
+            
+            >>> result
+            tensor([[0.0000, 0.0000, 0.0000],
+                [0.1500, 0.1500, 0.1500],
+                [0.3000, 0.3000, 0.3000]])
+                
+            >>> new_labels
+            tensor([0, 1, 5])
+        """
+        uniques = labels.unique().tolist()
+        labels = labels.tolist()
 
+        key_val = {key: val for key, val in zip(uniques, range(len(uniques)))}
+        val_key = {val: key for key, val in zip(uniques, range(len(uniques)))}
+        
+        labels = torch.LongTensor(list(map(key_val.get, labels)))
+        
+        labels = labels.view(labels.size(0), 1).expand(-1, value.size(1)).to(device)
+        
+        unique_labels, labels_count = labels.unique(dim=0, return_counts=True)
+        result = torch.zeros_like(unique_labels, dtype=torch.float, device=device).scatter_add_(0, labels, value)
+        result = result / labels_count.float().unsqueeze(1)
+        new_labels = torch.LongTensor(list(map(val_key.get, unique_labels[:, 0].tolist())))
+        return result, new_labels

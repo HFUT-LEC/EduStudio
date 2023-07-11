@@ -13,17 +13,11 @@ class M2C_DIMKT_OP(BaseMid2Cache):
         self.num_c = dt_info['cpt_count']
 
         df_train_folds = kwargs['df_train_folds']
-        df_valid_folds = kwargs['df_valid_folds']
-        df_test_folds = kwargs['df_test_folds']
 
         kwargs['q_diff_list'] = []
         kwargs['c_diff_list'] = []
-        for train_dict, val_dict, test_dict in zip(
-            df_train_folds, df_valid_folds, df_test_folds
-        ):
+        for train_dict in df_train_folds:
             self.train_dict = train_dict
-            self.val_dict = val_dict
-            self.test_dict = test_dict
             self.compute_difficulty()
             kwargs['q_diff_list'].append(self.q_dif)
             kwargs['c_diff_list'].append(self.c_dif)
