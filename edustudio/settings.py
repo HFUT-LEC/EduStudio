@@ -25,6 +25,7 @@ pathUtil.auto_create_folder_path(
 DISABLE_TQDM_BAR = False
 LOG_WITHOUT_DATE = False
 TQDM_NCOLS = 100
+DISABLE_LOG_STDOUT = False
 
 curr_file_folder = os.path.dirname(__file__)
 DT_INFO_FILE_PATH = os.path.realpath(curr_file_folder + "/assets/datasets.yaml")

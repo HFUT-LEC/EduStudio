@@ -13,7 +13,8 @@ class Logger(object):
                  fmt: str = "%(asctime)s[%(levelname)s]: %(message)s",
                  date_fmt: str = "%Y-%m-%d %H:%M:%S",
                  timezone: str = "Asia/Shanghai",
-                 level=logging.DEBUG
+                 level=logging.DEBUG,
+                 DISABLE_LOG_STDOUT=False
                  ):
         self.timezone = timezone
         if filepath:
@@ -43,7 +44,7 @@ class Logger(object):
         for handler in self.logger.handlers:
             if type(handler) is logging.StreamHandler:
                 flag = True
-        if flag is False:
+        if flag is False and DISABLE_LOG_STDOUT is False:
             self.logger.addHandler(ch)
 
     def _flush(self):

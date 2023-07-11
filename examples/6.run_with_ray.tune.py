@@ -1,8 +1,4 @@
-import sys
-import os
-
-# sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/../")
-# os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# run following after installed edustudio
 
 from edustudio.quickstart import run_edustudio
 from ray import tune
@@ -51,12 +47,13 @@ search_space= {
 
     'traintpl_cfg.batch_size': tune.grid_search([256,]),
     'traintpl_cfg.epoch_num': tune.grid_search([2]),
-    'traintpl_cfg.device': tune.grid_search(["cpu"]),
-    'modeltpl_cfg.emb_dim': tune.grid_search([20,40])
+    'traintpl_cfg.device': tune.grid_search(["cuda:0"]),
+    'modeltpl_cfg.emb_dim': tune.grid_search([20,40]),
+    'frame_cfg.DISABLE_LOG_STDOUT': tune.grid_search([False]),
 }
 
 tuner = tune.Tuner(
-    objective_function, param_space=search_space, tune_config=tune.TuneConfig(max_concurrent_trials=1)
+    tune.with_resources(objective_function, {"gpu": 1}), param_space=search_space, tune_config=tune.TuneConfig(max_concurrent_trials=1),
 ) 
 results = tuner.fit()
 

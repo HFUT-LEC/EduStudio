@@ -24,9 +24,14 @@ def init_all(cfg: UnifyConfig):
     )
     log_filepath = f"{frame_cfg.temp_folder_path}/{frame_cfg.ID}.log"
     if frame_cfg['LOG_WITHOUT_DATE']:
-        cfg.logger = Logger(filepath=log_filepath, fmt='[%(levelname)s]: %(message)s', date_fmt=None).get_std_logger()
+        cfg.logger = Logger(
+            filepath=log_filepath, fmt='[%(levelname)s]: %(message)s', date_fmt=None,
+            DISABLE_LOG_STDOUT=cfg['frame_cfg']['DISABLE_LOG_STDOUT']
+        ).get_std_logger()
     else:
-        cfg.logger = Logger(filepath=log_filepath).get_std_logger()
+        cfg.logger = Logger(
+            filepath=log_filepath, DISABLE_LOG_STDOUT=cfg['frame_cfg']['DISABLE_LOG_STDOUT']
+        ).get_std_logger()
 
     if frame_cfg['DISABLE_TQDM_BAR'] is True:
         from tqdm import tqdm
