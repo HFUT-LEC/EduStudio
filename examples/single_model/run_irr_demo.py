@@ -12,6 +12,7 @@ run_edustudio(
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'EduTrainTPL',
+        'lr': 0.0001,
     },
     datatpl_cfg_dict={
         'cls': 'IRRDataTPL',

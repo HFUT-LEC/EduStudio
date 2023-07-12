@@ -7,6 +7,7 @@ Reference:
 from ..basemodel import BaseProxyModel
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class PairSCELoss(nn.Module):
@@ -38,6 +39,7 @@ class IRR(BaseProxyModel):
     """
     default_cfg = {
         "backbone_modeltpl_cls": "IRT",
+        'pair_weight': 0.5,
     }
 
     def __init__(self, cfg):
@@ -68,7 +70,10 @@ class IRR(BaseProxyModel):
         pos_pd = self(**kwargs).flatten()
         kwargs['stu_id'] = pair_neg_stu
         neg_pd = self(**kwargs).flatten()
+        pos_label = torch.ones(pos_pd.shape[0]).to(self.device)
+        neg_label = torch.zeros(neg_pd.shape[0]).to(self.device)
+        point_loss = F.binary_cross_entropy(input=pos_pd, target=pos_label) + F.binary_cross_entropy(input=neg_pd, target=neg_label)
 
         return {
-            'loss_main': self.irr_pair_loss(pos_pd, neg_pd)
+            'loss_main': self.modeltpl_cfg['pair_weight'] * self.irr_pair_loss(pos_pd, neg_pd) + (1-self.modeltpl_cfg['pair_weight']) * point_loss
         }
