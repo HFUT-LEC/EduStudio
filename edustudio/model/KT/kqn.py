@@ -6,9 +6,9 @@ from torch.autograd import Variable
 
 class KQN(GDBaseModel):
     default_cfg = {
-        'emb_size': 100,
-        'rnn_hidden_size': 100,
-        'mlp_hidden_size': 100,
+        'emb_size': 128,
+        'rnn_hidden_size': 128,
+        'mlp_hidden_size': 128,
         'n_rnn_layers': 1,
         'rnn_or_lstm': 'lstm',
         'dropout': 0.2
@@ -20,13 +20,12 @@ class KQN(GDBaseModel):
     def build_cfg(self):
         self.n_user = self.datatpl_cfg['dt_info']['stu_count']
         self.n_item = self.datatpl_cfg['dt_info']['exer_count']
-        # assert self.modeltpl_cfg['rnn_or_lstm'] in {'rnn', 'lstm'}
     
     def build_model(self):
         # helper variable for making a one-hot vector for rnn input
-        self.inter_emb = torch.eye(self.n_item * 2)
+        self.inter_emb = torch.eye(self.n_item * 2).to(self.device)
         # helper variable for making a one-hot vector for skills
-        self.cpt_emb = torch.eye(self.n_item)
+        self.cpt_emb = torch.eye(self.n_item).to(self.device)
 
         if self.modeltpl_cfg['rnn_or_lstm'] == 'gru':
             self.seq_model = nn.GRU(
