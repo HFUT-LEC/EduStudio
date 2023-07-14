@@ -27,7 +27,7 @@ pip install -U edustudio
 Download the source files from GitHub.
 
 ```bash
-git clone https://github.com/HFUT-LEC/EduStudio.git && cd edustudio
+git clone https://github.com/HFUT-LEC/EduStudio.git && cd EduStudio
 ```
 
 Run the following command to install:

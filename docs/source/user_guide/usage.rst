@@ -7,4 +7,4 @@ Usage
    usage/run_edustudio
    usage/aht
    usage/atomic_cmds
-
+   usage/use_case_of_config
