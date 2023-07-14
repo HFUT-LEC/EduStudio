@@ -7,6 +7,7 @@ from ast import literal_eval
 from collections import defaultdict
 import importlib
 
+
 def get_global_cfg(
     dataset:str,
     cfg_file_name:str,
@@ -16,6 +17,20 @@ def get_global_cfg(
     modeltpl_cfg_dict: Dict[str, Any],
     frame_cfg_dict:  Dict[str, Any],
 ):
+    """merge configurations from different entrypoint into a global config object
+
+    Args:
+        dataset (str): dataset name
+        cfg_file_name (str): config file name
+        traintpl_cfg_dict (Dict[str, Any]): parameter dict of training template
+        datatpl_cfg_dict (Dict[str, Any]): parameter dict of data template
+        evaltpl_cfg_dict (Dict[str, Any]): parameter dict of evaluate template
+        modeltpl_cfg_dict (Dict[str, Any]): parameter dict of model template
+        frame_cfg_dict (Dict[str, Any]): parameter dict of framework template
+
+    Returns:
+        UnifyConfig: the global config object
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', '-dt', type=str,
                         help='dataset name', dest='dataset', default=dataset)

@@ -4,10 +4,20 @@ from edustudio.utils.common import UnifyConfig
 
 
 class BaseProxyDataTPL(object):
+    """The basic protocol for implementing a proxy data template
+    """
     default_cfg = {'backbone_datatpl_cls': 'BaseDataTPL'}
 
     @classmethod
     def from_cfg_proxy(cls, cfg):
+        """an interface to instantiate a proxy model
+
+        Args:
+            cfg (UnifyConfig): the global config object
+
+        Returns:
+           BaseProxyDataTPL
+        """
         backbone_datatpl_cls = cls.get_backbone_cls(cfg.datatpl_cfg.backbone_datatpl_cls)
         new_cls = cls.get_new_cls(p_cls=backbone_datatpl_cls)
         return new_cls.from_cfg(cfg)
@@ -25,11 +35,27 @@ class BaseProxyDataTPL(object):
     
     @classmethod
     def get_new_cls(cls, p_cls):
+        """dynamic inheritance
+
+        Args:
+            p_cls (BaseModel): parent class
+
+        Returns:
+            BaseProxyModel: A inherited class
+        """
         new_cls = type(cls.__name__ + "_proxy", (cls, p_cls), {})
         return new_cls
 
     @classmethod
     def get_default_cfg(cls, backbone_datatpl_cls, **kwargs):
+        """Get the final default_cfg
+
+        Args:
+            backbone_datatpl_cls (BaseDataTPL): backbone data template class name
+
+        Returns:
+            UnifyConfig: the final default config object
+        """
         bb_cls = None
         if backbone_datatpl_cls is not None:
             bb_cls = cls.get_backbone_cls(backbone_datatpl_cls)

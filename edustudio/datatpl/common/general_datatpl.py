@@ -26,6 +26,8 @@ class DataTPLStatus(object):
         
 
 class GeneralDataTPL(BaseDataTPL):
+    """General Data Template
+    """
     default_cfg = {
         'seperator': ',',
         'n_folds': 1,
@@ -80,6 +82,14 @@ class GeneralDataTPL(BaseDataTPL):
 
     @classmethod
     def from_cfg(cls, cfg):
+        """an interface to instantiate a data template
+
+        Args:
+            cfg (UnifyConfig): the global config object
+
+        Returns:
+           BaseDataTPL
+        """
         if not os.path.exists(f'{cfg.frame_cfg.data_folder_path}'):
             print(cfg.frame_cfg.data_folder_path)
             cls.download_dataset(cfg)
@@ -98,12 +108,19 @@ class GeneralDataTPL(BaseDataTPL):
     
     @property
     def common_str2df(self):
+        """get the common data object
+
+        Returns:
+            dict: the common data object through the atomic operations
+        """
         return {
             "df": self.df, "df_train": self.df_train, "df_valid": self.df_valid,
             "df_test": self.df_test, "dt_info": self.datatpl_cfg['dt_info']
         }
     
     def process_load_data_from_middata(self):
+        """process middata
+        """
         kwargs = self.common_str2df
         for op in self.m2c_op_list:
             kwargs = op.process(**kwargs)
@@ -119,6 +136,8 @@ class GeneralDataTPL(BaseDataTPL):
             raise NotImplementedError # 统计数据集
 
     def process_data(self):
+        """process data
+        """
         load_data_from = self.datatpl_cfg['load_data_from']
         if load_data_from != 'cachedata':
             self.process_load_data_from_middata()
@@ -127,6 +146,8 @@ class GeneralDataTPL(BaseDataTPL):
     
     @classmethod
     def load_data(cls, cfg): # 只在middata存在时调用
+        """load data from disk
+        """
         is_dataset_divided = cfg.datatpl_cfg['is_dataset_divided']
         if cfg.datatpl_cfg['n_folds'] == 1:
             kwargs = cls.load_data_from_undivided(cfg) # 1折时，如果数据没划分好，那么直接导入
@@ -140,6 +161,8 @@ class GeneralDataTPL(BaseDataTPL):
 
     @classmethod
     def load_data_from_undivided(cls, cfg):
+        """load undivided data from disk
+        """
         fph = f'{cfg.frame_cfg.data_folder_path}/middata/{cfg.dataset}.inter.csv'
         
         exclude_feats = cfg.datatpl_cfg['inter_exclude_feat_names']
@@ -152,6 +175,8 @@ class GeneralDataTPL(BaseDataTPL):
     
     @classmethod
     def load_data_from_divided(cls, cfg):
+        """load divided data from disk
+        """
         train_fph = f'{cfg.frame_cfg.data_folder_path}/middata/{cfg.dataset}.train.inter.csv'
         valid_fph = f'{cfg.frame_cfg.data_folder_path}/middata/{cfg.dataset}.valid.inter.csv'
         test_fph = f'{cfg.frame_cfg.data_folder_path}/middata/{cfg.dataset}.test.inter.csv'
@@ -175,6 +200,8 @@ class GeneralDataTPL(BaseDataTPL):
         return df
 
     def build_dataloaders(self):
+        """build dataloaders that would be convey to training template
+        """
         batch_size = self.traintpl_cfg['batch_size']
         num_workers = self.traintpl_cfg['num_workers']
         eval_batch_size = self.traintpl_cfg['eval_batch_size']
@@ -193,6 +220,8 @@ class GeneralDataTPL(BaseDataTPL):
         return train_loader_list, valid_loader_list, test_loader_list
 
     def save_cache(self):
+        """save cache data
+        """
         # chech path
         if os.path.exists(self.cache_folder_path):
             raise ValueError(f"cache_fold({self.cache_folder_path}) already exists, won't save cache")
@@ -214,6 +243,8 @@ class GeneralDataTPL(BaseDataTPL):
             json.dump(json.loads(self.datatpl_cfg.dump_tpl()), fp=f, indent=2, ensure_ascii=False)
 
     def check_cache(self):
+        """check whether the cache data is consistent with current config
+        """
         with open(f"{self.cache_folder_path}/datatpl_cfg.json", 'r', encoding='utf-8') as f:
             cache_datatpl_cfg = json.load(f)
         
@@ -235,6 +266,8 @@ class GeneralDataTPL(BaseDataTPL):
         self.datatpl_cfg['dt_info'] = cache_datatpl_cfg['dt_info'] # partial load_cache
 
     def load_cache(self):
+        """load cache data from disk
+        """
         if self.datatpl_cfg['load_data_from'] != 'cachedata':
             return
         if not os.path.exists(self.cache_folder_path):
@@ -251,6 +284,8 @@ class GeneralDataTPL(BaseDataTPL):
         self.final_kwargs = self.load_pickle(final_kwargs_fph)
 
     def build_datasets(self):
+        """build datasets
+        """
         n_folds = self.datatpl_cfg['n_folds']
         assert len(self.dict_train_folds) == n_folds
         assert self.status.mode == DataTPLMode.MANAGER
@@ -279,6 +314,12 @@ class GeneralDataTPL(BaseDataTPL):
         return default_collate(batch)
     
     def set_mode(self, mode: DataTPLMode, fold_id):
+        """set mode of current data template
+
+        Args:
+            mode (DataTPLMode): mode
+            fold_id (int): id of fold
+        """
         self.status.mode = mode
         self.status.fold_id = fold_id
         if mode is DataTPLMode.MANAGER:
@@ -295,20 +336,30 @@ class GeneralDataTPL(BaseDataTPL):
         self.length = next(iter(self.dict_main.values())).shape[0]
 
     def _set_mode_manager(self):
+        """progress of manager mode
+        """
         self.dict_main = None
         self.status.mode = DataTPLMode.MANAGER
         self.status.fold_id = None
 
     def _set_mode_train(self):
+        """progress of train mode
+        """
         self.dict_main = self.dict_train_folds[self.status.fold_id]
     
     def _set_mode_valid(self):
+        """progress of valid mode
+        """
         self.dict_main = self.dict_valid_folds[self.status.fold_id]
     
     def _set_mode_test(self):
+        """progress of test mode
+        """
         self.dict_main = self.dict_test_folds[self.status.fold_id]
 
     def _check_params(self):
+        """check validation of default parameters
+        """
         super()._check_params()
         assert self.datatpl_cfg['load_data_from'] in {'rawdata', 'middata', 'cachedata'}
         assert 'dt_info' not in self.datatpl_cfg
@@ -323,29 +374,47 @@ class GeneralDataTPL(BaseDataTPL):
         }
     
     def _copy(self):
+        """copy current instance
+        """
         obj = super()._copy()
         obj.status = copy.copy(obj.status)
         return obj
     
     @property
     def hasValidDataset(self):
+        """whether exists validation dataset
+        """
         return self.dict_valid_folds is not None and len(self.dict_valid_folds) > 0
     
     @property
     def cache_folder_path(self):
+        """folder path of cache data
+        """
         save_cache_id = self.datatpl_cfg['cache_id']
         return f"{self.frame_cfg.data_folder_path}/cachedata/{self.cfg.dataset}_{save_cache_id}/"
     
     def save_pickle(self, filepath, obj):
+        """save data into pickle file
+        """
         with open(filepath, 'wb') as fb:
             pickle.dump(obj, fb, protocol=pickle.HIGHEST_PROTOCOL)
     
     def load_pickle(self, filepath):
+        """load data into pickle file
+        """
         with open(filepath, 'rb') as fb:
             return pickle.load(fb)
 
     @classmethod
     def get_default_cfg(cls, mid2cache_op_seq, **kwargs):
+        """Get final default config object
+
+        Args:
+            mid2cache_op_seq (List[Union[BaseMid2Cache,str]]): Mid2Cahce Sequence
+
+        Returns:
+            UnifyConfig: the final default config object
+        """
         cfg = UnifyConfig()
         for _cls in cls.__mro__:
             if not hasattr(_cls, 'default_cfg'):
@@ -378,6 +447,14 @@ class GeneralDataTPL(BaseDataTPL):
 
     @classmethod
     def _get_r2m_op(cls, cfg):
+        """Get Raw2Mid operation
+
+        Args:
+            cfg (UnifyConfig): the global config object
+
+        Returns:
+            BaseRaw2Mid: Raw2Mid operation
+        """
         from edustudio.atom_op.raw2mid import BaseRaw2Mid
         r2m_op = cfg.datatpl_cfg['raw2mid_op']
         assert r2m_op is not None
@@ -390,6 +467,11 @@ class GeneralDataTPL(BaseDataTPL):
         return r2m_op.from_cfg(cfg)
     
     def _get_m2c_op_list(self):
+        """Get Mid2Cache operation sequence
+
+        Returns:
+           List[BaseMid2Cache]: Mid2Cache operation sequence
+        """
         from edustudio.atom_op.mid2cache import BaseMid2Cache
         m2c_op_list = self.datatpl_cfg['mid2cache_op_seq']
         op_list = []
@@ -405,6 +487,8 @@ class GeneralDataTPL(BaseDataTPL):
 
 
     def df2dict(self):
+        """convert dataframe object into dict
+        """
         # if self.datatpl_cfg['is_dataset_divided'] is True:
         #     self.df_train_folds.append(self.df_train)
         #     self.df_valid_folds.append(self.df_valid)
@@ -422,6 +506,8 @@ class GeneralDataTPL(BaseDataTPL):
 
     @staticmethod
     def _df2dict(dic_raw):
+        """convert dataframe into dict
+        """
         dic = {}
         for k in dic_raw:
             if type(dic_raw) is not dict:
@@ -434,6 +520,8 @@ class GeneralDataTPL(BaseDataTPL):
         return dic
 
     def get_extra_data(self, **kwargs):
+        """an interface to construct extra data except the data from forward API
+        """
         extra_data = super().get_extra_data(**kwargs)
         # extra_data.update({
         #     'df': self.df,
@@ -446,6 +534,11 @@ class GeneralDataTPL(BaseDataTPL):
     
     @staticmethod
     def _preprocess_feat(df):
+        """convert data format after loading files according to field type
+
+        Args:
+            df (DataFrame): data
+        """
         for col in df.columns:
             col_name, col_type = col.split(":")
             if col_type == 'token':
@@ -461,12 +554,22 @@ class GeneralDataTPL(BaseDataTPL):
 
     @staticmethod
     def _unwrap_feat(df:pd.DataFrame):
+        """unwrap the type of field
+
+        Args:
+            df (pd.DataFrame): dataframe after unwrapping
+        """
         for col in df.columns:
             col_name, col_type = col.split(":")
             df.rename(columns={col:col_name}, inplace=True)
         
     @classmethod
     def get_default_cfg(cls, **kwargs):
+        """Get the final default config object
+
+        Returns:
+            UnifyConfig: the final default config object
+        """
         cfg = UnifyConfig()
         for _cls in cls.__mro__:
             if not hasattr(_cls, 'default_cfg'):
@@ -485,4 +588,9 @@ class GeneralDataTPL(BaseDataTPL):
 
     
     def set_info_for_fold(self, fold_id):
+        """Get data information when a specifying fold id
+
+        Args:
+            fold_id (int): id of fold
+        """
         pass

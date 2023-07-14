@@ -14,6 +14,9 @@ from edustudio.utils.common import set_same_seeds
 
 
 class BaseTrainTPL(object):
+    """The basic protocol for implementing a training template
+    """
+
     default_cfg = {
         "seed": 2023
     }
@@ -60,10 +63,14 @@ class BaseTrainTPL(object):
         return cfg
     
     def start(self):
+        """entrypoint of starting a training process
+        """
         self.logger.info(f"TrainTPL {self.__class__} Started!")
         set_same_seeds(self.traintpl_cfg['seed'])
 
     def _check_params(self):
+        """check validation of default config
+        """
         pass
 
     def get_model_obj(self):

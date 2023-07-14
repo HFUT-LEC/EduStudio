@@ -27,6 +27,8 @@ class GDTrainTPL(BaseTrainTPL):
         self.test_loader_list = []
     
     def _get_optim(self):
+        """Get optimizer
+        """
         optimizer = self.traintpl_cfg['optim']
         lr = self.traintpl_cfg['lr']
         weight_decay = self.traintpl_cfg['weight_decay']
@@ -45,6 +47,8 @@ class GDTrainTPL(BaseTrainTPL):
         return optim
 
     def start(self):
+        """entrypoint of starting a training process
+        """
         super().start()
         self.build_loaders()
 
@@ -88,6 +92,11 @@ class GDTrainTPL(BaseTrainTPL):
         History.dump_json(best_metric_value_dict_mean, f"{self.frame_cfg.temp_folder_path}/result.json")
     
     def one_fold_start(self, fold_id):
+        """training process of one one fold
+
+        Args:
+            fold_id (int): fold id
+        """
         self.logger.info(f"====== [FOLD ID]: {fold_id} ======")
 
     def batch_dict2device(self, batch_dict):
@@ -100,6 +109,8 @@ class GDTrainTPL(BaseTrainTPL):
         return dic
 
     def build_loaders(self):
+        """build dataloaders
+        """
         batch_size = self.traintpl_cfg['batch_size']
         num_workers = self.traintpl_cfg['num_workers']
         eval_batch_size = self.traintpl_cfg['eval_batch_size']

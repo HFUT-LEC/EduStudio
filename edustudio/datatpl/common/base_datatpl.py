@@ -9,6 +9,8 @@ import os
 
 
 class BaseDataTPL(Dataset):
+    """The basic data protocol for implementing a data template
+    """
     default_cfg = {'seed': 2023}
 
     def __init__(self, cfg):
@@ -23,6 +25,11 @@ class BaseDataTPL(Dataset):
 
     @classmethod
     def get_default_cfg(cls, **kwargs):
+        """Get the final default config object
+
+        Returns:
+            UnifyConfig: the final default config object
+        """
         cfg = UnifyConfig()
         for _cls in cls.__mro__:
             if not hasattr(_cls, 'default_cfg'):
@@ -32,20 +39,39 @@ class BaseDataTPL(Dataset):
 
     @classmethod
     def from_cfg(cls, cfg):
+        """Instantiate data template
+
+        Args:
+            cfg (UnifyConfig): the global config object
+
+        Returns:
+            BaseDataTPL: instance of data template
+        """
         return cls(cfg)
     
     def get_extra_data(self, **kwargs):
+        """an interface to construct extra data except the data from forward API
+        """
         return {}
 
     def _check_params(self):
+        """check validation of default config
+        """
         pass
 
     def _copy(self):
+        """copy current instance
+        """
         obj = copy.copy(self)
         return obj
 
     @classmethod
     def download_dataset(cls, cfg):
+        """Download Dataset from the Internet
+
+        Args:
+            cfg (UnifyConfig):the global config object
+        """
         dt_name = cfg.dataset
         cfg.logger.warning(f"Can't find dataset files of {dt_name} in local environment!")
         cfg.logger.info(f"Prepare to download {dt_name} from Internet.")

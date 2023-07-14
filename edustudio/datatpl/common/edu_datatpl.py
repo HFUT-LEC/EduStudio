@@ -7,6 +7,9 @@ import torch
 
 
 class EduDataTPL(GeneralDataTPL):
+    """Educational Data Template including student features and exercise features
+    """
+    
     default_cfg = {
         'exer_exclude_feat_names': (),
         'stu_exclude_feat_names': (),

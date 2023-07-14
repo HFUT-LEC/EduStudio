@@ -7,6 +7,11 @@ import os
 
 
 def init_all(cfg: UnifyConfig):
+    """initialize process
+
+    Args:
+        cfg (UnifyConfig): the global config obejct
+    """
     frame_cfg = cfg.frame_cfg
     dataset = cfg.dataset
     traintpl_cls =cfg.traintpl_cfg.cls if isinstance(cfg.traintpl_cfg.cls, str) else cfg.traintpl_cfg.cls.__name__

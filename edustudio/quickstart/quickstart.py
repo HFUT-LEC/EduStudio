@@ -21,6 +21,20 @@ def run_edustudio(
     frame_cfg_dict:  Dict[str, Any] = {},  # parameters dictionary
     return_cfg_and_result: bool = False,
 ):
+    """The quick start API to run edustudio
+
+    Args:
+        dataset (str, optional):dataset name. Defaults to None.
+        cfg_file_name (str, optional): config file name. Defaults to None.
+        traintpl_cfg_dict (Dict[str, Any]): parameter dict of training template
+        datatpl_cfg_dict (Dict[str, Any]): parameter dict of data template
+        evaltpl_cfg_dict (Dict[str, Any]): parameter dict of evaluate template
+        modeltpl_cfg_dict (Dict[str, Any]): parameter dict of model template
+        frame_cfg_dict (Dict[str, Any]): parameter dict of framework template
+
+    Returns:
+        tuple: the global config object and experimental result
+    """
     cfg: UnifyConfig = get_global_cfg(
         dataset, cfg_file_name, traintpl_cfg_dict,
         datatpl_cfg_dict, evaltpl_cfg_dict, modeltpl_cfg_dict, frame_cfg_dict

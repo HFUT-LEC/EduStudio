@@ -8,6 +8,8 @@ from edustudio.utils.callback import CallbackList
 
 
 class BaseEvalTPL(object):
+    """The baisc protocol for implementing a evaluate template
+    """
     default_cfg = {}
 
     def __init__(self, cfg):

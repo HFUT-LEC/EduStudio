@@ -8,6 +8,8 @@ from edustudio.utils.common import UnifyConfig
 import importlib
 
 class BaseModel(nn.Module):
+    """The basic protocol for implementing a model template
+    """
     default_cfg = {}
     def __init__(self, cfg):
         super().__init__()
@@ -20,14 +22,26 @@ class BaseModel(nn.Module):
         self.logger: logging.Logger = cfg.logger
 
     @classmethod
-    def from_cfg(cls, cfg):
+    def from_cfg(cls, cfg: UnifyConfig):
+        """an interface to instantiate a model
+
+        Args:
+            cfg (UnifyConfig): the global config object
+
+        Returns:
+           BaseModel
+        """
         return cls(cfg)
     
     def add_extra_data(self, **kwargs):
+        """an interface to get extra data except the data from forward API
+        """
         pass
 
     @classmethod
     def get_default_cfg(cls, **kwargs):
+        """get the final default_cfg
+        """
         cfg = UnifyConfig()
         for _cls in cls.__mro__:
             if not hasattr(_cls, 'default_cfg'):
@@ -77,18 +91,36 @@ class BaseModel(nn.Module):
 
 
 class BaseProxyModel(object):
+    """The baisc protocol to implement a proxy model template
+    """
     default_cfg = {
         'backbone_modeltpl_cls': 'BaseModel'
     }
     
     @classmethod
     def from_cfg_proxy(cls, cfg):
+        """an interface to instantiate a proxy model
+
+        Args:
+            cfg (UnifyConfig): the global config object
+
+        Returns:
+           BaseModel
+        """
         backbone_modeltpl_cls = cls.get_backbone_cls(cfg.modeltpl_cfg.backbone_modeltpl_cls)
         new_cls = cls.get_new_cls(p_cls=backbone_modeltpl_cls)
         return new_cls.from_cfg(cfg)
     
     @classmethod
     def get_backbone_cls(cls, backbone_modeltpl_cls):
+        """get backbone class from its name
+
+        Args:
+            backbone_modeltpl_cls (_type_): class name or class address
+
+        Returns:
+            BaseProxyModel: the class address of proxy model
+        """
         if isinstance(backbone_modeltpl_cls, str):
             backbone_modeltpl_cls = importlib.import_module('edustudio.model').\
                 __getattribute__(backbone_modeltpl_cls)
@@ -100,11 +132,27 @@ class BaseProxyModel(object):
 
     @classmethod
     def get_new_cls(cls, p_cls):
+        """dynamic inheritance
+
+        Args:
+            p_cls (BaseModel): parent class
+
+        Returns:
+            BaseProxyModel: A inherited class
+        """
         new_cls = type(cls.__name__ + "_proxy", (cls, p_cls), {})
         return new_cls
 
     @classmethod
     def get_default_cfg(cls, backbone_modeltpl_cls):
+        """get the final default_cfg
+
+        Args:
+            backbone_modeltpl_cls (str/BaseModel): name or address of backbone class
+
+        Returns:
+            UnifyConfig: the final default_cfg object
+        """
         bb_cls = None
         if backbone_modeltpl_cls is not None:
             bb_cls = cls.get_backbone_cls(backbone_modeltpl_cls)
