@@ -32,3 +32,5 @@ Then run the following command:
 ```bash
 python run.py
 ```
+
+To find out which templates are used for a model, we can find in the [Reference Table](https://edustudio.readthedocs.io/en/latest/user_guide/reference_table.html)
