@@ -14,6 +14,7 @@ run_edustudio(
     },
     traintpl_cfg_dict={
         'cls': 'EduTrainTPL',
+        'eval_batch_size': 512,
     },
     modeltpl_cfg_dict={
         'cls': 'DeepIRT',
