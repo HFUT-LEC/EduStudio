@@ -41,7 +41,7 @@ class GraphLayer(nn.Module):
         self.g.ndata['z'] = z
         self.g.apply_edges(self.edge_attention)
         self.g.update_all(self.message_func, self.reduce_func)
-        return self.g.pop('h')
+        return self.g.ndata.pop('h')
 
 
 class Fusion(nn.Module):
