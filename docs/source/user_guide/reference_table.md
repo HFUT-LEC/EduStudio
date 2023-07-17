@@ -38,7 +38,7 @@
 | DKVMN        |  KTInterExtendsQDataTPL | EduTrainTPL | BinaryClassificationEvalTPL |
 | DTransformer | KTInterCptUnfoldDataTPL | EduTrainTPL | BinaryClassificationEvalTPL |
 | EERNN        |            EERNNDataTPL | EduTrainTPL | BinaryClassificationEvalTPL |
-| EKT          |            EERNNDataTPL | EduTrainTPL | BinaryClassificationEvalTPL |
+| EKT          |            EKTDataTPL | EduTrainTPL | BinaryClassificationEvalTPL |
 | HawkesKT     | KTInterCptUnfoldDataTPL | EduTrainTPL | BinaryClassificationEvalTPL |
 | IEKT         |  KTInterExtendsQDataTPL | EduTrainTPL | BinaryClassificationEvalTPL |
 | KQN          |          KTInterDataTPL | EduTrainTPL | BinaryClassificationEvalTPL |

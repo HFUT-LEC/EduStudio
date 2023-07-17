@@ -10,3 +10,4 @@ from .DIMKTDataTPL import DIMKTDataTPL
 from .QDKTDataTPL import QDKTDataTPL
 from .RKTDataTPL import RKTDataTPL
 from .CL4KTDataTPL import CL4KTDataTPL
+from .EKTDataTPL import EKTDataTPL
