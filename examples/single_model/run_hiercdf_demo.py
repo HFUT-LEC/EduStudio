@@ -45,7 +45,9 @@ run_edustudio(
     dataset='JunyiExerAsCpt',
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',        
+        'cls': 'EduTrainTPL',   
+        'batch_size': 2048,
+        'eval_batch_size': 2048,
     },
     datatpl_cfg_dict={
         'cls': 'HierCDFDataTPL',
@@ -55,6 +57,9 @@ run_edustudio(
         'M2C_ReMapId': {
             'share_id_columns': [{'cpt_seq:token_seq', 'cpt_head:token', 'cpt_tail:token', 'exer_id:token'}],
         },
+        'M2C_MyFilterRecords4CD': {
+            "stu_least_records": 60,
+        }
     },
     modeltpl_cfg_dict={
         'cls': 'HierCDF',
