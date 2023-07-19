@@ -34,6 +34,7 @@ class M2C_ReMapId(BaseMid2Cache):
         feats_group.extend(self.m2c_cfg['share_id_columns'])
         kwargs['feats_group'] = feats_group
 
+        kwargs['lbe_dict'] = {}
         for feats in feats_group:
             col_arr = self.get_specific_column_into_arr(feats, kwargs.values())
             lbe = LabelEncoder().fit(col_arr)
@@ -48,8 +49,10 @@ class M2C_ReMapId(BaseMid2Cache):
                                 v[col] = v[col].apply(lambda x: lbe.transform(x).tolist())
                             else:
                                 raise ValueError("unsupport type of the feat: {col}")
+            for f in feats:
+                kwargs['lbe_dict'][f] = lbe
         return kwargs
-                         
+                        
     @staticmethod
     def get_specific_column_into_arr(columns, df_list: List[pd.DataFrame]):
         col_list = []
