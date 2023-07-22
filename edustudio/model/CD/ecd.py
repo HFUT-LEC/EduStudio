@@ -56,9 +56,10 @@ class ECD(GDBaseModel):
 
     def add_extra_data(self, **kwargs):
         self.qqq_group_list = kwargs['qqq_group_list']
+        self.Q_mat = kwargs['Q_mat'].to(self.device)
+        self.QQQ_list = kwargs['qqq_list'].to(self.device)
 
     def atten(self, query, key, value):
-        qk_dim = key.shape[2]
         v_dim = value.shape[2]
         btch = query.shape[0]
         temp0 = torch.matmul(query, key.transpose(1, 2))
@@ -123,9 +124,9 @@ class ECD_IRT(ECD):
     def irf(theta, a, b,  D=1.702):
         return 1 / (1 + torch.exp(-D * a * (theta - b)))
 
-    def forward(self, stu_id, exer_id, Q_mat, QQQ_list):
-        items_Q_mat = Q_mat[exer_id]
-        stus_qqq = QQQ_list[stu_id]
+    def forward(self, stu_id, exer_id):
+        items_Q_mat = self.Q_mat[exer_id]
+        stus_qqq = self.QQQ_list[stu_id]
         theta_inner = self.theta(stu_id)
         a = self.a(exer_id)
         b = self.b(exer_id)
@@ -148,18 +149,16 @@ class ECD_IRT(ECD):
             return pre_all
 
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat, kwargs['QQQ_list']).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
 
     def get_main_loss(self, **kwargs):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        QQQ_list = kwargs['QQQ_list']
-        pd_all, pd_context, pd_inner = self(stu_id, exer_id, Q_mat, QQQ_list)
+        pd_all, pd_context, pd_inner = self(stu_id, exer_id)
         pd_all, pd_context, pd_inner = pd_all.flatten(), pd_context.flatten(), pd_inner.flatten()
         loss_all = F.binary_cross_entropy(input=pd_all, target=label)
         loss_context = F.binary_cross_entropy(input=pd_context, target=label)
@@ -192,9 +191,9 @@ class ECD_MIRT(ECD):
     def irf(theta, a, b):
         return 1 / (1 + torch.exp(- torch.sum(torch.multiply(a, theta), axis=-1) + b))
 
-    def forward(self, stu_id, exer_id, Q_mat, QQQ_list):
-        items_Q_mat = Q_mat[exer_id]
-        stus_qqq = QQQ_list[stu_id]
+    def forward(self, stu_id, exer_id):
+        items_Q_mat = self.Q_mat[exer_id]
+        stus_qqq = self.QQQ_list[stu_id]
         theta_inner = self.theta(stu_id)
         a = self.a(exer_id)
         b = self.b(exer_id).flatten()
@@ -215,18 +214,16 @@ class ECD_MIRT(ECD):
             return pre_all
 
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id, **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat, kwargs['QQQ_list']).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
 
     def get_main_loss(self, **kwargs):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        QQQ_list = kwargs['QQQ_list']
-        pd_all, pd_context, pd_inner = self(stu_id, exer_id, Q_mat, QQQ_list)
+        pd_all, pd_context, pd_inner = self(stu_id, exer_id)
         pd_all, pd_context, pd_inner = pd_all.flatten(), pd_context.flatten(), pd_inner.flatten()
         loss_all = F.binary_cross_entropy(input=pd_all, target=label)
         loss_context = F.binary_cross_entropy(input=pd_context, target=label)
@@ -260,9 +257,9 @@ class ECD_NCD(ECD):
             dnn_units=self.modeltpl_cfg['dnn_units'], dropout_rate=self.modeltpl_cfg['dropout_rate']
         )
 
-    def forward(self, stu_id, exer_id, Q_mat, QQQ_list):
-        items_Q_mat = Q_mat[exer_id]
-        stus_qqq = QQQ_list[stu_id]
+    def forward(self, stu_id, exer_id):
+        items_Q_mat = self.Q_mat[exer_id]
+        stus_qqq = self.QQQ_list[stu_id]
 
         stu_emb = self.student_emb(stu_id)
         theta_inner = torch.sigmoid(stu_emb)
@@ -284,18 +281,16 @@ class ECD_NCD(ECD):
             return pre_all
 
     @torch.no_grad()
-    def predict(self, stu_id, exer_id, Q_mat, **kwargs):
+    def predict(self, stu_id, exer_id,  **kwargs):
         return {
-            'y_pd': self(stu_id, exer_id, Q_mat, kwargs['QQQ_list']).flatten(),
+            'y_pd': self(stu_id, exer_id).flatten(),
         }
 
     def get_main_loss(self, **kwargs):
         stu_id = kwargs['stu_id']
         exer_id = kwargs['exer_id']
         label = kwargs['label']
-        Q_mat = kwargs['Q_mat']
-        QQQ_list = kwargs['QQQ_list']
-        pd_all, pd_context, pd_inner = self(stu_id, exer_id, Q_mat, QQQ_list)
+        pd_all, pd_context, pd_inner = self(stu_id, exer_id)
         pd_all, pd_context, pd_inner = pd_all.flatten(), pd_context.flatten(), pd_inner.flatten()
         loss_all = F.binary_cross_entropy(input=pd_all, target=label)
         loss_context = F.binary_cross_entropy(input=pd_context, target=label)
