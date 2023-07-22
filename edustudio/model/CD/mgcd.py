@@ -153,21 +153,24 @@ class MGCD(GDBaseModel):
                     stu_id.append(stu)
                     exer_stu.append(exer)
                     label_stu.append(self.stu_exe2label[(stu, exer)])
-        stu_id = torch.tensor(stu_id).to(self.device)
-        exer_id = torch.tensor(exer_stu).to(self.device)
-        label_stu = torch.unsqueeze(torch.tensor(label_stu), dim=1).to(self.device)
-        kn_emb = self.Q_mat[exer_id]
-        stu_emb = self.R(stu_id)
-        stu_emb = torch.sigmoid(torch.matmul(stu_emb, self.A))
-        k_difficulty = torch.sigmoid(self.B(exer_id))
-        e_discrimination = torch.sigmoid(self.D(exer_id)) * 10
-        # prednet
-        input_x = e_discrimination * (stu_emb - k_difficulty) * kn_emb
-        input_x = self.drop_1(torch.tanh(self.prednet_full1(input_x)))
-        input_x = self.drop_2(torch.tanh(self.prednet_full2(input_x)))
-        output = torch.sigmoid(self.prednet_full3(input_x)).to(self.device)
+        if stu_id != []:
+            stu_id = torch.tensor(stu_id).to(self.device)
+            exer_id = torch.tensor(exer_stu).to(self.device)
+            label_stu = torch.unsqueeze(torch.tensor(label_stu), dim=1).to(self.device)
+            kn_emb = self.Q_mat[exer_id]
+            stu_emb = self.R(stu_id)
+            stu_emb = torch.sigmoid(torch.matmul(stu_emb, self.A))
+            k_difficulty = torch.sigmoid(self.B(exer_id))
+            e_discrimination = torch.sigmoid(self.D(exer_id)) * 10
+            # prednet
+            input_x = e_discrimination * (stu_emb - k_difficulty) * kn_emb
+            input_x = self.drop_1(torch.tanh(self.prednet_full1(input_x)))
+            input_x = self.drop_2(torch.tanh(self.prednet_full2(input_x)))
+            output = torch.sigmoid(self.prednet_full3(input_x)).to(self.device)
 
-        loss_stu = F.binary_cross_entropy(input=output, target=label_stu)
+            loss_stu = F.binary_cross_entropy(input=output, target=label_stu)
+        else:
+            loss_stu = 0
 
         return {
             'loss_main': loss_group + loss_stu
@@ -195,3 +198,4 @@ class NoneNegClipper(object):
             w = module.weight.data
             a = torch.relu(torch.neg(w))
             w.add_(a)
+
