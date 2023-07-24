@@ -8,3 +8,5 @@ Math2:
   middata_url: https://gitlab.com/hfut-lec/edudatafiles/-/raw/main/Math2/Math2-middata.zip
 AAAI_2023:
   middata_url: https://gitlab.com/hfut-lec/edudatafiles/-/raw/main/AAAI_2023/AAAI_2023-middata.zip
+PISA_2015_ECD:
+  middata_url: https://gitlab.com/hfut-lec/edudatafiles/-/raw/main/PISA_2015_ECD/PISA_2015_ECD-middata.zip
