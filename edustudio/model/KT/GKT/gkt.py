@@ -17,12 +17,8 @@ import torch.nn.functional as F
 import numpy as np
 from .building_blocks import MLP, MLPDecoder, MLPEncoder, EraseAddGate, ScaledDotProductAttention
 import scipy.sparse as sp
+from .losses import VAELoss, gumbel_softmax
 
-def build_dense_graph(node_num):
-    graph = 1. / (node_num - 1) * np.ones((node_num, node_num))
-    np.fill_diagonal(graph, 0)
-    graph = torch.from_numpy(graph).float()
-    return graph
 
 class GKT(GDBaseModel):
     default_cfg = {
@@ -33,15 +29,19 @@ class GKT(GDBaseModel):
         'dropout': 0.0,
         'MHA_cfg': {
             'atten_dim': 32,
+        },
+        'VAE_cfg': {
+            'encoder_dim': 32,
+            'decoder_dim': 32,
+            'temp': 0.5,
+            'bias': True,
+            'factor': False,
+            'var': 1.0
         }
     }
 
     def add_extra_data(self, **kwargs):
-        self.graph = build_dense_graph(self.n_exer)
-        self.graph_model = None
-        # self.graph = kwargs['graph']
-        # self.graph_model = kwargs['graph_model']
-        pass
+        self.graph = kwargs['graph']
 
     def build_cfg(self):
         self.graph_type = self.modeltpl_cfg['graph_type']
@@ -55,8 +55,8 @@ class GKT(GDBaseModel):
         assert self.graph_type in ['Dense', 'Transition', 'DKT', 'PAM', 'MHA', 'VAE']
 
     def build_model(self):
-        self.exer_emb = nn.Embedding(self.n_exer * 2, self.modeltpl_cfg['emb_dim'])
-        self.cpt_emb = nn.Embedding(self.n_exer, self.modeltpl_cfg['emb_dim'])
+        self.exer_emb = nn.Embedding(self.n_exer * 2, self.emb_dim)
+        self.cpt_emb = nn.Embedding(self.n_exer, self.emb_dim)
 
         if self.graph_type in ['Dense', 'Transition', 'DKT']:
             assert  self.edge_type_num == 2
@@ -65,10 +65,24 @@ class GKT(GDBaseModel):
             self.graph.requires_grad = False  # fix parameter
         else:  # ['PAM', 'MHA', 'VAE']
             if self.graph_type == 'PAM':
+                assert self.graph is None
                 self.graph = nn.Parameter(torch.rand(self.n_exer, self.n_exer))
+            elif self.graph_type == 'MHA':
+                self.graph_model = MultiHeadAttention(
+                    2, self.n_exer, self.emb_dim,
+                    self.modeltpl_cfg['MHA_cfg']['atten_dim'],
+                    dropout=self.modeltpl_cfg['dropout']
+                )
+            elif self.graph_type == 'VAE':
+                vae_cfg = self.modeltpl_cfg['VAE_cfg']
+                self.graph_model = VAE(
+                    self.emb_dim, vae_cfg['encoder_dim'], 2, vae_cfg['decoder_dim'], vae_cfg['decoder_dim'], 
+                    self.n_exer, edge_type_num=2, tau=vae_cfg['temp'], 
+                    factor=vae_cfg['factor'], dropout=self.modeltpl_cfg['dropout'], bias=vae_cfg['bias']
+                )
+                self.vae_loss = VAELoss(self.n_exer, 2, prior=False, var=vae_cfg['var'])
             else:
-                assert self.graph_model is not None
-
+                raise ValueError(f"unknown graph_type: {self.graph_type}")
         dropout = self.modeltpl_cfg['dropout']
         mlp_input_dim =  self.hidden_dim + self.emb_dim
 
@@ -270,22 +284,27 @@ class GKT(GDBaseModel):
             rec_list.append(rec_embedding)
             z_prob_list.append(z_prob)
         pred_res = torch.stack(pred_list, dim=1)  # [batch_size, seq_len - 1]
-        return pred_res # , ec_list, rec_list, z_prob_list
+        return pred_res, ec_list, rec_list, z_prob_list
     
     def get_main_loss(self, **kwargs):
-        y_pd = self(**kwargs).squeeze(dim=-1)
-        # y_pd = y_pd.gather(
-        #     index=kwargs['exer_seq'][:, 1:].unsqueeze(dim=-1), dim=2
-        # ).squeeze(dim=-1)
+        y_pd, ec_list, rec_list, z_prob_list = self(**kwargs)
+        y_pd = y_pd.squeeze(dim=-1)
         y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
         y_gt = kwargs['label_seq'][:, 1:]
         y_gt = y_gt[kwargs['mask_seq'][:, 1:] == 1]
         loss = F.binary_cross_entropy(
             input=y_pd, target=y_gt
         )
-        return {
-            'loss_main': loss
-        }
+
+        if self.graph_type != 'VAE':
+            return {
+                'loss_main': loss,
+            }
+        else:
+            return {
+                'loss_main': loss,
+                'loss_vae': self.vae_loss(ec_list, rec_list, z_prob_list)
+            }
 
 
     def get_loss_dict(self, **kwargs):
@@ -293,7 +312,7 @@ class GKT(GDBaseModel):
     
     @torch.no_grad()
     def predict(self, **kwargs):
-        y_pd = self(**kwargs).squeeze(dim=-1)
+        y_pd = self(**kwargs)[0].squeeze(dim=-1)
         # y_pd = y_pd.gather(
         #     index=kwargs['exer_seq'][:, 1:].unsqueeze(dim=-1), dim=2
         # ).squeeze(dim=-1)

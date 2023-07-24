@@ -10,7 +10,7 @@ run_edustudio(
     dataset='ASSIST_0910',
     cfg_file_name=None,
     datatpl_cfg_dict={
-        'cls': 'KTInterCptAsExerDataTPL',
+        'cls': 'GKTDataTPL',
     },
     traintpl_cfg_dict={
         'cls': 'EduTrainTPL',
