@@ -22,6 +22,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install build
+        pip install pytest
+        pip install torch==1.12.1
+        pip install -e . --verbose
+        pip install -r requirements.txt
+    - name: Test
+      run: |
+        cd tests && pytest && cd ..
     - name: Build package
       run: python -m build
     - name: Publish package

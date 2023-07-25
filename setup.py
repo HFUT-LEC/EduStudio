@@ -18,6 +18,7 @@ install_requires = [
     "requests>=2.27.1",
     "pytz>=2022.1",
     "matplotlib>=3.5.1",
+    "deepdiff>=6.3.1",
 ]
 
 setup_requires = []

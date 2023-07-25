@@ -14,3 +14,8 @@ __pycache__/
 /dist/
 *.egg-info/
 docs/build/
+/.pytest_cache/
+/tests/archive/
+/tests/conf/
+/tests/temp/
+/tests/data/
