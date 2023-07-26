@@ -47,7 +47,11 @@ class M2C_BuildCptRelation(BaseMid2Cache):
                             if cpt_pre != cpt_next:
                                 n_mat[cpt_pre, cpt_next] += 1
 
-        C_mat = n_mat / np.sum(n_mat, axis=1)[:,None]
+        a = np.sum(n_mat, axis=1)[:,None]
+        nonzero_mask = (a != 0)
+        np.seterr(divide='ignore', invalid='ignore')
+        C_mat = np.where(nonzero_mask, n_mat / a, n_mat)
+
         max_val = C_mat.max()
         np.fill_diagonal(C_mat, max_val)
         min_val = C_mat.min()
