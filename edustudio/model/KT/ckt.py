@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch
 import torch.nn.functional as F
 
+
 class CKT(GDBaseModel):
     default_cfg = {
         'hidden_size': 100,
@@ -83,14 +84,15 @@ class CKT(GDBaseModel):
 
     def data_helper(self, exer_seq, label_seq):
         num_steps = self.datatpl_cfg['dt_info']['real_window_size']
-        batch_size = self.traintpl_cfg['batch_size']
-
+        batch_size = len(exer_seq)
         input_data = torch.zeros((batch_size, num_steps), device=self.device)
         input_skill = torch.zeros((batch_size, num_steps), device=self.device)
         next_id = torch.zeros((batch_size, num_steps), device=self.device)
         l = torch.ones((batch_size, num_steps, self.num_skills), device=self.device)
         for i in range(batch_size):
+
             problem_ids = exer_seq[i]
+
             correctness = label_seq[i]
             correct_num = torch.zeros(self.num_skills, device=self.device)
             answer_count = torch.ones(self.num_skills, device=self.device)
@@ -109,17 +111,17 @@ class CKT(GDBaseModel):
         return input_data, input_skill, l, next_id
 
 
-class GLU(nn.Module):
-    def __init__(self, input_size, dim):
-        super(GLU, self).__init__()
-        self.fc_sigmoid = nn.Linear(input_size, dim)
-        self.fc_tanh = nn.Linear(input_size, dim)
+def GLU(inputs, dim, device):
+    sigmoid = nn.Sigmoid().to(device)
+    dense1 = nn.Linear(inputs.size(-1), dim).to(device)
+    dense2 = nn.Linear(inputs.size(-1), dim).to(device)
 
-    def forward(self, inputs):
-        r = nn.Sigmoid()(self.fc_sigmoid(inputs))
-        output = self.fc_tanh(inputs)
-        output = output * r
-        return output
+    r = sigmoid(dense1(inputs))
+
+    output = dense2(inputs)
+
+    output = output * r
+    return output
 
 
 class CNNBlock(nn.Module):
@@ -142,14 +144,13 @@ class CNNBlock(nn.Module):
         self.b = nn.Parameter(torch.Tensor(filter1))
         nn.init.uniform_(self.b)
 
-        self.glu1 = GLU(self.filter1, self.filter1).to(self.device)
 
     def forward(self, x):
         o1 = x
         o2 = F.conv1d(o1.permute([0, 2, 1]), self.res_w.permute([2, 1, 0]), stride=1, padding='same').permute(
             [0, 2, 1]) + self.b
         o2 = F.dropout(o2, p=self.drop_rate)
-        o2 = self.glu1(o2)
+        o2 = GLU(o2, self.filter1, self.device)
         return o2 + x
 
 
@@ -162,15 +163,14 @@ class CNN(nn.Module):
 
         self.cnn_block = cnn_block
 
-        self.glu = GLU(self.hidden_size * 5, dim=self.hidden_size).to(self.device)
-
     def forward(self, x, skills, individual, next_skill):
         att = self.cal_att(skills)
 
         x2 = torch.matmul(att, x)
 
         x = torch.cat([x, x2, individual], axis=-1)
-        x = self.glu(x)
+        x = GLU(x, self.hidden_size, self.device)
+        # x = self.glu(x)
         for i in range(1, 4):
             x = self.cnn_block(x)
         x = x * next_skill

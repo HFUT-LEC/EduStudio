@@ -14,6 +14,8 @@ run_edustudio(
     },
     traintpl_cfg_dict={
         'cls': 'EduTrainTPL',
+        'batch_size': 32,
+        'eval_batch_size': 32
     },
     modeltpl_cfg_dict={
         'cls': 'CKT',
