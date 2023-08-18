@@ -77,6 +77,9 @@ class BaseDataTPL(Dataset):
         cfg.logger.info(f"Prepare to download {dt_name} from Internet.")
         fph = cfg.frame_cfg['DT_INFO_FILE_PATH']
         dataset_info = cls.read_yml_file(fph)
+        dataset_info_from_cfg: dict = cfg['frame_cfg']['DT_INFO_DICT']
+        dataset_info_from_cfg.update(dataset_info)
+
         if dt_name not in dataset_info:
             raise Exception("Can't find dataset files from Local and Internet!")
 
