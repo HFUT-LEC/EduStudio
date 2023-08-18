@@ -167,31 +167,34 @@ def get_global_cfg(
 
     # config file
     if args.cfg_file_name is not None:
-        if config_name == 'datatpl_cfg':
-            for k,v in yaml_cfg[config_name].items():
-                assert k in cfg[config_name], f"invalid key: {k}"
-                if k == 'cls': continue
-                # assert type(v) is None or type(cfg[config_name][k]) is type(v)
-                if k in atom_data_op_set:
-                    for kk,vv in datatpl_cfg_dict[k].items():
-                        assert kk in cfg['datatpl_cfg'][k], f"invalid key: {kk}"
-                        cfg['datatpl_cfg'][k][kk] = vv
-                else:
-                    cfg[config_name][k] = v 
-        for config_name in ['traintpl_cfg', 'modeltpl_cfg']:
-            for k,v in yaml_cfg[config_name].items():
-                assert k in cfg[config_name], f"invalid key: {k}"
-                if k == 'cls': continue
-                # assert type(v) is None or type(cfg[config_name][k]) is type(v)
-                cfg[config_name][k] = v
-        for k,v in yaml_cfg['evaltpl_cfg'].items():
-            if k == 'clses': continue
-            assert k in cfg.evaltpl_cfg['clses'], f"invalid key: {k}"
-            assert type(v) is dict
-            for kk, vv in v.items():
-                assert kk in cfg.evaltpl_cfg[k], f"invalid key: {kk}"
-                assert type(cfg.evaltpl_cfg[k][kk]) is type(vv)
-                cfg.evaltpl_cfg[k][kk] = vv
+        for config_name in ['traintpl_cfg', 'datatpl_cfg', 'modeltpl_cfg', 'evaltpl_cfg']:
+            if config_name not in yaml_cfg: continue
+            if config_name == 'datatpl_cfg':
+                for k,v in yaml_cfg[config_name].items():
+                    assert k in cfg[config_name], f"invalid key: {k}"
+                    if k == 'cls': continue
+                    # assert type(v) is None or type(cfg[config_name][k]) is type(v)
+                    if k in atom_data_op_set:
+                        for kk,vv in datatpl_cfg_dict[k].items():
+                            assert kk in cfg[config_name][k], f"invalid key: {kk}"
+                            cfg[config_name][k][kk] = vv
+                    else:
+                        cfg[config_name][k] = v 
+            if config_name in ['traintpl_cfg', 'modeltpl_cfg']:
+                for k,v in yaml_cfg[config_name].items():
+                    assert k in cfg[config_name], f"invalid key: {k}"
+                    if k == 'cls': continue
+                    # assert type(v) is None or type(cfg[config_name][k]) is type(v)
+                    cfg[config_name][k] = v
+            if config_name in ['evaltpl_cfg']:
+                for k,v in yaml_cfg[config_name].items():
+                    if k == 'clses': continue
+                    assert k in cfg.evaltpl_cfg['clses'], f"invalid key: {k}"
+                    assert type(v) is dict
+                    for kk, vv in v.items():
+                        assert kk in cfg.evaltpl_cfg[k], f"invalid key: {kk}"
+                        assert type(cfg.evaltpl_cfg[k][kk]) is type(vv)
+                        cfg.evaltpl_cfg[k][kk] = vv
 
     # parameter dict
     for k,v in traintpl_cfg_dict.items():
