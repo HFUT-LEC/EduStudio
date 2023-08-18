@@ -19,6 +19,7 @@ install_requires = [
     "pytz>=2022.1",
     "matplotlib>=3.5.1",
     "deepdiff>=6.3.1",
+    "networkx>=2.8"
 ]
 
 setup_requires = []
@@ -41,7 +42,7 @@ if on_rtd:
 
 setup(
     name="edustudio",
-    version="v1.0.0-beta1", 
+    version="v1.0.0-beta2", 
     description="a Unified and Templatized Framework for Student Assessment Models",
     long_description=long_description,
     python_requires='>=3.8',
