@@ -64,7 +64,14 @@ class EduTrainTPL(GDTrainTPL):
             for name in metrics: self.logger.info(f"{name}: {metrics[name]}")
             History.dump_json(metrics, f"{self.frame_cfg.temp_folder_path}/{fold_id}/result.json")
         else:
-            metrics = history_cb.log_as_time[metric.best_epoch]
+            # metrics = history_cb.log_as_time[metric.best_epoch]
+            # load best params
+            fpth =  f"{self.frame_cfg.temp_folder_path}/pths/{fold_id}/best-epoch-{metric.best_epoch:03d}-for-{metric.name}.pth"
+            self.model.load_state_dict(torch.load(fpth))
+
+            metrics = self.inference(self.test_loader)
+            for name in metrics: self.logger.info(f"{name}: {metrics[name]}")
+            History.dump_json(metrics, f"{self.frame_cfg.temp_folder_path}/{fold_id}/result.json")
 
         if self.traintpl_cfg['unsave_best_epoch_pth']: shutil.rmtree(f"{self.frame_cfg.temp_folder_path}/pths/")
         return metrics
