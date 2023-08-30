@@ -1,5 +1,5 @@
 .. EduStudio documentation master file.
-.. title:: EduStudio v1.0.0-beta2
+.. title:: EduStudio v1.0.0-beta2.1
 .. image:: assets/logo.png
 
 =========================================================

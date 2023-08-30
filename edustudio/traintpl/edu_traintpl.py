@@ -92,7 +92,9 @@ class EduTrainTPL(GDTrainTPL):
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-                for k in loss_dict: logs[k][batch_id] = loss_dict[k].item() if loss_dict[k] is not None else np.nan
+                for k in loss_dict: 
+                    if loss_dict[k] is not None:
+                        logs[k][batch_id] = loss_dict[k].item()
 
             for name in logs: logs[name] = float(np.nanmean(logs[name]))
 
