@@ -78,8 +78,8 @@ class UnifyConfig(object):
             yield k
 
     def __getattr__(self, key: str):
-        if key in self.__config__.keys():
-            return self.__config__[key]
+        if '__config__' in self.__dict__ and key in self.__dict__['__config__']:
+            return self.__dict__['__config__'][key]
         elif key in dir(self):
             return self.__dict__[key]
         else:

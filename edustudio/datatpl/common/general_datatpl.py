@@ -240,7 +240,7 @@ class GeneralDataTPL(BaseDataTPL):
         self.save_pickle(final_kwargs_fph, self.final_kwargs)
 
         with open(f"{self.cache_folder_path}/datatpl_cfg.json", 'w', encoding='utf-8') as f:
-            json.dump(json.loads(self.datatpl_cfg.dump_tpl()), fp=f, indent=2, ensure_ascii=False)
+            json.dump(json.loads(self.datatpl_cfg.dump_fmt()), fp=f, indent=2, ensure_ascii=False)
 
     def check_cache(self):
         """check whether the cache data is consistent with current config
@@ -253,7 +253,7 @@ class GeneralDataTPL(BaseDataTPL):
         del temp_cache_datatpl_cfg['load_data_from']
         # del temp_cache_datatpl_cfg['raw2mid_op']
         # del temp_cache_datatpl_cfg['mid2cache_op_seq']
-        curr_datatpl_cfg = copy.deepcopy(json.loads(self.datatpl_cfg.dump_tpl()))
+        curr_datatpl_cfg = copy.deepcopy(json.loads(self.datatpl_cfg.dump_fmt()))
         del curr_datatpl_cfg['dt_info']
         del curr_datatpl_cfg['load_data_from']
         # del curr_datatpl_cfg['raw2mid_op']
