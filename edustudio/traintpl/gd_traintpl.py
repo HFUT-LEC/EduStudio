@@ -1,10 +1,11 @@
 from .base_traintpl import BaseTrainTPL
-from edustudio.utils.common import UnifyConfig
+from edustudio.utils.common import UnifyConfig, set_same_seeds
 import torch
 from torch.utils.data import DataLoader
 from edustudio.utils.callback import History
 from collections import defaultdict
 import numpy as np
+
 
 class GDTrainTPL(BaseTrainTPL):
     default_cfg = {
@@ -98,6 +99,7 @@ class GDTrainTPL(BaseTrainTPL):
             fold_id (int): fold id
         """
         self.logger.info(f"====== [FOLD ID]: {fold_id} ======")
+        set_same_seeds(self.traintpl_cfg['seed'])
 
     def batch_dict2device(self, batch_dict):
         dic = {}
