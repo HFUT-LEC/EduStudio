@@ -50,7 +50,13 @@ def get_global_cfg(
                         dest='backbone_modeltpl_cls', default=modeltpl_cfg_dict.get('backbone_modeltpl_cls', None))
     parser.add_argument('--datatpl_cfg.mid2cache_op_seq', '-mid2cache_op_seq', type=str,
                         dest='mid2cache_op_seq', default=datatpl_cfg_dict.get('mid2cache_op_seq', None))   
-    args, unknown_args = parser.parse_known_args()
+
+    try:
+        __IPYTHON__
+        _default_args = []
+    except NameError:
+        _default_args = None
+    args, unknown_args = parser.parse_known_args(args=_default_args)
     assert args.dataset is not None
     
     unknown_arg_dict = defaultdict(dict)
