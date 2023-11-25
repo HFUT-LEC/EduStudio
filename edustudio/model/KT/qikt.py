@@ -71,12 +71,9 @@ class QIKT(GDBaseModel):
                           dim=2) / cpt_seq_mask.sum(dim=2).unsqueeze(2).repeat(1, 1, self.modeltpl_cfg['emb_size'])
 
 
-        e_tmp = torch.cat((emb_q, emb_c), dim=2)
-        mask_e = label_seq.unsqueeze(-1).repeat(1, 1, e_tmp.shape[-1]).to(torch.float)
-        emb_qca = torch.cat((mask_e*e_tmp, (1-mask_e)*e_tmp), dim=-1)
-
-        mask_c = label_seq.unsqueeze(-1).repeat(1, 1, emb_c.shape[-1]).to(torch.float)
-        emb_qc = torch.cat((mask_c * emb_c, (1 - mask_c) * emb_c), dim=-1)
+        emb_qc = torch.cat((emb_q, emb_c), dim=2)
+        mask_e = label_seq.unsqueeze(-1).repeat(1, 1, emb_qc.shape[-1]).to(torch.float)
+        emb_qca = torch.cat((mask_e*emb_qc, (1-mask_e)*emb_qc), dim=-1)
 
         emb_qc_shift = emb_qc[:, 1:, :]
         emb_qca_current = emb_qca[:, :-1, :]
