@@ -1,5 +1,7 @@
 import networkx as nx
 from ..common import BaseMid2Cache
+import torch
+from torch.nn import functional as F
 import numpy as np
 
 
@@ -12,10 +14,18 @@ class M2C_QDKT_OP(BaseMid2Cache):
         self.num_q = dt_info['exer_count']
         self.num_c = dt_info['cpt_count']
         self.Q_mat = kwargs['Q_mat']
-        graph = self.generate_graph()
-        laplacian_matrix = self.laplacian_matrix(graph)
+        laplacian_matrix = self.laplacian_matrix_by_vectorization()
         kwargs['laplacian_matrix'] = laplacian_matrix
         return kwargs
+
+    def laplacian_matrix_by_vectorization(self):
+        normQ = F.normalize(self.Q_mat.float(), p=2, dim=-1)
+        A = torch.mm(normQ, normQ.T) > (1 - 1/len(normQ))
+        A = A.int()  #Adjacency matrix
+        D = A.sum(-1, dtype=torch.int32)
+        diag_idx = [range(len(A)), range(len(A))]
+        A[diag_idx] = D - A[diag_idx]
+        return A
 
     def generate_graph(self):
 
