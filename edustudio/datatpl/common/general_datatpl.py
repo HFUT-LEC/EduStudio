@@ -70,6 +70,7 @@ class GeneralDataTPL(BaseDataTPL):
         if self.datatpl_cfg['load_data_from'] == 'cachedata':
             self.load_cache()
             self.check_cache()
+            self.process_data()
             self.logger.info(f"Load from cache successfully: {self.datatpl_cfg['cache_id']}")
             self.logger.info(self.datatpl_cfg['dt_info'])
         else:
@@ -141,8 +142,6 @@ class GeneralDataTPL(BaseDataTPL):
         load_data_from = self.datatpl_cfg['load_data_from']
         if load_data_from != 'cachedata':
             self.process_load_data_from_middata()
-        else:
-            raise ValueError(f"load_data_from={load_data_from} is not expected to appear here")
     
     @classmethod
     def load_data(cls, cfg): # 只在middata存在时调用
