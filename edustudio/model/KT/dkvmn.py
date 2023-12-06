@@ -84,7 +84,7 @@ class DKVMN(GDBaseModel):
     @torch.no_grad()
     def predict(self, **kwargs):
         y_pd = self(**kwargs)
-        y_pd = y_pd[:, :-1]
+        y_pd = y_pd[:, 1:]
         y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
         y_gt = None
         if kwargs.get('label_seq', None) is not None:
@@ -97,7 +97,7 @@ class DKVMN(GDBaseModel):
 
     def get_main_loss(self, **kwargs):
         y_pd = self(**kwargs)
-        y_pd = y_pd[:, :-1]
+        y_pd = y_pd[:, 1:]
         y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
         y_gt = kwargs['label_seq'][:, 1:]
         y_gt = y_gt[kwargs['mask_seq'][:, 1:] == 1]
