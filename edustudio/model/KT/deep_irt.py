@@ -123,7 +123,7 @@ class DeepIRT(GDBaseModel):
             dict: The predictions of the model and the real situation
         """
         y_pd = self(**kwargs)
-        y_pd = y_pd[:, :-1]
+        y_pd = y_pd[:, 1:]
         y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
         y_gt = None
         if kwargs.get('label_seq', None) is not None:
@@ -141,7 +141,7 @@ class DeepIRT(GDBaseModel):
             dict: {'loss_main': loss_value}
         """
         y_pd = self(**kwargs)
-        y_pd = y_pd[:, :-1]
+        y_pd = y_pd[:, 1:]
         y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
         y_gt = kwargs['label_seq'][:, 1:]
         y_gt = y_gt[kwargs['mask_seq'][:, 1:] == 1]
