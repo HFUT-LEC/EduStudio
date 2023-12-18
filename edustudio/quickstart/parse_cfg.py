@@ -181,7 +181,7 @@ def get_global_cfg(
                     if k == 'cls': continue
                     # assert type(v) is None or type(cfg[config_name][k]) is type(v)
                     if k in atom_data_op_set:
-                        for kk,vv in datatpl_cfg_dict[k].items():
+                        for kk,vv in yaml_cfg[config_name].get(k, {}).items():
                             assert kk in cfg[config_name][k], f"invalid key: {kk}"
                             cfg[config_name][k][kk] = vv
                     else:

@@ -28,8 +28,8 @@ class IRT(GDBaseModel):
         super().__init__(cfg)
 
     def build_cfg(self):
-        if self.modeltpl_cfg['a_range']  < 0: self.modeltpl_cfg['a_range'] = None
-        if self.modeltpl_cfg['diff_range'] < 0: self.modeltpl_cfg['diff_range'] = None
+        if self.modeltpl_cfg['a_range'] is not None and self.modeltpl_cfg['a_range']  < 0: self.modeltpl_cfg['a_range'] = None
+        if self.modeltpl_cfg['diff_range'] is not None and self.modeltpl_cfg['diff_range'] < 0: self.modeltpl_cfg['diff_range'] = None
 
         self.n_user = self.datatpl_cfg['dt_info']['stu_count']
         self.n_item = self.datatpl_cfg['dt_info']['exer_count']
