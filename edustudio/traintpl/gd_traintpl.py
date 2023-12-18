@@ -69,6 +69,7 @@ class GDTrainTPL(BaseTrainTPL):
 
             extra_data = self.datatpl.get_extra_data() 
 
+            set_same_seeds(self.traintpl_cfg['seed'])
             self.model = self.get_model_obj()
             self.model.build_cfg()
             self.model.add_extra_data(**extra_data)
@@ -99,7 +100,6 @@ class GDTrainTPL(BaseTrainTPL):
             fold_id (int): fold id
         """
         self.logger.info(f"====== [FOLD ID]: {fold_id} ======")
-        set_same_seeds(self.traintpl_cfg['seed'])
 
     def batch_dict2device(self, batch_dict):
         dic = {}

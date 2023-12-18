@@ -47,7 +47,7 @@ class EduTrainTPL(GDTrainTPL):
                                     test_loader=self.test_loader
                                     )
         # train
-        set_same_seeds(self.traintpl_cfg['seed'])
+        #set_same_seeds(self.traintpl_cfg['seed'])
         if self.valid_loader is not None:
             self.fit(train_loader=self.train_loader, valid_loader=self.valid_loader)
         else:
