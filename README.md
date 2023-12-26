@@ -7,15 +7,23 @@
 <img src="https://img.shields.io/badge/License-MIT-blue">
 <img src="https://img.shields.io/github/issues/HFUT-LEC/EduStudio.svg">
 </p>
-
 EduStudio is a Unified and Templatized Framework for Student Assessment Models including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
 
-## Announcement
+## Navigation
 
-- We are working hard to reproduce the results presented in their papers for all models. These results will be published later on https://edustudio.ai/.
-- We are organizing more comprehensive resources related to student assessment models to build a complete ecosystem for EduStudio.
+
+| Resource Name                                                | Description                                                  | Status |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------ |
+| [awesome-education](https://github.com/HFUT-LEC/awesome-education) | A  repository containing resources about Educational Data Mining | ⛏️      |
+| [documentation](https://edustudio.readthedocs.io/en/latest/) | Documentation for usage of EduStudio                         | ✔️      |
+| [leaderboard](https://leaderboard.edustudio.ai)              | A leaderboard demonstrating performance of implemented models | ⛏️      |
+| [dataset list](https://edustudio.readthedocs.io/en/latest/user_guide/datasets.html) | Dataset list in documentation                                | ✔️      |
+| [paper list](https://edustudio.readthedocs.io/en/latest/user_guide/models.html) | Paper list in documentation                                  | ✔️      |
+
+
 
 ## Description
+
 EduStudio first decomposes the general algorithmic workflow into five steps: `configuration reading`, `data processing`, `model implementation`, `training control`, and `result evaluation`. Subsequently, to enhance the `reusability `of each step, we extract the commonalities of each algorithm at each step into individual templates for templatization.
 
 As illustrated in the Figure below, to better implement a templatized framework, we implement an `inheritance-style` EduStudio that contains basic architecture and inherited architecture with different responsibilities. The **basic architecture emphasizes domain-irrelevant content and strives to build templatized protocols**. The **inherited architecture obeys the protocol in the basic architecture and focuses on domain-relevant content**. The inheritance-style separates domainrelevant and domain-irrelevant content, greatly simplifying framework structure and enhancing `readability`.
