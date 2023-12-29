@@ -97,3 +97,32 @@ Here is a list of models and corresponding papers of CD and KT including impleme
 |✔️ | EERNN | AAAI 2018 | [Exercise-enhanced sequential modeling for student performance prediction](https://ojs.aaai.org/index.php/AAAI/article/view/11864) |
 | ✔️ | EKT | TKDE 2019 | [EKT: Exercise-Aware Knowledge Tracing for Student Performance Prediction](https://ieeexplore.ieee.org/document/8744302) |
 | ✔️| qDKT | EDM 2020 | [qDKT: Question-centric Deep Knowledge Tracing](https://people.umass.edu/~andrewlan/papers/20edm-qdkt.pdf) |
+| | DAKTN | AAAI 2023 | [Deep Attentive Model for Knowledge Tracing](https://ojs.aaai.org/index.php/AAAI/article/view/26214) |
+| | LBKT | KDD 2023 | [Learning Behavior-oriented Knowledge Tracing](http://staff.ustc.edu.cn/~huangzhy/files/papers/BihanXu-KDD2023.pdf) |
+| | MVGKT | TLT 2023 | [Multi-Variate Knowledge Tracking based on Graph Neural Network in ASSISTments](https://ieeexplore.ieee.org/abstract/document/10202591) |
+| | MvCRF | TKDE 2023 | [Multivariate Cognitive Response Framework for Student Performance Prediction on MOOC](https://ieeexplore.ieee.org/abstract/document/10210482) |
+| | CMKT | CIKM 2023 | [CMKT: Concept map driven knowledge tracing](https://ieeexplore.ieee.org/abstract/document/9850398/) |
+| | SFKT | CIKM 2023 | [No Length Left Behind: Enhancing Knowledge Tracing for Modeling Sequences of Excessive or Insufficient Lengths](https://dl.acm.org/doi/abs/10.1145/3583780.3614988) |
+| | MAKT | World Wide Web 2023 | [Integrating fine-grained attention into multi-task learning for knowledge tracing](https://link.springer.com/article/10.1007/s11280-023-01190-y) |
+| | CORE | Arxiv 2023 | [Do We Fully Understand Students’ Knowledge States? Identifying and Mitigating Answer Bias in Knowledge Tracing](https://arxiv.org/abs/2308.07779) |
+| | DLKT | TOIS 2023 | [MAN: Memory-augmented Attentive Networks for Deep Learning-based Knowledge Tracing](https://dl.acm.org/doi/abs/10.1145/3589340) |
+| | CMVF | ICDM 2023 | [Cognition-Mode Aware Variational Representation Learning Framework for Knowledge Tracing](https://arxiv.org/abs/2309.01179) |
+| | GraphCA | CAA 2023 | [GraphCA: Learning From Graph Counterfactual Augmentation for Knowledge Tracing](https://ieeexplore.ieee.org/abstract/document/10266657) |
+| | ENAS-KT | NeurIPS 2023 | [Evolutionary Neural Architecture Search for Transformer in Knowledge Tracing](https://arxiv.org/abs/2310.01180) |
+| | FoLiBi | CIKM 2023 | [Forgetting-aware Linear Bias for Attentive Knowledge Tracing](https://dl.acm.org/doi/abs/10.1145/3583780.3615191) |
+| | FKT | ESWA 2023 | [Response speed enhanced fine-grained knowledge tracing: A multi-task learning perspective](https://www.sciencedirect.com/science/article/pii/S095741742302609X) |
+| | CPKT | CIKM 2023 | [Continuous Personalized Knowledge Tracing: Modeling Long-Term Learning in Online Environments](https://dl.acm.org/doi/abs/10.1145/3583780.3614822) |
+| | ABQR | MM 2023 | [Adversarial Bootstrapped Question Representation Learning for Knowledge Tracing](https://dl.acm.org/doi/abs/10.1145/3581783.3612044) |
+| | TSKT | ESWA 2023 | [Heterogeneous graph-based knowledge tracing with spatiotemporal evolution](https://www.sciencedirect.com/science/article/pii/S0957417423027513) |
+| | AAKT | TLT 2023 | [AAKT: Enhancing Knowledge Tracing with Alternate Autoregressive Modeling](https://www.techrxiv.org/doi/full/10.36227/techrxiv.24487747.v1) |
+| | DKTMR | ESWA 2023 | [Towards More Accurate and Interpretable Model: Fusing Multiple Knowledge Relations into Deep Knowledge Tracing](https://www.sciencedirect.com/science/article/pii/S0957417423030750) |
+| | MA-DKT | AHPCAI 2023 | [A deep knowledge tracing model based on multi-head self-attention mechanism](https://www.spiedigitallibrary.org/conference-proceedings-of-spie/12941/129412N/A-deep-knowledge-tracing-model-based-on-multi-head-self/10.1117/12.3011559.short#_=_) |
+| | OPKT | TLT 2023 | [OPKT: Enhancing Knowledge Tracing with Optimized Pre-training Mechanisms in Intelligent Tutoring](https://ieeexplore.ieee.org/abstract/document/10328390) |
+| | RCKT | Arxiv 2023 | [Interpretable Knowledge Tracing via Response Influence-based Counterfactual Reasoning](https://arxiv.org/abs/2312.10045) |
+| | BiCo | TKDD 2023 | [Pre-training uestion Embeddings for Improving Knowledge Tracing with Self-supervised Bi-graph Co-contrastive Learning](https://dl.acm.org/doi/abs/10.1145/3638055) |
+| | QRCL | ESWA 2023 | [Question-response Representation with Dual-level Contrastive Learning for Improving Knowledge Tracing](https://www.sciencedirect.com/science/article/pii/S0020025523016183) |
+| | - | LAK 2023 | [Investigating Algorithmic Bias on Bayesian Knowledge Tracing and Carelessness Detectors](https://learninganalytics.upenn.edu/ryanbaker/lak24-47-4.pdf) |
+
+
+
+
