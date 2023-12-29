@@ -26,6 +26,19 @@ Here is a list of models and corresponding papers of CD and KT including impleme
 |  ✔️  | CDMFKC         | CIKM 2022   | [Cognitive Diagnosis Focusing on Knowledge Concepts](https://dl.acm.org/doi/10.1145/3511808.3557096) |
 |        | ICD           | ESWA 2022   | [ICD: A new interpretable cognitive diagnosis model for intelligent tutor systems](https://www.sciencedirect.com/science/article/abs/pii/S0957417422023272) |
 | | DNeuralCDM | TLT 2023 | [Dynamic Cognitive Diagnosis: An Educational Priors-Enhanced Deep Knowledge Tracing Perspective](https://ieeexplore.ieee.org/document/10065517) |
+| | DZCD | SIGIR 2023 | [Leveraging Transferable Knowledge Concept Graph Embedding for Cold-Start Cognitive Diagnosis](https://dl.acm.org/doi/abs/10.1145/3539618.3591774) |
+| | BETA-CD | AAAI 2023 | [BETA-CD: A Bayesian Meta-Learned Cognitive Diagnosis Framework for Personalized Learning](https://ojs.aaai.org/index.php/AAAI/article/view/25629) |
+| | EIRS | IJCAI 2023 | [Exploiting Non-Interactive Exercises in Cognitive Diagnosis](http://staff.ustc.edu.cn/~qiliuql/files/Publications/Fangzhou-Yao-IJCAI23.pdf) |
+| | ID-CDM | Arxiv 2023 | [Identifiable Cognitive Diagnosis with Encoder-decoder for Modelling Students’ Performance](https://arxiv.org/abs/2309.00300) |
+| | SCD | AAAI 2023 | [Self-supervised Graph Learning for Long-tailed Cognitive Diagnosis](https://ojs.aaai.org/index.php/AAAI/article/view/25082) |
+| | - | RECSYS 2023 | [What We Evaluate When We Evaluate Recommender Systems: Understanding Recommender Systems’ Performance using Item Response Theory](https://dl.acm.org/doi/abs/10.1145/3604915.3608809) |
+| | GLNC | ESWA 2023 | [Global and Local Neural Cognitive Modeling for Student Performance Prediction](https://www.sciencedirect.com/science/article/abs/pii/S0957417423021395) |
+| | HomoGCD | CIKM 2023 | [Homogeneous Cohort-Aware Group Cognitive Diagnosis: A Multi-grained Modeling Perspective](https://dl.acm.org/doi/abs/10.1145/3583780.3615287) |
+| | DAISim | CIKM 2023 | [Simulating Student Interactions with Two-stage Imitation Learning for Intelligent Educational Systems](https://dl.acm.org/doi/abs/10.1145/3583780.3615060) |
+| | QCCDM | ECAI 2023 | [QCCDM: A Q-Augmented Causal Cognitive Diagnosis Model for Student Learning](https://github.com/lswhim/CDM_ILOG) |
+| | CBICDM | ICONIP 2023 | [A Causality-Based Interpretable Cognitive Diagnosis Model](https://link.springer.com/chapter/10.1007/978-981-99-8067-3_16) |
+| | CMES | Arxiv 2023 | [Enhancing Cognitive Diagnosis using Un-interacted Exercises: A Collaboration-aware Mixed Sampling Approach](https://arxiv.org/abs/2312.10110) |
+| | Zero-1-to-3 | Arxiv 2023 | [Zero-1-to-3: Domain-level Zero-shot Cognitive Diagnosis via One Batch of Early-bird Students towards Three Diagnostic Objectives](https://arxiv.org/abs/2312.13434) |
 
 ## Knowledge Tracing
 
