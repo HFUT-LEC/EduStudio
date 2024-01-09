@@ -52,26 +52,17 @@ class EduTrainTPL(GDTrainTPL):
             self.fit(train_loader=self.train_loader, valid_loader=self.valid_loader)
         else:
             self.fit(train_loader=self.train_loader, valid_loader=self.test_loader)
-        
+
         metric_name = self.traintpl_cfg['best_epoch_metric']
         metric = [m for m in modelCheckPoint.metric_list if m.name == metric_name][0]
-        if self.valid_loader is not None:
-            # load best params
-            fpth =  f"{self.frame_cfg.temp_folder_path}/pths/{fold_id}/best-epoch-{metric.best_epoch:03d}-for-{metric.name}.pth"
-            self.model.load_state_dict(torch.load(fpth))
 
-            metrics = self.inference(self.test_loader)
-            for name in metrics: self.logger.info(f"{name}: {metrics[name]}")
-            History.dump_json(metrics, f"{self.frame_cfg.temp_folder_path}/{fold_id}/result.json")
-        else:
-            # metrics = history_cb.log_as_time[metric.best_epoch]
-            # load best params
-            fpth =  f"{self.frame_cfg.temp_folder_path}/pths/{fold_id}/best-epoch-{metric.best_epoch:03d}-for-{metric.name}.pth"
-            self.model.load_state_dict(torch.load(fpth))
+        # load best params
+        fpth =  f"{self.frame_cfg.temp_folder_path}/pths/{fold_id}/best-epoch-{metric.best_epoch:03d}-for-{metric.name}.pth"
+        self.model.load_state_dict(torch.load(fpth))
 
-            metrics = self.inference(self.test_loader)
-            for name in metrics: self.logger.info(f"{name}: {metrics[name]}")
-            History.dump_json(metrics, f"{self.frame_cfg.temp_folder_path}/{fold_id}/result.json")
+        metrics = self.inference(self.test_loader)
+        for name in metrics: self.logger.info(f"{name}: {metrics[name]}")
+        History.dump_json(metrics, f"{self.frame_cfg.temp_folder_path}/{fold_id}/result.json")
 
         if self.traintpl_cfg['unsave_best_epoch_pth']: shutil.rmtree(f"{self.frame_cfg.temp_folder_path}/pths/")
         return metrics
