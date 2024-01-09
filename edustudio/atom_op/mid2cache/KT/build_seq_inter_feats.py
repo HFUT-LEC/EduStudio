@@ -47,7 +47,7 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
                     kwargs['df_valid_folds'] = [valid_dict]
                     kwargs['df_test_folds'] = [test_dict]
                 else:
-                    kwargs['df_train_folds'], kwargs['df_valid_folds'], kwargs['df_test_folds'] = self._divide_data_df_by_stu_multi_fold(df)
+                    kwargs['df_train_folds'], kwargs['df_test_folds'] = self._divide_data_df_by_stu_multi_fold(df)
             elif self.m2c_cfg['divide_by'] == 'time':
                 raise NotImplementedError
             else:
@@ -101,21 +101,17 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
         return train_dict, val_dict, test_dict
     
     def _divide_data_df_by_stu_multi_fold(self, df: pd.DataFrame):
-        res = SpliterUtil.divide_data_df_one_fold(
-            df['stu_id:token'].drop_duplicates(), seed=self.m2c_cfg['seed'], shuffle=True,
-            divide_scale_list=self.m2c_cfg['divide_scale_list']
-        )
+        res = SpliterUtil.divide_data_df_multi_folds(
+            df['stu_id:token'].drop_duplicates(), n_folds=self.n_folds, seed=self.m2c_cfg['seed'], shuffle=True)
 
-        train_list, valid_list, test_list = [], [], []
-        for train_stu_id, val_stu_id, test_stu_id in zip(res):
+        train_list, test_list = [], []
+        for train_stu_id, val_stu_id in zip(*res):
             train_df = df[df['stu_id:token'].isin(train_stu_id)]
-            val_df = df[df['stu_id:token'].isin(val_stu_id)] if val_stu_id is not None else None
-            test_df = df[df['stu_id:token'].isin(test_stu_id)]
+            test_df = df[df['stu_id:token'].isin(val_stu_id)] if val_stu_id is not None else None
             
             if self.m2c_cfg['window_size'] <= 0 or self.m2c_cfg['window_size'] is None:
                 self.window_size = np.max([
                     train_df[['stu_id:token', 'exer_id:token']].groupby('stu_id:token').agg('count')['exer_id:token'].max(),
-                    val_df[['stu_id:token', 'exer_id:token']].groupby('stu_id:token').agg('count')['exer_id:token'].max() if val_df is not None else 0,
                     test_df[['stu_id:token', 'exer_id:token']].groupby('stu_id:token').agg('count')['exer_id:token'].max()
                 ])
                 self.logger.info(f"actual window size: {self.window_size}")
@@ -123,13 +119,11 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
                 self.window_size = self.m2c_cfg['window_size']
             
             train_dict = self.construct_df2dict(train_df)
-            valid_dict = self.construct_df2dict(val_df)
             test_dict = self.construct_df2dict(test_df)
             train_list.append(train_dict)
-            valid_list.append(valid_dict)
             test_list.append(test_dict)
 
-        return train_list, valid_list, test_list
+        return train_list, test_list
     
     def construct_df2dict(self, df: pd.DataFrame):
         if df is None: return None
