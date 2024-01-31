@@ -11,7 +11,7 @@ run_edustudio(
     dataset='FrcSub',
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
         'lr': 0.01,
         'epoch_num': 1000
     },

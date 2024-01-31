@@ -8,19 +8,19 @@ The TrainTPL Protocol is detailed in ``BaseTrainTPL``. The function to start the
 
 ## TrainTPLs 
 
-By inherenting the TrainTPL Protocol, EduStudio provides the class ``EduStudio.edustudio.traintpl.traintpl.gd_traintpl.GDTrainTPL``(``GDTrainTPL``) and ``EduStudio.edustudio.traintpl.edu_traintpl.EduTrainTPL``(``EduTrainTPL``), which are suitable for most gradient descent optimization-based models and most student evaluation models.  ``GDTrainTPL`` inherits ``BaseTrainTPL``  and rewrites ``start()``. The function to get optimizer according to the parameter ``default_cfg.optim`` is ``GDTrainTPL._get_optim()``. The function to obtain loaders of train, val, and test dataset is ``GDTrainTPL.build_loaders()``.  ``EduTrainTPL`` inherits ``GDTrainTPL`` and rewrites ``start()``. In the ``EduTrainTPL.start()``, the functions for each dataloader is ``EduTrainTPL.fit()`` .
+By inherenting the TrainTPL Protocol, EduStudio provides the class ``EduStudio.edustudio.traintpl.traintpl.gd_traintpl.GDTrainTPL``(``GDTrainTPL``) and ``EduStudio.edustudio.traintpl.edu_traintpl.GeneralTrainTPL``(``GeneralTrainTPL``), which are suitable for most gradient descent optimization-based models and most student evaluation models.  ``GDTrainTPL`` inherits ``BaseTrainTPL``  and rewrites ``start()``. The function to get optimizer according to the parameter ``default_cfg.optim`` is ``GDTrainTPL._get_optim()``. The function to obtain loaders of train, val, and test dataset is ``GDTrainTPL.build_loaders()``.  ``GeneralTrainTPL`` inherits ``GDTrainTPL`` and rewrites ``start()``. In the ``GeneralTrainTPL.start()``, the functions for each dataloader is ``GeneralTrainTPL.fit()`` .
 
 ## Develop a New TrainTPL in EduStudio
 
-If the developed model needs more complex training method, then one can inherent ``BaseTrainTPL`` and revise the function ``start()``. One can also define the configuration of the new training template in the dictionary ``default_cfg``.  Similarly, one can inherent ``GDTrainTPL`` and ``EduTrainTPL`` and revise the ``start`` function and ``default_cfg`` dictionary.
+If the developed model needs more complex training method, then one can inherent ``BaseTrainTPL`` and revise the function ``start()``. One can also define the configuration of the new training template in the dictionary ``default_cfg``.  Similarly, one can inherent ``GDTrainTPL`` and ``GeneralTrainTPL`` and revise the ``start`` function and ``default_cfg`` dictionary.
 
 Example
 -------------------------
-If you need to modify TrainTPl in the student assessment model so that only ``main_loss`` is used after a certain epoch, then you just need to inherit ``EduTrainTPL``, set the ``epoch_to_change`` parameter in ``default_cfg``.
+If you need to modify TrainTPl in the student assessment model so that only ``main_loss`` is used after a certain epoch, then you just need to inherit ``GeneralTrainTPL``, set the ``epoch_to_change`` parameter in ``default_cfg``.
 
 ```python
-from .edu_traintpl import EduTrainTPL
-class NewTrainTPL(EduTrainTPL):
+from .edu_traintpl import GeneralTrainTPL
+class NewTrainTPL(GeneralTrainTPL):
     default_cfg = {
         'epoch_to_change': 10,
     }
@@ -59,8 +59,8 @@ def fit(self, train_loader, val_loader):
 The complete code of example is detailed as follows.
 
 ```python
-from .edu_traintpl import EduTrainTPL
-class NewTrainTPL(EduTrainTPL):
+from .edu_traintpl import GeneralTrainTPL
+class NewTrainTPL(GeneralTrainTPL):
     default_cfg = {
         'epoch_to_change': 10,
     }

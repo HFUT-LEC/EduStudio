@@ -13,7 +13,7 @@ run_edustudio(
         'cls': 'KTInterCptUnfoldDataTPL',
     },
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
         'batch_size': 16,
         'eval_batch_size': 16
     },

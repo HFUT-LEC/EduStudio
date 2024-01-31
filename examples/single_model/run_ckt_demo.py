@@ -13,7 +13,7 @@ run_edustudio(
         'cls': 'KTInterExtendsQDataTPL',
     },
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
         'batch_size': 32,
         'eval_batch_size': 32
     },

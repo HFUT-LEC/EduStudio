@@ -5,10 +5,12 @@
 from edustudio.utils.common import PathUtil as pathUtil
 from edustudio.utils.common import IDUtil as idUtil
 import os
+from edustudio import __version__
 
 ID = idUtil.get_random_id_bytime() # RUN ID
 
 WORK_DIR = os.getcwd()
+EDUSTUDIO_VERSION = __version__
 
 DATA_FOLDER_PATH = f"{WORK_DIR}/data"
 TEMP_FOLDER_PATH = f"{WORK_DIR}/temp"

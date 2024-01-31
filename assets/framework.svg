@@ -1040,14 +1040,14 @@
 			<title>工作表.370</title>
 			<g id="shape371-212" v:mID="371" v:groupContext="shape">
 				<title>矩形.91</title>
-				<desc>EduTrainTPL</desc>
+				<desc>GeneralTrainTPL</desc>
 				<v:userDefs>
 					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
 				</v:userDefs>
 				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 				<v:textRect cx="34.929" cy="247.271" width="69.86" height="10.0251"/>
 				<rect x="0" y="242.258" width="69.8579" height="10.0251" rx="2.83465" ry="2.83465" class="st6"/>
-				<text x="12.71" y="249.67" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>EduTrainTPL</text>			</g>
+				<text x="12.71" y="249.67" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>GeneralTrainTPL</text>			</g>
 		</g>
 		<g id="shape372-215" v:mID="372" v:groupContext="shape" transform="translate(351.496,35.9193) rotate(90)">
 			<title>工作表.372</title>

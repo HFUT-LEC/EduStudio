@@ -10,7 +10,7 @@ run_edustudio(
     dataset='ASSIST_1213',
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
         'early_stop_metrics': [('rmse','min')],
         'best_epoch_metric': 'rmse',
         'batch_size': 512

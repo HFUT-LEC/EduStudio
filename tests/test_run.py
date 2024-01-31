@@ -7,7 +7,7 @@ class TestRun:
             dataset='FrcSub',
             cfg_file_name=None,
             traintpl_cfg_dict={
-                'cls': 'EduTrainTPL',
+                'cls': 'GeneralTrainTPL',
                 'epoch_num': 2,
                 'device': 'cpu'
             },

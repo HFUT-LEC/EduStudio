@@ -54,7 +54,7 @@ def objective_function(args):
 
 
 search_space= {
-    'traintpl_cfg.cls': tune.grid_search(['EduTrainTPL']),
+    'traintpl_cfg.cls': tune.grid_search(['GeneralTrainTPL']),
     'datatpl_cfg.cls': tune.grid_search(['CDInterExtendsQDataTPL']),
     'modeltpl_cfg.cls': tune.grid_search(['KaNCD']),
     'evaltpl_cfg.clses': tune.grid_search([['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL']]),
@@ -115,7 +115,7 @@ def objective_function(args):
 
 
 space = {
-    'traintpl_cfg.cls': hp.choice('traintpl_cfg.cls', ['EduTrainTPL']),
+    'traintpl_cfg.cls': hp.choice('traintpl_cfg.cls', ['GeneralTrainTPL']),
     'datatpl_cfg.cls': hp.choice('datapl_cfg.cls', ['CDInterExtendsQDataTPL']),
     'modeltpl_cfg.cls': hp.choice('modeltpl_cfg.cls', ['KaNCD']),
     'evaltpl_cfg.clses': hp.choice('evaltpl_cfg.clses', [['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL']]),

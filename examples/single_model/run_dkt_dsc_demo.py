@@ -13,7 +13,7 @@ run_edustudio(
         'cls': 'DKTDSCDataTPL',
     },
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
     },
     modeltpl_cfg_dict={
         'cls': 'DKTDSC',

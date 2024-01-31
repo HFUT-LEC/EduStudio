@@ -13,7 +13,7 @@ run_edustudio(
         'cls': 'CL4KTDataTPL',
     },
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
         'eval_batch_size': 1024,
     },
     modeltpl_cfg_dict={

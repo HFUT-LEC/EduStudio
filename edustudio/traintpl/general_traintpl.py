@@ -10,7 +10,7 @@ import numpy as np
 import shutil
 
 
-class EduTrainTPL(GDTrainTPL):
+class GeneralTrainTPL(GDTrainTPL):
     default_cfg = {
         'num_stop_rounds': 10,
         'early_stop_metrics': [('auc','max')],

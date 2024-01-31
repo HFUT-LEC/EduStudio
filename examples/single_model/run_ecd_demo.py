@@ -10,7 +10,7 @@ run_edustudio(
     dataset='PISA_2015_ECD',#ecd only supports PISA dataset
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
         'batch_size': 2048,
         'eval_batch_size': 2048,
     },

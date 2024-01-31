@@ -11,7 +11,7 @@ run_edustudio(
     dataset='FrcSub',
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
     },
     datatpl_cfg_dict={
         'cls': 'CDInterExtendsQDataTPL'
@@ -48,7 +48,7 @@ datatpl_cfg:
   cls: CDInterDataTPL
 
 traintpl_cfg:
-  cls: EduTrainTPL
+  cls: GeneralTrainTPL
   batch_size: 512
 
 modeltpl_cfg:

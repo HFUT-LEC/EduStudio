@@ -16,7 +16,7 @@ run_edustudio(
         }
     },
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
         'batch_size': 8,
         'eval_batch_size': 8,
     },

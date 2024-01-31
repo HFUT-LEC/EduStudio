@@ -10,7 +10,7 @@ run_edustudio(
     dataset='FrcSub',
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
         'batch_size': 1024
     },
     datatpl_cfg_dict={

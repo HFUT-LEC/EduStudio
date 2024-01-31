@@ -13,7 +13,7 @@ run_edustudio(
         'cls': 'KTInterCptAsExerDataTPL',
     },
     traintpl_cfg_dict={
-        'cls': 'EduTrainTPL',
+        'cls': 'GeneralTrainTPL',
     },
     modeltpl_cfg_dict={
         'cls': 'DKT',

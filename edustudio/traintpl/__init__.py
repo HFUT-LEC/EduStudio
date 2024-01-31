@@ -4,5 +4,5 @@
 
 from .base_traintpl import BaseTrainTPL
 from .gd_traintpl import GDTrainTPL
-from .edu_traintpl import EduTrainTPL
+from .general_traintpl import GeneralTrainTPL
 from .atkt_traintpl import AtktTrainTPL
