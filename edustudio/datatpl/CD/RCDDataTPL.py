@@ -7,10 +7,10 @@ class RCDDataTPL(EduDataTPL):
     default_cfg = {
         'mid2cache_op_seq': [
             'M2C_Label2Int', 'M2C_FilterRecords4CD', 'M2C_ReMapId', 
-            'M2C_RandomDataSplit4CD', 'M2C_BuildCptRelation', 
+            'M2C_RandomDataSplit4CD', 'M2C_BuildKCRelation', 
             'M2C_GenQMat', 'M2C_RCD_OP'
         ],
-        'M2C_BuildCptRelation': {
+        'M2C_BuildKCRelation': {
             'relation_type': 'rcd_transition',
             'threshold': None
         }

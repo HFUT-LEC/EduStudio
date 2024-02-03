@@ -4,7 +4,7 @@ import numpy as np
 
 class KTInterExtendsQDataTPL(EduDataTPL):
     default_cfg = {
-        'mid2cache_op_seq': ['M2C_Label2Int', 'M2C_ReMapId', 'M2C_BuildSeqInterFeats', 'M2C_GenCptSeq'],
+        'mid2cache_op_seq': ['M2C_Label2Int', 'M2C_ReMapId', 'M2C_BuildSeqInterFeats', 'M2C_RandomDataSplit4KT', 'M2C_GenKCSeq'],
     }
 
     def __getitem__(self, index):

@@ -8,9 +8,9 @@ import os
 from edustudio import __version__
 
 ID = idUtil.get_random_id_bytime() # RUN ID
+EDUSTUDIO_VERSION = __version__
 
 WORK_DIR = os.getcwd()
-EDUSTUDIO_VERSION = __version__
 
 DATA_FOLDER_PATH = f"{WORK_DIR}/data"
 TEMP_FOLDER_PATH = f"{WORK_DIR}/temp"

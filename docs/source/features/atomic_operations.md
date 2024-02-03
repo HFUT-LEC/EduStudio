@@ -50,7 +50,7 @@ In the following, we give a table to display existing atomic operations.
 | name                   | description                                 |
 | ---------------------- | ------------------------------------------- |
 | M2C_BuildSeqInterFeats | Build Sequential Features and Split dataset |
-| M2C_CptAsExer          | Treat knowledge concept as exercise         |
-| M2C_GenCptSeq          | Generate knowledge concept seq              |
-| M2C_GenUnFoldCptSeq    | Unfold knowledge concepts                   |
+| M2C_KCAsExer          | Treat knowledge concept as exercise         |
+| M2C_GenKCSeq          | Generate knowledge concept seq              |
+| M2C_GenUnFoldKCSeq    | Unfold knowledge concepts                   |
 

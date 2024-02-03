@@ -3,7 +3,9 @@ from sklearn.preprocessing import LabelEncoder
 from itertools import chain
 
 
-class M2C_CptAsExer(BaseMid2Cache):
+class M2C_KCAsExer(BaseMid2Cache):
+    """Knowledge Concept As Exercise
+    """
     default_cfg = {}
 
     def process(self, **kwargs):

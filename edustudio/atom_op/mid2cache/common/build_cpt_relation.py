@@ -4,7 +4,7 @@ import numpy as np
 from itertools import chain
 
 
-class M2C_BuildCptRelation(BaseMid2Cache):
+class M2C_BuildKCRelation(BaseMid2Cache):
     default_cfg = {
         'relation_type': 'rcd_transition',
         'threshold': None

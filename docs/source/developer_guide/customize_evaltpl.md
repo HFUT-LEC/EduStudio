@@ -30,7 +30,7 @@ This EvalTPL is for the model evaluation using binary classification metrics.
 The protocols in ``PredictionEvalTPL`` are listed as follows.
 
 
-### InterpretabilityEvalT
+### InterpretabilityEvalTPL
 This EvalTPL is for the model evaluation for interpretability. It uses states of students and Q matrix for ``eval``, which are domain-specific in student assessment.
 
 ## Develop a New EvalTPL in EduStudio

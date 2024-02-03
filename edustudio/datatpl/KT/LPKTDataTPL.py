@@ -3,7 +3,7 @@ from ..common import EduDataTPL
 
 class LPKTDataTPL(EduDataTPL):
     default_cfg = {
-        'mid2cache_op_seq': ['M2C_Label2Int', 'M2C_ReMapId', 'M2C_BuildSeqInterFeats', 'M2C_LPKT_OP', "M2C_GenQMat"],
+        'mid2cache_op_seq': ['M2C_Label2Int', 'M2C_ReMapId', 'M2C_BuildSeqInterFeats', 'M2C_RandomDataSplit4KT', 'M2C_LPKT_OP', "M2C_GenQMat"],
         'M2C_BuildSeqInterFeats': {
             "extra_inter_feats": ['start_timestamp:float', 'answer_time:float']
         }

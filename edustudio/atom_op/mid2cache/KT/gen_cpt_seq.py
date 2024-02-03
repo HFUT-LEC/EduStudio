@@ -3,7 +3,9 @@ import numpy as np
 from edustudio.datatpl.utils import PadSeqUtil
 
 
-class M2C_GenCptSeq(BaseMid2Cache):
+class M2C_GenKCSeq(BaseMid2Cache):
+    """Generate Knowledge Component Sequence
+    """
     default_cfg = {
         'cpt_seq_window_size': -1,
     }

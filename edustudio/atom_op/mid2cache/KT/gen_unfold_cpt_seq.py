@@ -4,7 +4,7 @@ from edustudio.datatpl.utils import PadSeqUtil
 import pandas as pd
 
 
-class M2C_GenUnFoldCptSeq(BaseMid2Cache):
+class M2C_GenUnFoldKCSeq(BaseMid2Cache):
     default_cfg = {}
     
     def __init__(self, m2c_cfg, n_folds, is_dataset_divided) -> None:

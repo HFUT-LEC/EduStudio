@@ -5,7 +5,7 @@ from ..common import EduDataTPL
 
 class EERNNDataTPL(EduDataTPL):
     default_cfg = {
-        'mid2cache_op_seq': ['M2C_Label2Int', 'M2C_ReMapId', 'M2C_BuildSeqInterFeats', 'M2C_EERNN_OP'],
+        'mid2cache_op_seq': ['M2C_Label2Int', 'M2C_ReMapId', 'M2C_BuildSeqInterFeats','M2C_RandomDataSplit4KT', 'M2C_EERNN_OP'],
     }
     
     def get_extra_data(self, **kwargs):

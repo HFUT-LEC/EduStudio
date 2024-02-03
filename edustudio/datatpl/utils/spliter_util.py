@@ -58,7 +58,7 @@ class SpliterUtil:
                                 shuffle=shuffle, random_state=seed)
             splits = skf.split(df)
 
-        train_df_list, test_df_list = [], [], []
+        train_df_list, test_df_list = [], []
         for train_index, test_index in splits:
             train_df = df.iloc[train_index].reset_index(drop=True)
             test_df = df.iloc[test_index].reset_index(drop=True)
