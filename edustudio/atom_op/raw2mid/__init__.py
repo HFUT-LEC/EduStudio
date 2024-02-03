@@ -15,7 +15,8 @@ from .junyi_exer_as_cpt import R2M_JunyiExerAsCpt
 from .nips12 import R2M_Eedi_20_T12
 from .nips34 import R2M_Eedi_20_T34
 from .simulated5 import R2M_Simulated5
-
+from .slp_english import R2M_SLP_English
+from .slp_math import R2M_SLP_Math
 
 # look up api dict
 _cli_api_dict_ = {}
@@ -35,3 +36,5 @@ _cli_api_dict_['R2M_JunyiExerAsCpt'] = R2M_JunyiExerAsCpt.from_cli
 _cli_api_dict_['R2M_Eedi_20_T12'] = R2M_Eedi_20_T12.from_cli
 _cli_api_dict_['R2M_Eedi_20_T34'] = R2M_Eedi_20_T34.from_cli
 _cli_api_dict_['R2M_Simulated5'] = R2M_Simulated5.from_cli
+_cli_api_dict_['R2M_SLP_Math'] = R2M_SLP_Math.from_cli
+_cli_api_dict_['R2M_SLP_English'] = R2M_SLP_English.from_cli

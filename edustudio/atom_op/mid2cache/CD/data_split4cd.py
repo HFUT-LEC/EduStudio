@@ -104,5 +104,3 @@ class M2C_RandomDataSplit4CD(BaseMid2Cache):
                                 dt_info['cpt_count'] = max(dt_info.get('cpt_count', -1), df[col].max() + 1)
                             else:
                                 dt_info['cpt_count'] = max(dt_info.get('cpt_count', -1), np.max(list(chain(*df[col].to_list()))) + 1)
-
-            a = 1

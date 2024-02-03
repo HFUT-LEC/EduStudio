@@ -111,17 +111,21 @@ class GeneralTrainTPL(GDTrainTPL):
     @torch.no_grad()
     def evaluate(self, loader):
         self.model.eval()
+        stu_id_list = list(range(len(loader)))
         pd_list = list(range(len(loader)))
         gt_list = list(range(len(loader)))
         for idx, batch_dict in enumerate(tqdm(loader, ncols=self.frame_cfg['TQDM_NCOLS'], desc="[PREDICT]")):
             batch_dict = self.batch_dict2device(batch_dict)
             eval_dict = self.model.predict(**batch_dict)
+            stu_id_list[idx] = batch_dict['stu_id']
             pd_list[idx] = eval_dict['y_pd']
             gt_list[idx] = eval_dict['y_gt'] if 'y_gt' in eval_dict else batch_dict['label']
         y_pd = torch.hstack(pd_list)
         y_gt = torch.hstack(gt_list)
+        stu_id = torch.hstack(stu_id_list)
 
         eval_data_dict = {
+            'stu_id': stu_id,
             'y_pd': y_pd,
             'y_gt': y_gt,
         }
@@ -142,17 +146,21 @@ class GeneralTrainTPL(GDTrainTPL):
     @torch.no_grad()
     def inference(self, loader):
         self.model.eval()
+        stu_id_list = list(range(len(loader)))
         pd_list = list(range(len(loader)))
         gt_list = list(range(len(loader)))
         for idx, batch_dict in enumerate(tqdm(loader, ncols=self.frame_cfg['TQDM_NCOLS'], desc="[PREDICT]")):
             batch_dict = self.batch_dict2device(batch_dict)
             eval_dict = self.model.predict(**batch_dict)
+            stu_id_list[idx] = batch_dict['stu_id']
             pd_list[idx] = eval_dict['y_pd']
             gt_list[idx] = eval_dict['y_gt'] if 'y_gt' in eval_dict else batch_dict['label']
         y_pd = torch.hstack(pd_list)
         y_gt = torch.hstack(gt_list)
+        stu_id = torch.hstack(stu_id_list)
 
         eval_data_dict = {
+            'stu_id': stu_id,
             'y_pd': y_pd,
             'y_gt': y_gt,
         }

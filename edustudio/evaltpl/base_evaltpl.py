@@ -20,6 +20,7 @@ class BaseEvalTPL(object):
         self.frame_cfg: UnifyConfig = cfg.frame_cfg
         self.modeltpl_cfg: UnifyConfig = cfg.modeltpl_cfg
         self.logger: logging.Logger = logging.getLogger("edustudio")
+        self._check_params()
 
     @classmethod
     def get_default_cfg(cls):

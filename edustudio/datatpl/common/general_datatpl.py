@@ -36,7 +36,7 @@ class GeneralDataTPL(BaseDataTPL):
         'cache_id': 'cache_default',
         'load_data_from': 'middata', # ['rawdata', 'middata', 'cachedata']
         'inter_exclude_feat_names': (),
-        'raw2mid_op': None, 
+        'raw2mid_op': "None", 
         'mid2cache_op_seq': []
     }
 
@@ -456,7 +456,7 @@ class GeneralDataTPL(BaseDataTPL):
         """
         from edustudio.atom_op.raw2mid import BaseRaw2Mid
         r2m_op = cfg.datatpl_cfg['raw2mid_op']
-        assert r2m_op is not None
+        assert r2m_op is not None or r2m_op != "None"
         if isinstance(r2m_op, str):
             r2m_op = importlib.import_module('edustudio.atom_op.raw2mid').__getattribute__(r2m_op)
         elif issubclass(r2m_op, BaseRaw2Mid):
@@ -541,13 +541,20 @@ class GeneralDataTPL(BaseDataTPL):
         for col in df.columns:
             col_name, col_type = col.split(":")
             if col_type == 'token':
-                df[col] = df[col].astype('int64')
+                # df[col] = df[col].astype('int64')
+                pass
             elif col_type == 'float':
                 df[col] = df[col].astype('float32')
             elif col_type == 'token_seq':
-                df[col] = df[col].astype(str).apply(lambda x: [int(i) for i in x.split(",")])
+                try:
+                    df[col] = df[col].astype(str).apply(lambda x: [int(i) for i in x.split(",")])
+                except:
+                    df[col] = df[col].astype(str).apply(lambda x: eval(x))
             elif col_type == 'float_seq':
-                df[col] = df[col].astype(str).apply(lambda x: [float(i) for i in x.split(",")])
+                try:
+                    df[col] = df[col].astype(str).apply(lambda x: [float(i) for i in x.split(",")])
+                except:
+                    df[col] = df[col].astype(str).apply(lambda x: eval(x))
             else:
                 raise ValueError(f"unknown field type of {col_type}")
 
