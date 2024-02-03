@@ -13,3 +13,4 @@ from .cdgk import CDGK_SINGLE, CDGK_MULTI
 from .cdmfkc import CDMFKC
 from .ecd import *
 from .mgcd import MGCD
+from .dcd import DCD

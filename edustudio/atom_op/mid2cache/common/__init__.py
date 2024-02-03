@@ -4,3 +4,5 @@ from .label2int import M2C_Label2Int
 from .merge_divided_splits import M2C_MergeDividedSplits
 from .remapid import M2C_ReMapId
 from .build_cpt_relation import M2C_BuildKCRelation
+from .build_missing_Q import M2C_BuildMissingQ
+from .fill_missing_Q import M2C_FillMissingQ

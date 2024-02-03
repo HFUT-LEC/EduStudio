@@ -7,4 +7,5 @@ from .MGCDDataTPL import MGCDDataTPL
 from .CNCDQDataTPL import CNCDQDataTPL
 from .RCDDataTPL import RCDDataTPL
 from .CDGKDataTPL import CDGKDataTPL
-from.ECDDataTPL import ECDDataTPL
+from .ECDDataTPL import ECDDataTPL
+from .DCDDataTPL import DCDDataTPL

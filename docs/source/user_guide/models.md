@@ -38,7 +38,8 @@ Here is a list of models and corresponding papers of CD and KT including impleme
 | | QCCDM | ECAI 2023 | [QCCDM: A Q-Augmented Causal Cognitive Diagnosis Model for Student Learning](https://github.com/lswhim/CDM_ILOG) |
 | | CBICDM | ICONIP 2023 | [A Causality-Based Interpretable Cognitive Diagnosis Model](https://link.springer.com/chapter/10.1007/978-981-99-8067-3_16) |
 | | CMES | Arxiv 2023 | [Enhancing Cognitive Diagnosis using Un-interacted Exercises: A Collaboration-aware Mixed Sampling Approach](https://arxiv.org/abs/2312.10110) |
-| | Zero-1-to-3 | Arxiv 2023 | [Zero-1-to-3: Domain-level Zero-shot Cognitive Diagnosis via One Batch of Early-bird Students towards Three Diagnostic Objectives](https://arxiv.org/abs/2312.13434) |
+|✔️ | DCD | NeurIPS 2023 | [Disentangling Cognitive Diagnosis with Limited Exercise Labels](https://openreview.net/pdf?id=ogPBujRhiN) |
+| | Zero-1-to-3 | AAAI 2024 | [Zero-1-to-3: Domain-level Zero-shot Cognitive Diagnosis via One Batch of Early-bird Students towards Three Diagnostic Objectives](https://arxiv.org/abs/2312.13434) |
 
 ## Knowledge Tracing
 
