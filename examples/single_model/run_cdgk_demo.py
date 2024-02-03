@@ -23,6 +23,6 @@ run_edustudio(
         'cls': 'CDGK_MULTI',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )

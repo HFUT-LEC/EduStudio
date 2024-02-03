@@ -19,7 +19,7 @@ run_edustudio(
         'cls': 'SAINT',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )
 

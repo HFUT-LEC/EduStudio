@@ -6,7 +6,9 @@ from edustudio.utils.common import tensor2npy
 from edustudio.utils.callback import ModeState
 
 
-class CognitiveDiagnosisEvalTPL(BaseEvalTPL):
+class InterpretabilityEvalTPL(BaseEvalTPL):
+    """Student Cogntive Representation Interpretability Evaluation
+    """
     default_cfg = {
         'use_metrics': ['doa_all'],
         'test_only_metrics': ['doa_all']
@@ -189,10 +191,4 @@ class CognitiveDiagnosisEvalTPL(BaseEvalTPL):
                 doa.append(_doa / _z)
                 z_support += _z # 有效pair个数
                 doa_support += 1 # 有效doa
-        # return {
-        #     "doa": np.mean(doa),
-        #     "doa_know_support": doa_support,
-        #     "doa_z_support": z_support,
-        #     "doa_list": doa,
-        # }
         return float(np.mean(doa))

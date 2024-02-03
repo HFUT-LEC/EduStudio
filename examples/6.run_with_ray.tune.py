@@ -42,7 +42,7 @@ search_space= {
     'traintpl_cfg.cls': tune.grid_search(['GeneralTrainTPL']),
     'datatpl_cfg.cls': tune.grid_search(['CDInterExtendsQDataTPL']),
     'modeltpl_cfg.cls': tune.grid_search(['KaNCD']),
-    'evaltpl_cfg.clses': tune.grid_search([['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL']]),
+    'evaltpl_cfg.clses': tune.grid_search([['PredictionEvalTPL', 'InterpretabilityEvalTPL']]),
     
 
     'traintpl_cfg.batch_size': tune.grid_search([256,]),

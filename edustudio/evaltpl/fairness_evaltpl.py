@@ -5,6 +5,8 @@ from edustudio.utils.common import tensor2npy
 
 
 class FairnessEvalTPL(BaseEvalTPL):
+    """Fairness Cognitive Evaluation
+    """
     default_cfg = {
         'use_sensi_attrs': ['gender:token'],
         'use_metrics': ['EO', 'DP', 'FCD']

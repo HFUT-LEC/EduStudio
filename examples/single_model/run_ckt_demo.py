@@ -21,6 +21,6 @@ run_edustudio(
         'cls': 'CKT',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )

@@ -18,6 +18,6 @@ class TestRun:
                 'cls': 'KaNCD',
             },
             evaltpl_cfg_dict={
-                'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
+                'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
             }
         )

@@ -21,6 +21,6 @@ run_edustudio(
         'cls': 'ECD_IRT',#ECD_IRT,ECD_MIRT,ECD_NCD
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )

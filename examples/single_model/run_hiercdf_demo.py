@@ -65,6 +65,6 @@ run_edustudio(
         'cls': 'HierCDF',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )

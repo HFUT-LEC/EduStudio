@@ -44,7 +44,7 @@ space = {
     'traintpl_cfg.cls': hp.choice('traintpl_cfg.cls', ['GeneralTrainTPL']),
     'datatpl_cfg.cls': hp.choice('datapl_cfg.cls', ['CDInterExtendsQDataTPL']),
     'modeltpl_cfg.cls': hp.choice('modeltpl_cfg.cls', ['KaNCD']),
-    'evaltpl_cfg.clses': hp.choice('evaltpl_cfg.clses', [['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL']]),
+    'evaltpl_cfg.clses': hp.choice('evaltpl_cfg.clses', [['PredictionEvalTPL', 'InterpretabilityEvalTPL']]),
     
 
     'traintpl_cfg.batch_size': hp.choice('traintpl_cfg.batch_size', [256,]),

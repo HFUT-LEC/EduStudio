@@ -24,8 +24,8 @@ run_edustudio(
         'cls': 'MGCD',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
-        'BinaryClassificationEvalTPL': {
+        'clses': ['PredictionEvalTPL'],
+        'PredictionEvalTPL': {
             'use_metrics': ['rmse']
         }
     }

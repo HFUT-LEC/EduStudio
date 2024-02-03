@@ -4,7 +4,9 @@ from edustudio.utils.common import tensor2npy
 from sklearn.metrics import mean_squared_error, roc_auc_score, accuracy_score, f1_score, label_ranking_loss, coverage_error
 
 
-class BinaryClassificationEvalTPL(BaseEvalTPL):
+class PredictionEvalTPL(BaseEvalTPL):
+    """Student Performance Prediction Evaluation
+    """
     default_cfg = {
         'use_metrics': ['auc', 'acc', 'rmse']
     }

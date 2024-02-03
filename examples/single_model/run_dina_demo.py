@@ -20,6 +20,6 @@ run_edustudio(
         'cls': 'DINA',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
     }
 )

@@ -19,6 +19,6 @@ run_edustudio(
         'cls': 'HawkesKT',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )

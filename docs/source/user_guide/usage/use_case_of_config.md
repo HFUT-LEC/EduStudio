@@ -34,15 +34,15 @@ run_edustudio(
         'cls': 'KaNCD',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
     }
 )
 ```
 
 ## Q2: How to specify the config of evaluate template
-The default_cfg of `BinaryClassificationEvalTPL` is as follows:
+The default_cfg of `PredictionEvalTPL` is as follows:
 ```python
-class BinaryClassificationEvalTPL(BaseEvalTPL):
+class PredictionEvalTPL(BaseEvalTPL):
     default_cfg = {
         'use_metrics': ['auc', 'acc', 'rmse']
     }
@@ -70,8 +70,8 @@ run_edustudio(
         'cls': 'KaNCD',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
-        'CognitiveDiagnosisEvalTPL': {
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
+        'InterpretabilityEvalTPL': {
             'use_metrics': {"auc"} # look here
         }
     }

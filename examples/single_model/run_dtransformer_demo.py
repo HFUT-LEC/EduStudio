@@ -21,7 +21,7 @@ run_edustudio(
         'cls': 'DTransformer',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )
 

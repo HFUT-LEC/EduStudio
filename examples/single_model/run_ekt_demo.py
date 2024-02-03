@@ -24,6 +24,6 @@ run_edustudio(
         'cls': 'EKTM',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )

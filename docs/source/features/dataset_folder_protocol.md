@@ -62,7 +62,7 @@ run_edustudio(
         'cls': 'KaNCD',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
     }
 )
 ```
@@ -90,7 +90,7 @@ run_edustudio(
         'cls': 'KaNCD',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
     }
 )
 ```
@@ -118,7 +118,7 @@ run_edustudio(
         'cls': 'KaNCD',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
     }
 )
 ```
@@ -154,7 +154,7 @@ run_edustudio(
         'cls': 'KaNCD',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL'],
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
     }
 )
 ```

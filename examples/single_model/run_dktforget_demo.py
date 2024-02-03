@@ -19,6 +19,6 @@ run_edustudio(
         'cls': 'DKTForget',
     },
     evaltpl_cfg_dict={
-        'clses': ['BinaryClassificationEvalTPL'],
+        'clses': ['PredictionEvalTPL'],
     }
 )

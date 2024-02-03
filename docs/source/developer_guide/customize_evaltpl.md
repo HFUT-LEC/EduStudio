@@ -23,14 +23,14 @@ The protocols in ``BaseEvalTPL`` are listed as follows.
 EvalTPLs
 ----------------------
 
-EduStudio provides ``BinaryClassificationEvalTPL`` and ``CognitiveDiagnosisEvalTPL``, which inherent ``BaseEvalTPL``.
+EduStudio provides ``PredictionEvalTPL`` and ``InterpretabilityEvalTPL``, which inherent ``BaseEvalTPL``.
 
-### BinaryClassificationEvalTPL
+### PredictionEvalTPL
 This EvalTPL is for the model evaluation using binary classification metrics.
-The protocols in ``BinaryClassificationEvalTPL`` are listed as follows.
+The protocols in ``PredictionEvalTPL`` are listed as follows.
 
 
-### CognitiveDiagnosisEvalTPL
+### InterpretabilityEvalT
 This EvalTPL is for the model evaluation for interpretability. It uses states of students and Q matrix for ``eval``, which are domain-specific in student assessment.
 
 ## Develop a New EvalTPL in EduStudio

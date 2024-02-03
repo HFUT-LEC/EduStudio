@@ -57,7 +57,7 @@ search_space= {
     'traintpl_cfg.cls': tune.grid_search(['GeneralTrainTPL']),
     'datatpl_cfg.cls': tune.grid_search(['CDInterExtendsQDataTPL']),
     'modeltpl_cfg.cls': tune.grid_search(['KaNCD']),
-    'evaltpl_cfg.clses': tune.grid_search([['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL']]),
+    'evaltpl_cfg.clses': tune.grid_search([['PredictionEvalTPL', 'InterpretabilityEvalTPL']]),
     
 
     'traintpl_cfg.batch_size': tune.grid_search([256,]),
@@ -118,7 +118,7 @@ space = {
     'traintpl_cfg.cls': hp.choice('traintpl_cfg.cls', ['GeneralTrainTPL']),
     'datatpl_cfg.cls': hp.choice('datapl_cfg.cls', ['CDInterExtendsQDataTPL']),
     'modeltpl_cfg.cls': hp.choice('modeltpl_cfg.cls', ['KaNCD']),
-    'evaltpl_cfg.clses': hp.choice('evaltpl_cfg.clses', [['BinaryClassificationEvalTPL', 'CognitiveDiagnosisEvalTPL']]),
+    'evaltpl_cfg.clses': hp.choice('evaltpl_cfg.clses', [['PredictionEvalTPL', 'InterpretabilityEvalTPL']]),
     
 
     'traintpl_cfg.batch_size': hp.choice('traintpl_cfg.batch_size', [256,]),

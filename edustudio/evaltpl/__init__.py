@@ -1,4 +1,4 @@
 from .base_evaltpl import BaseEvalTPL
-from .bc_evaltpl import BinaryClassificationEvalTPL
-from .cd_evaltpl import CognitiveDiagnosisEvalTPL
+from .prediction_evaltpl import PredictionEvalTPL
+from .interpretability_evaltpl import InterpretabilityEvalTPL
 from .fairness_evaltpl import FairnessEvalTPL
