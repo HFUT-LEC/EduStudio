@@ -78,7 +78,11 @@ class GeneralTrainTPL(GDTrainTPL):
 
     def fit(self, train_loader, valid_loader):
         self.model.train()
-        self.optimizer = self._get_optim()
+        optimizer = self.traintpl_cfg['optim']
+        lr = self.traintpl_cfg['lr']
+        weight_decay = self.traintpl_cfg['weight_decay']
+        eps = self.traintpl_cfg['eps']
+        self.optimizer = self._get_optim(optimizer=optimizer, lr=lr, weight_decay=weight_decay, eps=eps)
         self.callback_list.on_train_begin()
         for epoch in range(self.traintpl_cfg['epoch_num']):
             self.callback_list.on_epoch_begin(epoch + 1)

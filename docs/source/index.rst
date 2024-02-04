@@ -50,6 +50,7 @@ The overall structure is illustrated as follows:
    :maxdepth: 1
    :caption: User Guide
 
+   user_guide/atom_op
    user_guide/datasets
    user_guide/models
    user_guide/reference_table

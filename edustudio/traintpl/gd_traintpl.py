@@ -27,13 +27,9 @@ class GDTrainTPL(BaseTrainTPL):
         self.valid_loader_list = []
         self.test_loader_list = []
     
-    def _get_optim(self):
+    def _get_optim(self, optimizer='adam', lr=0.001, weight_decay=0.0, eps=1e-8):
         """Get optimizer
         """
-        optimizer = self.traintpl_cfg['optim']
-        lr = self.traintpl_cfg['lr']
-        weight_decay = self.traintpl_cfg['weight_decay']
-        eps = self.traintpl_cfg['eps']
         if optimizer == "sgd":
             optim = torch.optim.SGD(self.model.parameters(), lr=lr, weight_decay=weight_decay, eps=eps)
         elif optimizer == "adam":
