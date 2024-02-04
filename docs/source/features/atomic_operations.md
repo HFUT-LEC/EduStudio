@@ -1,31 +1,30 @@
-# Atomic Operations
+# Atomic Data Operations
 
 In `Edustudio`, we view the dataset from three stages: `rawdata`, `middata`, `cachedata`.
 
- we treat the whole data processing as multiple atomic operations called atomic operation sequence. 
+We treat the whole data processing as multiple atomic operations called atomic operation sequence. 
 The first atomic operation, inheriting the protocol class `BaseRaw2Mid`, is the process from raw data to middle data.
 The following atomic operations, inheriting the protocol class `BaseMid2Cache`,  construct the process from middle data to cache data.
 
-The atomic operation protocol can be seen at `Atomic Operation Protocol`.
 
+## Partial Atomic Operation Table
 
-
-## Atomic Operation Table
-
-In the following, we give a table to display existing atomic operations.
+In the following, we give a table to display some existing atomic operations. For more detailed Atomic Operation Table, please see the `user_guide/Atomic Data Operation List`
 
 ### Raw2Mid
 
-| name            | description                                                  |
+For the conversion from rawdata to middata, we implement a specific atomic data operation prefixed with `R2M` for each dataset.
+
+| name            | Corresponding datase                                                |
 | --------------- | ------------------------------------------------------------ |
-| R2M_ASSIST_0910 | The atomic operation that process the Assistment_0910 dataset from rawdata into midata |
-| R2M_FrcSub      | The atomic operation that process the FrcSub dataset from rawdata into midata |
-| R2M_ASSIST_1213 | The atomic operation that process the Assistment_1213 dataset from rawdata into midata |
-| R2M_Math1       | The atomic operation that process the Math1dataset from rawdata into midata |
-| R2M_Math2       | The atomic operation that process the Math2 dataset from rawdata into midata |
-| R2M_AAAI_2023   | The atomic operation that process the AAAI 2023 challenge dataset from rawdata into midata |
-| R2M_Algebra_0506 | The atomic operation that process the Algebra 2005-2006 dataset from rawdata into midata |
-| R2M_ASSIST_1516 | The atomic operation that process the Assistment 2015-2016 dataset from rawdata into midata |
+| R2M_ASSIST_0910 |  ASSISTment 2009-2010  |
+| R2M_FrcSub      | Frcsub |
+| R2M_ASSIST_1213 | ASSISTment 2012-2013  |
+| R2M_Math1       | Math1 |
+| R2M_Math2       | Math2 |
+| R2M_AAAI_2023   | AAAI 2023 Global Knowledge Tracing Challenge |
+| R2M_Algebra_0506 | Algebra 2005-2006 |
+| R2M_ASSIST_1516 | ASSISTment 2015-2016 |
 
 ### Mid2Cache
 

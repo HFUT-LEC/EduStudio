@@ -1,12 +1,8 @@
-# Atomic File Protocol
+# Middle Data Format Protocol
 
 In `EduStudio`, we adopt a flexible CSV (Comma-Separated Values) file format following [Recbole](https://recbole.io/atomic_files.html).  The flexible CSV format is defined in `middata` stage of dataset (see dataset stage protocol for details).
 
-The atomic file protocol including two parts:  `Columns name Format` and `Filename Format`.
-
-**Note**: The atomic files protocol is  defined in `Inherited Architecture`. In fact, users can abandon the atomic files protocol by inheriting the data template protocol class in `Basic Architecture`(i.e. `BaseDataTPL`). 
-
-
+The Middle Data Format Protocol including two parts:  `Columns name Format` and `Filename Format`.
 
 ## Columns Name Format
 

@@ -1,4 +1,4 @@
-# Inheritable Configuration
+# Inheritable Default Configuration
 
 The management of default configuration in Edustudio is implemented by class variable, i.e. a dictionary object called default_config. 
 
@@ -6,7 +6,7 @@ Templates usually introduce new features through inheritance, and these new feat
 
 ## Example
 
-The inheritance example of data template is illustrated as follows:
+The inheritance example of data template is illustrated as follows. We present an example in the data preparation procedure. There are three data template classes (DataTPLs) that inherit from each other: BaseDataTPL, GeneralDataTPL, and EduDataTPL. If users specify current DataTPL is EduDataTPL, the eventual default\_config of data preparation procedure is a merger of default\_cfg of three templates. When a configuration conflict is encountered, the default\_config of subclass template takes precedence over that of parent class templates. As a result, other configuration portals (i.e, configuration file, parameter dictionary, and command line) can only specify parameters that are confined within the default configuration. The advantage of the inheritable design is that it facilitates the reader to locate the numerous hyperparameters.
 
 ```python
 class BaseDataTPL(Dataset):

@@ -16,14 +16,12 @@ The description of five config objects is illustrated in Table below.
 
 
 
-## Four Entry Points of Configuration
+## Four Configuration Portals
 
-There are four entry points of configuration:
+There are four configuration portals:
 
-- default_cfg: inheritable class varible
-- config file
-- parameter dict
+- default_cfg: inheritable python class varible
+- configuration file
+- parameter dictionary
 - command line
-
-
 
