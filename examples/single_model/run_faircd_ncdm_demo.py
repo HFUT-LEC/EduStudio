@@ -7,14 +7,14 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from edustudio.quickstart import run_edustudio
 
 run_edustudio(
-    dataset='term-eng',
+    dataset='SLP_English',
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'AdversarialTrainTPL',
-        'device': 'cpu'
+        'batch_size': 1024
     },
     datatpl_cfg_dict={
-        'cls': 'FAIRCDDataTPL',
+        'cls': 'FAIRDataTPL',
     },
     modeltpl_cfg_dict={
         'cls': 'FairCD_NCDM',

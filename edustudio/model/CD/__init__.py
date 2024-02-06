@@ -14,6 +14,4 @@ from .cdmfkc import CDMFKC
 from .ecd import *
 from .mgcd import MGCD
 from .dcd import DCD
-from .faircd_irt import FairCD_IRT
-from .faircd_mirt import FairCD_MIRT
-from .faircd_ncdm import FairCD_NCDM
+from .faircd import FairCD_IRT, FairCD_MIRT, FairCD_NCDM

@@ -9,4 +9,4 @@ from .RCDDataTPL import RCDDataTPL
 from .CDGKDataTPL import CDGKDataTPL
 from .ECDDataTPL import ECDDataTPL
 from .DCDDataTPL import DCDDataTPL
-from .FAIRCDDataTPL import FAIRCDDataTPL
+from .FAIRDataTPL import FAIRDataTPL
