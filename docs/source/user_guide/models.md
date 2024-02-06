@@ -24,6 +24,7 @@ If you are seeking comprehensive access to all the literature in this field, we 
 |   ✔️    | KSCD          | CIKM 2022    | [Knowledge-Sensed Cognitive Diagnosis for Intelligent Education Platforms](https://dl.acm.org/doi/abs/10.1145/3511808.3557372) |
 |   ✔️    | CDMFKC        | CIKM 2022    | [Cognitive Diagnosis Focusing on Knowledge Concepts](https://dl.acm.org/doi/10.1145/3511808.3557096) |
 |   ✔️    | DCD           | NeurIPS 2023 | [Disentangling Cognitive Diagnosis with Limited Exercise Labels](https://openreview.net/pdf?id=ogPBujRhiN) |
+|   ✔️    | FairCD           | SCIS 2023 | [Understanding and Improving Fairness in Cognitive Diagnosis](https://www.sciengine.com/SCIS/doi/10.1007/s11432-022-3852-0;JSESSIONID=90890fc0-d1be-4694-ac0d-0b12a450f9ad) |
 
 ## Knowledge Tracing
 

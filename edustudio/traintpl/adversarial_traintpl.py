@@ -38,8 +38,8 @@ class AdversarialTrainTPL(GeneralTrainTPL):
         weight_decay = self.traintpl_cfg['weight_decay']
         eps = self.traintpl_cfg['eps']
         
-        self.optimizer_g = self._get_optim(self.model.get_g_parameters(), self.modeltpl_cfg['optim'], lr=lr, weight_decay=weight_decay, eps=eps)
-        self.optimizer_d = self._get_optim(self.model.get_d_parameters(), self.modeltpl_cfg['optim_d'], lr=lr_d, weight_decay=weight_decay, eps=eps)
+        self.optimizer_g = self._get_optim(self.model.get_g_parameters(), self.traintpl_cfg['optim'], lr=lr, weight_decay=weight_decay, eps=eps)
+        self.optimizer_d = self._get_optim(self.model.get_d_parameters(), self.traintpl_cfg['optim_d'], lr=lr_d, weight_decay=weight_decay, eps=eps)
 
         self.callback_list.on_train_begin()
         for epoch in range(self.traintpl_cfg['epoch_num']):
@@ -54,15 +54,13 @@ class AdversarialTrainTPL(GeneralTrainTPL):
                         tqdm(train_loader, ncols=self.frame_cfg['TQDM_NCOLS'], desc="[GEN:EPOCH={:03d}]".format(epoch + 1))
                 ):
                     batch_dict = self.batch_dict2device(batch_dict)
-                    loss_gen_dict, loss_dis_dict = self.model.get_loss_dict(**batch_dict)
+                    loss_gen_dict = self.model.get_main_loss(**batch_dict)
                     loss_gen = torch.hstack([i for i in loss_gen_dict.values() if i is not None]).sum()
-                    loss_dis = torch.hstack([i for i in loss_dis_dict.values() if i is not None]).sum()
-                    loss = loss_gen - loss_dis
+                    loss = loss_gen
                     self.optimizer_g.zero_grad()
                     loss.backward()
                     self.optimizer_g.step()
                     for k in loss_gen_dict: logs[k][batch_id + len(train_loader) * round_id] = loss_gen_dict[k].item() if loss_gen_dict[k] is not None else np.nan
-                    for k in loss_dis_dict: logs[k][batch_id + len(train_loader) * round_id] = loss_dis_dict[k].item() if loss_dis_dict[k] is not None else np.nan
 
             logs_g = {}
             for name in logs: logs_g[f"GEN_{name}"] = float(np.nanmean(logs[name]))
@@ -74,14 +72,14 @@ class AdversarialTrainTPL(GeneralTrainTPL):
                         tqdm(train_loader, ncols=self.frame_cfg['TQDM_NCOLS'], desc="[DIS:EPOCH={:03d}]".format(epoch + 1))
                 ):
                     batch_dict = self.batch_dict2device(batch_dict)
-                    loss_gen_dict, loss_dis_dict = self.model.get_loss_dict(**batch_dict)
-                    loss_gen = torch.hstack([i for i in loss_gen_dict.values() if i is not None]).sum()
+                    loss_pre_dict, loss_dis_dict = self.model.get_loss_dict(**batch_dict)
+                    loss_pre = torch.hstack([i for i in loss_pre_dict.values() if i is not None]).sum()
                     loss_dis = torch.hstack([i for i in loss_dis_dict.values() if i is not None]).sum()
-                    loss = - loss_gen + loss_dis
+                    loss = loss_pre - loss_dis
                     self.optimizer_d.zero_grad()
                     loss.backward()
                     self.optimizer_d.step()
-                    for k in loss_gen_dict: logs[k][batch_id + len(train_loader) * round_id] = loss_gen_dict[k].item() if loss_gen_dict[k] is not None else np.nan
+                    for k in loss_pre_dict: logs[k][batch_id + len(train_loader) * round_id] = loss_pre_dict[k].item() if loss_pre_dict[k] is not None else np.nan
                     for k in loss_dis_dict: logs[k][batch_id + len(train_loader) * round_id] = loss_dis_dict[k].item() if loss_dis_dict[k] is not None else np.nan
 
             logs_d = {}

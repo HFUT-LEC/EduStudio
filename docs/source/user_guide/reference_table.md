@@ -20,6 +20,7 @@
 | MGCD    |            MGCDDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | RCD     |             RCDDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | DCD     |             CCDDataTPL | DCDTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL       |
+| FairCD  |          FAIRCDDataTPL | AdversarialTrainTPL | PredictionEvalTPL, FairnessEvalTPL       |
 
 ## KT models
 
