@@ -8,15 +8,18 @@
 
 Introduction
 -------------------------
-EduStudio is a Unified and Templatized Framework for Student Assessment Models including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
+EduStudio is a Unified Library for Student Assessment Models including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
 
-EduStudio first decomposes the general algorithmic workflow into five steps: ``configuration reading``, ``data processing``, ``model implementation``, ``training control``, and ``result evaluation``. Subsequently, to enhance the ``reusability`` of each step, we extract the commonalities of each algorithm at each step into individual templates for templatization.
+EduStudio first decomposes the general algorithmic workflow into six steps: `configuration reading`, `data prepration`, `model implementation`, `training control`, `model evaluation`, and `Log Storage`. Subsequently, to enhance the `reusability` and `scalability` of each step, we extract the commonalities of each algorithm at each step into individual templates for templatization.
 
-As illustrated in the Figure below, to better implement a templatized framework, we implement an ``inheritance-style`` EduStudio that contains basic architecture and inherited architecture with different responsibilities. 
+- Configuration Reading (Step 1) aims to collect, categorize and deliver configurations from different configuration portals. 
+- Data Preparation (Step 2) aims to convert raw data from the hard disk into model-friendly data objects. 
+- Model Implementation (Step 3) refers to the process of implementing the structure of each model and facilitating the reuse of model components. 
+- Training Control (Step 4) focuses primarily on the training methods of various models. 
+- Model Evaluation (Step 5) primarily focuses on the implementation of various evaluation metrics. 
+- Log Storage (Step 6) aims to implement storage specification when store generated data.
 
-The **basic architecture emphasizes domain-irrelevant content and strives to build templatized protocols**. 
-The **inherited architecture obeys the protocol in the basic architecture and focuses on domain-relevant content**. 
-The inheritance-style separates domainrelevant and domain-irrelevant content, greatly simplifying framework structure and enhancing ``readability``.
+The modularization establishes clear boundaries between various programs in the algorithm pipeline, facilitating the introduction of new content to individual modules and enhancing scalability.
 
 The overall structure is illustrated as follows:
 
@@ -42,8 +45,9 @@ The overall structure is illustrated as follows:
 
    features/global_cfg_obj
    features/inheritable_config
-   features/atomic_files
+   features/standard_datamodule
    features/dataset_folder_protocol
+   features/atomic_files
    features/atomic_operations
 
 .. toctree::

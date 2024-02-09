@@ -7,31 +7,25 @@
 <img src="https://img.shields.io/badge/License-MIT-blue">
 <img src="https://img.shields.io/github/issues/HFUT-LEC/EduStudio.svg">
 </p>
-EduStudio is a Unified and Templatized Framework for Student Assessment Models including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
+
+EduStudio is a Unified Library for Student Cognitive Modeling including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
 
 ## Navigation
 
 
-| Resource Name                                                | Description                                                  | Status |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------ |
-| [awesome-education](https://github.com/HFUT-LEC/awesome-education) | A  repository containing resources about Educational Data Mining | ⛏️      |
-| [documentation](https://edustudio.readthedocs.io/en/latest/) | Documentation for usage of EduStudio                         | ✔️      |
-| [leaderboard](https://leaderboard.edustudio.ai)              | A leaderboard demonstrating performance of implemented models | ⛏️      |
-| [dataset list](https://edustudio.readthedocs.io/en/latest/user_guide/datasets.html) | Dataset list in documentation                                | ✔️      |
-| [paper list](https://edustudio.readthedocs.io/en/latest/user_guide/models.html) | Paper list in documentation                                  | ✔️      |
-
-
+| Resource Name                                                | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Eco-Repository](https://github.com/HFUT-LEC/awesome-education) | A  repository containing resources about student cognitive modeling: [papers](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/papers), [datasets](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/datasets), [conferences&journals](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/conferences%26journals) |
+| [Eco-Leaderboard](https://leaderboard.edustudio.ai)          | A leaderboard demonstrating performance of implemented models |
+| [EduStudio Documentation](https://edustudio.readthedocs.io/) | The document for EduStudio usage                             |
+| [Reference Table](https://edustudio.readthedocs.io/en/latest/user_guide/reference_table.html) | The reference table demonstrating the corresponding templates of each model |
 
 ## Description
 
-EduStudio first decomposes the general algorithmic workflow into five steps: `configuration reading`, `data processing`, `model implementation`, `training control`, and `result evaluation`. Subsequently, to enhance the `reusability `of each step, we extract the commonalities of each algorithm at each step into individual templates for templatization.
-
-As illustrated in the Figure below, to better implement a templatized framework, we implement an `inheritance-style` EduStudio that contains basic architecture and inherited architecture with different responsibilities. The **basic architecture emphasizes domain-irrelevant content and strives to build templatized protocols**. The **inherited architecture obeys the protocol in the basic architecture and focuses on domain-relevant content**. The inheritance-style separates domainrelevant and domain-irrelevant content, greatly simplifying framework structure and enhancing `readability`.
-
-The documentation is available [here](https://edustudio.readthedocs.io).
+EduStudio first decomposes the general algorithmic workflow into six steps: `configuration reading`, `data prepration`, `model implementation`, `training control`, `model evaluation`, and `Log Storage`. Subsequently, to enhance the `reusability` and `scalability` of each step, we extract the commonalities of each algorithm at each step into individual templates for templatization.
 
 <p align="center">
-  <img src="assets/framework.svg" alt="EduStudio Architecture" width="600">
+  <img src="assets/framework.png" alt="EduStudio Architecture" width="600">
   <br>
   <b>Figure</b>: Overall Architecture of EduStudio
 </p>
@@ -74,4 +68,3 @@ To find out which templates are used for a model, we can find in the [Reference 
 ## License
 
 EduStudio uses [MIT License](https://github.com/HFUT-LEC/EduStudio/blob/main/LICENSE). 
-

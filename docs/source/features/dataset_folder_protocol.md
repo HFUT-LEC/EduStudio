@@ -1,6 +1,6 @@
-# Dataset Stage Protocol
+# Dataset Status Protocol
 
-In `Edustudio`, we view the dataset as three stages: `rawdata`, `middata`, `cachedata`.
+In `Edustudio`, we view the dataset as three statuses: `rawdata`, `middata`, `cachedata`.
 - inconsistent rawdata: the original data format provided by the dataset publisher.
 - standardized middata: the standardized middle data format(see Middle Data Format Protocol) defined by EduStudio.
 - model-friendly cachedata: the data format that is convenient for model usage.

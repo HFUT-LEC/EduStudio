@@ -1,4 +1,4 @@
-# Atomic Data Operations
+# Atomic Data Operation Protocol
 
 In `Edustudio`, we view the dataset from three stages: `rawdata`, `middata`, `cachedata`.
 
