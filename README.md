@@ -15,7 +15,7 @@ EduStudio is a Unified Library for Student Cognitive Modeling including Cognitiv
 
 | Resource Name                                                | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Eco-Repository](https://github.com/HFUT-LEC/awesome-education) | A  repository containing resources about student cognitive modeling: [papers](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/papers), [datasets](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/datasets), [conferences&journals](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/conferences%26journals) |
+| [Eco-Repository](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling) | A  repository containing resources about student cognitive modeling: [papers](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/papers), [datasets](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/datasets), [conferences&journals](https://github.com/HFUT-LEC/awesome-student-cognitive-modeling/tree/main/conferences%26journals) |
 | [Eco-Leaderboard](https://leaderboard.edustudio.ai)          | A leaderboard demonstrating performance of implemented models |
 | [EduStudio Documentation](https://edustudio.readthedocs.io/) | The document for EduStudio usage                             |
 | [Reference Table](https://edustudio.readthedocs.io/en/latest/user_guide/reference_table.html) | The reference table demonstrating the corresponding templates of each model |
