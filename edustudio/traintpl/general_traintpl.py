@@ -18,6 +18,7 @@ class GeneralTrainTPL(GDTrainTPL):
         'unsave_best_epoch_pth': True,
         'ignore_metrics_in_train': [],
         'batch_size': 32,
+        'eval_batch_size': 32
     }
 
     def _check_params(self):

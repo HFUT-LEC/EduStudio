@@ -541,8 +541,10 @@ class GeneralDataTPL(BaseDataTPL):
         for col in df.columns:
             col_name, col_type = col.split(":")
             if col_type == 'token':
-                # df[col] = df[col].astype('int64')
-                pass
+                try:
+                    df[col] = df[col].astype('int64')
+                except:
+                    pass
             elif col_type == 'float':
                 df[col] = df[col].astype('float32')
             elif col_type == 'token_seq':

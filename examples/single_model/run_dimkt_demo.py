@@ -14,7 +14,6 @@ run_edustudio(
     },
     traintpl_cfg_dict={
         'cls': 'GeneralTrainTPL',
-        'device': 'cpu',
     },
     modeltpl_cfg_dict={
         'cls': 'DIMKT',

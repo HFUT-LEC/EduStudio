@@ -5,7 +5,7 @@ For data module, we provide a standardized design with three protocols (see foll
 - Middle Data Format Protocol
 - Atomic Operation Protocol
 
-![](https://s2.loli.net/2024/02/09/trocOIdR4wxXJDQ.png)
+![](../assets/dataflow.jpg)
 
 The first step of Data Templates is to load the raw data from the hard disk. Then, a series of processing steps are performed to obtain model-friendly data objects. Finally, these data objects are passed on to other modules.
 We simplify the data preparation into three into three stages:

@@ -11,7 +11,8 @@ run_edustudio(
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'GeneralTrainTPL',
-        'batch_size': 1024
+        'batch_size': 1024,
+        'eval_batch_size': 1024
     },
     datatpl_cfg_dict={
         'cls': 'CDGKDataTPL',
