@@ -6,6 +6,7 @@ from ..utils.common import BigfileDownloader, DecompressionUtil
 import yaml
 import re
 import os
+import requests
 
 
 class BaseDataTPL(Dataset):
@@ -73,17 +74,26 @@ class BaseDataTPL(Dataset):
             cfg (UnifyConfig):the global config object
         """
         dt_name = cfg.dataset
-        cfg.logger.warning(f"Can't find dataset files of {dt_name} in local disk!")
+        cfg.logger.warning(f"Can't find dataset files of {dt_name} in local disk")
         
         fph = cfg.frame_cfg['DT_INFO_FILE_PATH']
         dataset_info = cls.read_yml_file(fph)
         dataset_info_from_cfg: dict = cfg['frame_cfg']['DT_INFO_DICT']
         dataset_info.update(dataset_info_from_cfg)
 
+        if dt_name not in dataset_info:
+            cfg.logger.info(f"Prepare download external datasets.yaml to find dataset:{dt_name}")
+            url = "https://huggingface.co/datasets/lmcRS/edustudio-datasets/raw/main/datasets.yaml"
+            cfg.logger.info(f"Eexternal datasets.yaml url: {url}")
+            resp = requests.get(url)
+            dataset_info_external = yaml.load(resp.text, Loader=cls._build_yaml_loader())
+            if dt_name not in dataset_info_external:
+                raise Exception("Can't find dataset files from local disk and online")
+            else:
+                dataset_info.update(dataset_info_external)
+
         cfg.logger.info(f"Prepare to download {dt_name} dataset from online")
         cfg.logger.info(f"Download_url: {dataset_info[dt_name]['middata_url']}")
-        if dt_name not in dataset_info:
-            raise Exception("Can't find dataset files from local disk and online")
 
         if not os.path.exists(cfg.frame_cfg.data_folder_path):
             os.makedirs(cfg.frame_cfg.data_folder_path)

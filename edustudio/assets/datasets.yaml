@@ -1,3 +1,6 @@
+# 1. all datasets are stored in https://huggingface.co/datasets/lmcRS/edustudio-datasets
+# 2. some datasets may not list here, but can still download, as edustudio will look up from external yaml file: https://huggingface.co/datasets/lmcRS/edustudio-datasets/raw/main/datasets.yaml
+
 ASSIST_0910:
   middata_url: https://huggingface.co/datasets/lmcRS/edustudio-datasets/resolve/main/ASSIST_0910/ASSIST_0910-middata.zip
 FrcSub:

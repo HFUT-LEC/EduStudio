@@ -32,4 +32,4 @@ DISABLE_LOG_STDOUT = False
 curr_file_folder = os.path.dirname(__file__)
 DT_INFO_FILE_PATH = os.path.realpath(curr_file_folder + "/assets/datasets.yaml")
 
-DT_INFO_DICT = {} # additional dataset info entrypoint, example: {'ASSIST_0910': {middata_url: https://gitlab.com/hfut-lec/edudatafiles/-/raw/main/ASSIST_0910/ASSIST_0910-middata.zip} }
+DT_INFO_DICT = {} # additional dataset info entrypoint, example: {'FrcSub': {middata_url: https://huggingface.co/datasets/lmcRS/edustudio-datasets/resolve/main/FrcSub/FrcSub-middata.zip} }
