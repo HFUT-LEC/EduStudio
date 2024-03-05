@@ -19,6 +19,6 @@ run_edustudio(
         'cls': 'NCDM',
     },
     evaltpl_cfg_dict={
-        'clses': ['PredictionEvalTPL'],
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL'],
     }
 )

@@ -91,8 +91,7 @@ class GeneralDataTPL(BaseDataTPL):
         Returns:
            BaseDataTPL
         """
-        if not os.path.exists(f'{cfg.frame_cfg.data_folder_path}'):
-            print(cfg.frame_cfg.data_folder_path)
+        if not os.path.exists(cfg.frame_cfg.data_folder_path) or len(os.listdir(cfg.frame_cfg.data_folder_path)) == 0:
             cls.download_dataset(cfg)
         
         load_data_from = cfg.datatpl_cfg['load_data_from']

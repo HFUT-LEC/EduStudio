@@ -73,15 +73,17 @@ class BaseDataTPL(Dataset):
             cfg (UnifyConfig):the global config object
         """
         dt_name = cfg.dataset
-        cfg.logger.warning(f"Can't find dataset files of {dt_name} in local environment!")
-        cfg.logger.info(f"Prepare to download {dt_name} from Internet.")
+        cfg.logger.warning(f"Can't find dataset files of {dt_name} in local disk!")
+        
         fph = cfg.frame_cfg['DT_INFO_FILE_PATH']
         dataset_info = cls.read_yml_file(fph)
         dataset_info_from_cfg: dict = cfg['frame_cfg']['DT_INFO_DICT']
         dataset_info.update(dataset_info_from_cfg)
 
+        cfg.logger.info(f"Prepare to download {dt_name} dataset from online")
+        cfg.logger.info(f"Download_url: {dataset_info[dt_name]['middata_url']}")
         if dt_name not in dataset_info:
-            raise Exception("Can't find dataset files from Local and Internet!")
+            raise Exception("Can't find dataset files from local disk and online")
 
         if not os.path.exists(cfg.frame_cfg.data_folder_path):
             os.makedirs(cfg.frame_cfg.data_folder_path)

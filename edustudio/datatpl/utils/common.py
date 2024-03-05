@@ -7,7 +7,7 @@ import zipfile
 class BigfileDownloader(object):
     @staticmethod
     def download(url, title, filepath, chunk_size=10240):
-        with closing(requests.get(url, stream=True)) as resp:
+        with closing(requests.get(url, stream=True, allow_redirects=True)) as resp:
             if resp.status_code != 200:
                 raise Exception("[ERROR]: {} - {} -{}".format(str(resp.status_code), title, url))
             chunk_size = chunk_size
