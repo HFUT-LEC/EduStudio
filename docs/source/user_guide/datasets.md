@@ -25,5 +25,5 @@ We have showcased the preprocessed dataset (i.e, provide raw2mid atomic data ope
 | EdNet_KT1                                                    | R2M_EdNet_KT1            | ✖️             | [download1](http://bit.ly/ednet-content), [download2](http://bit.ly/ednet-content) |
 | [Eedi_2020_Task1&2](https://dqanonymousdata.blob.core.windows.net/neurips-public/data.zip) | R2M_Eedi_20_T12          | ✖️             | [NeurIPS 2020 Education Challenge: Task1&2](https://eedi.com/projects/neurips-education-challenge) |
 | [Eedi_2020_Task3&4](https://dqanonymousdata.blob.core.windows.net/neurips-public/data.zip) | R2M_Eedi_20_T34          | ✖️             | [NeurIPS 2020 Education Challenge: Task3&4](https://eedi.com/projects/neurips-education-challenge) |
-| [SLP_English](https://aic-fe.bnu.edu.cn/en/data/index.html)  | R2M_SLP_English          | ✖️             | [[paper](https://aic-fe.bnu.edu.cn/fj/2021-ICCE-SLP.pdf)\], Smart Learning Partner |
-| [SLP_Math](https://aic-fe.bnu.edu.cn/en/data/index.html)     | R2M_SLP_Math             | ✖️             | [[paper](https://aic-fe.bnu.edu.cn/fj/2021-ICCE-SLP.pdf)\], Smart Learning Partner |
+| [SLP-English](https://aic-fe.bnu.edu.cn/en/data/index.html)  | R2M_SLP_English          | ✔️             | [[paper](https://aic-fe.bnu.edu.cn/fj/2021-ICCE-SLP.pdf)\], Smart Learning Partner |
+| [SLP-Math](https://aic-fe.bnu.edu.cn/en/data/index.html)     | R2M_SLP_Math             | ✔️             | [[paper](https://aic-fe.bnu.edu.cn/fj/2021-ICCE-SLP.pdf)\], Smart Learning Partner |
