@@ -85,10 +85,16 @@ class DCDTrainTPL(GeneralTrainTPL):
             'y_gt': y_gt,
         }
         if hasattr(self.model, 'get_stu_status'):
+            stu_stats_list = []
+            idx = torch.arange(0, self.datatpl_cfg['dt_info']['stu_count']).to(self.traintpl_cfg['device'])
+            for i in range(0,self.datatpl_cfg['dt_info']['stu_count'], self.traintpl_cfg['eval_batch_size']):
+                batch_stu_id = idx[i:i+self.traintpl_cfg['eval_batch_size']]
+                batch = self.model.get_stu_status(batch_stu_id)
+                stu_stats_list.append(batch)
+            stu_stats = torch.vstack(stu_stats_list)
             eval_data_dict.update({
-                'stu_stats': tensor2npy(self.model.get_stu_status()),
+                'stu_stats': tensor2npy(stu_stats),
             })
-
         if hasattr(self.model, 'get_exer_emb'):
             eval_data_dict.update({
                 'exer_emb': self.model.get_exer_emb(),
@@ -123,8 +129,15 @@ class DCDTrainTPL(GeneralTrainTPL):
             'y_gt': y_gt,
         }
         if hasattr(self.model, 'get_stu_status'):
+            stu_stats_list = []
+            idx = torch.arange(0, self.datatpl_cfg['dt_info']['stu_count']).to(self.traintpl_cfg['device'])
+            for i in range(0,self.datatpl_cfg['dt_info']['stu_count'], self.traintpl_cfg['eval_batch_size']):
+                batch_stu_id = idx[i:i+self.traintpl_cfg['eval_batch_size']]
+                batch = self.model.get_stu_status(batch_stu_id)
+                stu_stats_list.append(batch)
+            stu_stats = torch.vstack(stu_stats_list)
             eval_data_dict.update({
-                'stu_stats': tensor2npy(self.model.get_stu_status()),
+                'stu_stats': tensor2npy(stu_stats),
             })
 
         if hasattr(self.model, 'get_exer_emb'):

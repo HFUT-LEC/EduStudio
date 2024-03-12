@@ -52,6 +52,7 @@ class GeneralTrainTPL(GDTrainTPL):
         if self.valid_loader is not None:
             self.fit(train_loader=self.train_loader, valid_loader=self.valid_loader)
         else:
+            self.logger.info("Without validation set, replace it with test set")
             self.fit(train_loader=self.train_loader, valid_loader=self.test_loader)
         
         metric_name = self.traintpl_cfg['best_epoch_metric']
@@ -135,8 +136,15 @@ class GeneralTrainTPL(GDTrainTPL):
             'y_gt': y_gt,
         }
         if hasattr(self.model, 'get_stu_status'):
+            stu_stats_list = []
+            idx = torch.arange(0, self.datatpl_cfg['dt_info']['stu_count']).to(self.traintpl_cfg['device'])
+            for i in range(0,self.datatpl_cfg['dt_info']['stu_count'], self.traintpl_cfg['eval_batch_size']):
+                batch_stu_id = idx[i:i+self.traintpl_cfg['eval_batch_size']]
+                batch = self.model.get_stu_status(batch_stu_id)
+                stu_stats_list.append(batch)
+            stu_stats = torch.vstack(stu_stats_list)
             eval_data_dict.update({
-                'stu_stats': tensor2npy(self.model.get_stu_status()),
+                'stu_stats': tensor2npy(stu_stats),
             })
         if hasattr(self.datatpl, 'Q_mat'):
             eval_data_dict.update({
@@ -170,8 +178,15 @@ class GeneralTrainTPL(GDTrainTPL):
             'y_gt': y_gt,
         }
         if hasattr(self.model, 'get_stu_status'):
+            stu_stats_list = []
+            idx = torch.arange(0, self.datatpl_cfg['dt_info']['stu_count']).to(self.traintpl_cfg['device'])
+            for i in range(0,self.datatpl_cfg['dt_info']['stu_count'], self.traintpl_cfg['eval_batch_size']):
+                batch_stu_id = idx[i:i+self.traintpl_cfg['eval_batch_size']]
+                batch = self.model.get_stu_status(batch_stu_id)
+                stu_stats_list.append(batch)
+            stu_stats = torch.vstack(stu_stats_list)
             eval_data_dict.update({
-                'stu_stats': tensor2npy(self.model.get_stu_status()),
+                'stu_stats': tensor2npy(stu_stats),
             })
         if hasattr(self.datatpl, 'Q_mat'):
             eval_data_dict.update({
