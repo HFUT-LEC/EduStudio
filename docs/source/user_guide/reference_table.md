@@ -6,20 +6,20 @@
 | :------ | ---------------------: | :-------------: | ------------------------------------------------------ |
 | IRT     |         CDInterDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | MIRT    |         CDInterDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
-| NCDM    | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL |
+| NCDM    | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL |
 | CNCD_Q  |           CNCDQDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | CNCD_F  |           CNCDFDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
-| DINA    | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL |
-| HierCDF |         HierCDFDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL |
-| CDGK    |            CDGKDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL |
+| DINA    | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL |
+| HierCDF |         HierCDFDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL |
+| CDGK    |            CDGKDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL |
 | CDMFKC  | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | ECD     |             ECDDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | IRR     |             IRRDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
-| KaNCD   | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL |
+| KaNCD   | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL |
 | KSCD    | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | MGCD    |            MGCDDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | RCD     |             RCDDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
-| DCD     |             CCDDataTPL | DCDTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL       |
+| DCD     |             CCDDataTPL | DCDTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL       |
 | FairCD  |          FAIRDataTPL | AdversarialTrainTPL | PredictionEvalTPL, FairnessEvalTPL       |
 
 ## KT models

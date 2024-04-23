@@ -557,8 +557,8 @@ class GeneralDataTPL(BaseDataTPL):
                 except:
                     df[col] = df[col].astype(str).apply(lambda x: eval(x))
             else:
-                raise ValueError(f"unknown field type of {col_type}")
-
+                pass
+            
     @staticmethod
     def _unwrap_feat(df:pd.DataFrame):
         """unwrap the type of field
