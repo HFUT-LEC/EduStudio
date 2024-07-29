@@ -11,6 +11,7 @@ run_edustudio(
     cfg_file_name=None,
     traintpl_cfg_dict={
         'cls': 'GeneralTrainTPL',
+        'device': 'cpu'
     },
     datatpl_cfg_dict={
         'cls': 'CDInterExtendsQDataTPL'
