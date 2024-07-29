@@ -1,4 +1,5 @@
 from .irt import IRT
+from .mf import MF
 from .mirt import MIRT
 from .ncdm import NCDM
 from .dina import DINA, STEDINA

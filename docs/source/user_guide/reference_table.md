@@ -6,6 +6,7 @@
 | :------ | ---------------------: | :-------------: | ------------------------------------------------------ |
 | IRT     |         CDInterDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | MIRT    |         CDInterDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
+| MF     |         CDInterDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | NCDM    | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL |
 | CNCD_Q  |           CNCDQDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | CNCD_F  |           CNCDFDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
