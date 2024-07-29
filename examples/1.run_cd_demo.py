@@ -19,6 +19,16 @@ run_edustudio(
         'cls': 'KaNCD',
     },
     evaltpl_cfg_dict={
-        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL', 'IdentifiabilityEvalTPL']
+        'clses': ['PredictionEvalTPL', 'InterpretabilityEvalTPL', 'IdentifiabilityEvalTPL'],
+        'PredictionEvalTPL': {
+            'use_metrics': ['auc'],
+        },
+        'InterpretabilityEvalTPL': {
+            'use_metrics': ['doa_all', 'doc_all'],
+            'test_only_metrics': ['doa_all', 'doc_all'],
+        },
+        'IdentifiabilityEvalTPL': {
+            'use_metrics': ['IDS']
+        }
     }
 )
