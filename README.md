@@ -6,9 +6,16 @@
 <img src="https://img.shields.io/badge/pytorch-v1.10+-blue">
 <img src="https://img.shields.io/badge/License-MIT-blue">
 <img src="https://img.shields.io/github/issues/HFUT-LEC/EduStudio.svg">
+<a href="https://journal.hep.com.cn/fcs/EN/10.1007/s11704-024-40372-3">
+  <img src="https://img.shields.io/badge/Paper-EduStudio-blue" alt="Paper EduStudio Badge">
+</a>
 </p>
 
 EduStudio is a Unified Library for Student Cognitive Modeling including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
+
+## :loudspeaker: Announcement
+
+- The paper of our work is just accepted by Frontiers of Computer Science. 📃: [Paper](https://journal.hep.com.cn/fcs/EN/10.1007/s11704-024-40372-3)
 
 ## Navigation
 
