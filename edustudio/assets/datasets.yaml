@@ -1,0 +1,15 @@
+# 1. all datasets are stored in https://huggingface.co/datasets/lmcRS/edustudio-datasets
+# 2. some datasets may not list here, but can still download, as edustudio will look up from external yaml file: https://huggingface.co/datasets/lmcRS/edustudio-datasets/raw/main/datasets.yaml
+
+ASSIST_0910:
+  middata_url: https://huggingface.co/datasets/lmcRS/edustudio-datasets/resolve/main/ASSIST_0910/ASSIST_0910-middata.zip
+FrcSub:
+  middata_url: https://huggingface.co/datasets/lmcRS/edustudio-datasets/resolve/main/FrcSub/FrcSub-middata.zip
+Math1:
+  middata_url: https://huggingface.co/datasets/lmcRS/edustudio-datasets/resolve/main/Math1/Math1-middata.zip
+Math2:
+  middata_url: https://huggingface.co/datasets/lmcRS/edustudio-datasets/resolve/main/Math2/Math2-middata.zip
+AAAI_2023:
+  middata_url: https://huggingface.co/datasets/lmcRS/edustudio-datasets/resolve/main/AAAI_2023/AAAI_2023-middata.zip
+PISA_2015_ECD:
+  middata_url: https://huggingface.co/datasets/lmcRS/edustudio-datasets/resolve/main/PISA_2015_ECD/PISA_2015_ECD-middata.zip
