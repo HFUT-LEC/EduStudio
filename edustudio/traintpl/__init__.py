@@ -8,4 +8,4 @@ from .general_traintpl import GeneralTrainTPL
 from .atkt_traintpl import AtktTrainTPL
 from .dcd_traintpl import DCDTrainTPL
 from .adversarial_traintpl import AdversarialTrainTPL
-from .group_traintpl import GroupTrainTPL
+from .group_cd_traintpl import GroupCDTrainTPL

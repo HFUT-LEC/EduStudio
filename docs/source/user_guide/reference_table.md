@@ -18,7 +18,7 @@
 | IRR     |             IRRDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | KaNCD   | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL |
 | KSCD    | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
-| MGCD    |            MGCDDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
+| MGCD    |            MGCDDataTPL | GroupCDTrainTPL | PredictionEvalTPL                            |
 | RCD     |             RCDDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | DCD     |             CCDDataTPL | DCDTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL       |
 | FairCD  |          FAIRDataTPL | AdversarialTrainTPL | PredictionEvalTPL, FairnessEvalTPL       |

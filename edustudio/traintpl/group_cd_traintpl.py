@@ -4,7 +4,7 @@ import torch
 from tqdm import tqdm
 
 
-class GroupTrainTPL(GeneralTrainTPL):
+class GroupCDTrainTPL(GeneralTrainTPL):
     
     @torch.no_grad()
     def evaluate(self, loader):

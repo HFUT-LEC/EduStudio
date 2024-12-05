@@ -10,7 +10,7 @@ run_edustudio(
     dataset='ASSIST_0910',
     cfg_file_name=None,
     traintpl_cfg_dict={
-        'cls': 'GroupTrainTPL',
+        'cls': 'GroupCDTrainTPL',
         'early_stop_metrics': [('rmse','min')],
         'best_epoch_metric': 'rmse',
         'batch_size': 512
@@ -18,7 +18,7 @@ run_edustudio(
     datatpl_cfg_dict={
         'cls': 'MGCDDataTPL',
         # 'load_data_from': 'rawdata',
-        # 'raw2mid_op': 'R2M_ASSIST_1213'
+        # 'raw2mid_op': 'R2M_ASSIST_0910'
     },
     modeltpl_cfg_dict={
         'cls': 'MGCD',
@@ -26,7 +26,7 @@ run_edustudio(
     evaltpl_cfg_dict={
         'clses': ['PredictionEvalTPL'],
         'PredictionEvalTPL': {
-            'use_metrics': ['rmse']
+            'use_metrics': ['acc', 'auc','rmse']
         }
     }
 )
