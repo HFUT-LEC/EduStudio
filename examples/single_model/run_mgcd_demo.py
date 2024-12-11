@@ -26,7 +26,7 @@ run_edustudio(
     evaltpl_cfg_dict={
         'clses': ['PredictionEvalTPL'],
         'PredictionEvalTPL': {
-            'use_metrics': ['acc', 'auc','rmse']
+            'use_metrics': ['rmse']
         }
     }
 )
