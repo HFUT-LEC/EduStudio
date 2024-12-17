@@ -13,10 +13,6 @@
 
 EduStudio is a Unified Library for Student Cognitive Modeling including Cognitive Diagnosis(CD) and Knowledge Tracing(KT) based on Pytorch.
 
-## :loudspeaker: Announcement
-
-- The paper of our work is just accepted by Frontiers of Computer Science. 📃: [Paper](https://journal.hep.com.cn/fcs/EN/10.1007/s11704-024-40372-3)
-
 ## Navigation
 
 
@@ -71,6 +67,26 @@ run_edustudio(
 ```
 
 To find out which templates are used for a model, we can find in the [Reference Table](https://edustudio.readthedocs.io/en/latest/user_guide/reference_table.html)
+
+## Citation
+```
+@article{Le WU:198342,
+author = {Le WU, Xiangzhi CHEN, Fei LIU, Junsong XIE, Chenao XIA, Zhengtao TAN, Mi TIAN, Jinglong LI, Kun ZHANG, Defu LIAN, Richang HONG, Meng WANG},
+title = {EduStudio: towards a unified library for student cognitive modeling},
+publisher = {Front. Comput. Sci.},
+year = {2025},
+journal = {Frontiers of Computer Science},
+volume = {19},
+number = {8},
+eid = {198342},
+numpages = {0},
+pages = {198342},
+keywords = {open-source library;student cognitive modeling;intelligence education},
+url = {https://journal.hep.com.cn/fcs/EN/abstract/article_47994.shtml},
+doi = {10.1007/s11704-024-40372-3}
+}
+```
+
 
 ## License
 
