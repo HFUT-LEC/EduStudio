@@ -27,8 +27,8 @@ class M2C_CL4KT_OP(M2C_BuildSeqInterFeats):
     def compute_cpt2difflevel(self, **kwargs):
         cpt_correct = defaultdict(int)
         cpt_count = defaultdict(int)
-        for i, (c_list, r_list) in enumerate(zip(kwargs['df_train_folds'][0]['cpt_unfold_seq:token_seq'], kwargs['df_train_folds'][0]['label_seq:float_seq'])):
-            for c, r in zip(c_list[kwargs['df_train_folds'][0]['mask_seq:token_seq'][i] == 1], r_list[kwargs['df_train_folds'][0]['mask_seq:token_seq'][i] == 1]):
+        for i, (c_list, r_list) in enumerate(zip(kwargs['df_seq']['cpt_unfold_seq:token_seq'], kwargs['df_seq']['label_seq:float_seq'])):
+            for c, r in zip(c_list[kwargs['df_seq']['mask_seq:token_seq'][i] == 1], r_list[kwargs['df_seq']['mask_seq:token_seq'][i] == 1]):
                 cpt_correct[c] += r
                 cpt_count[c] += 1
         cpt_diff = {c: cpt_correct[c] / float(cpt_count[c]) for c in cpt_correct}  # cpt difficult
