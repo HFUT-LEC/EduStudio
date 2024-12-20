@@ -68,7 +68,7 @@ class SAKT(GDBaseModel):
         F = self.FFN(S)
         F = self.FFN_layer_norm(F + S)
 
-        p = torch.sigmoid(self.pred(F)).squeeze()
+        p = self.pred(F).squeeze(-1)
 
         return p, attn_weights
     
@@ -84,7 +84,7 @@ class SAKT(GDBaseModel):
             y_gt = kwargs['label_seq'][:, 1:]
             y_gt = y_gt[kwargs['mask_seq'][:, 1:] == 1]
         return {
-            'y_pd': y_pd,
+            'y_pd': torch.sigmoid(y_pd),
             'y_gt': y_gt
         }
 
@@ -93,7 +93,8 @@ class SAKT(GDBaseModel):
         y_pd = y_pd[kwargs['mask_seq'][:, 1:] == 1]
         y_gt = kwargs['label_seq'][:, 1:]
         y_gt = y_gt[kwargs['mask_seq'][:, 1:] == 1]
-        loss = F.binary_cross_entropy(
+        criterion = nn.BCEWithLogitsLoss()
+        loss = criterion(
             input=y_pd, target=y_gt
         )
         return {
