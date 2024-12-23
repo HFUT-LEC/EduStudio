@@ -260,13 +260,13 @@ class FairCD_NCDM(NCDM):
         self.discriminator = self.disc_cls(
                     input_dim=self.n_cpt,
                     output_dim=self.out_dim,
-                    dnn_units=[int(self.emb_dim / 2 )],
+                    dnn_units=[int(self.n_cpt / 2 )],
                     device=self.device
                )
         self.predictor = self.pred_cls(
                     input_dim=self.n_cpt,
                     output_dim=self.out_dim,
-                    dnn_units=[int(self.emb_dim / 2 )],
+                    dnn_units=[int(self.n_cpt / 2 )],
                     device=self.device
                )
         self.logger.info(self)
