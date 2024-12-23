@@ -49,7 +49,10 @@ class CT_NCM(GDBaseModel):
         self.input_len = self.knowledge_dim
         self.prelen1 = self.modeltpl_cfg['prelen1']
         self.prelen2 = self.modeltpl_cfg['prelen2']
-        self.loss_function = torch.nn.BCELoss()
+        # 使用 BCEWithLogitsLoss，因为模型输出未经过 Sigmoid 激活
+        self.loss_function = torch.nn.BCEWithLogitsLoss()
+        # 如果选择使用 BCELoss，请取消上面一行并启用下面一行
+        # self.loss_function = torch.nn.BCELoss()
 
     def build_model(self):
         """Initialize the various components of the model"""
@@ -66,6 +69,12 @@ class CT_NCM(GDBaseModel):
         self.linear2 = torch.nn.Linear(self.prelen1, self.prelen2)
         self.linear3 = torch.nn.Linear(self.prelen2, 1)
 
+        # 手动初始化权重
+        nn.init.xavier_normal_(self.reclstm.weight)
+        nn.init.xavier_normal_(self.linear1.weight)
+        nn.init.xavier_normal_(self.linear2.weight)
+        nn.init.xavier_normal_(self.linear3.weight)
+
     def forward(self, exer_seq, start_timestamp_seq, cpt_unfold_seq, label_seq, mask_seq, **kwargs):
         """A function of how well the model predicts students' responses to exercise questions
 
@@ -74,54 +83,90 @@ class CT_NCM(GDBaseModel):
             start_timestamp_seq (torch.Tensor): Sequence of Students start answering time. Shape of [batch_size, seq_len]
             cpt_unfold_seq (torch.Tensor): Sequence of knowledge concepts related to exercises. Shape of [batch_size, seq_len]
             label_seq (torch.Tensor): Sequence of students' answers to exercises. Shape of [batch_size, seq_len]
-            mask_seq (torch.Tensor): Sequence of mask. Mask=1 indicates that the student has answered the exercise, otherwise vice versa. Shape of [batch_size, seq_len] 
+            mask_seq (torch.Tensor): Sequence of mask. Mask=1 indicates that the student has answered the exercise, otherwise vice versa. Shape of [batch_size, seq_len]
 
         Returns:
             dict: The predictions of the model and the real situation
         """
-        problem_seqs_tensor = exer_seq[:,1:].to(self.device)
+        # 检查输入数据中是否存在 NaN 或 Inf
+        assert not torch.isnan(exer_seq).any(), "exer_seq contains NaNs"
+        assert not torch.isnan(start_timestamp_seq).any(), "start_timestamp_seq contains NaNs"
+        assert not torch.isnan(cpt_unfold_seq).any(), "cpt_unfold_seq contains NaNs"
+        assert not torch.isnan(label_seq).any(), "label_seq contains NaNs"
+        assert not torch.isnan(mask_seq).any(), "mask_seq contains NaNs"
+        assert not torch.isinf(exer_seq).any(), "exer_seq contains Inf"
+        assert not torch.isinf(start_timestamp_seq).any(), "start_timestamp_seq contains Inf"
+        assert not torch.isinf(cpt_unfold_seq).any(), "cpt_unfold_seq contains Inf"
+        assert not torch.isinf(label_seq).any(), "label_seq contains Inf"
+        assert not torch.isinf(mask_seq).any(), "mask_seq contains Inf"
+
+        problem_seqs_tensor = exer_seq[:, 1:].to(self.device)
         skill_seqs_tensor = cpt_unfold_seq.to(self.device)
-        start_timestamp_seqs_tensor = start_timestamp_seq[:,1:].to(self.device)
+        start_timestamp_seqs_tensor = start_timestamp_seq[:, 1:].to(self.device)
         correct_seqs_tensor = label_seq.to(self.device)
         mask_labels = mask_seq.long().to(self.device)
         seqs_length = torch.sum(mask_labels, dim=1)
         delete_row = 0
         for i in range(len(seqs_length)):
             if seqs_length[i] == 1:
-                problem_seqs_tensor = problem_seqs_tensor[torch.arange(problem_seqs_tensor.size(0))!=i-delete_row] 
-                skill_seqs_tensor = skill_seqs_tensor[torch.arange(skill_seqs_tensor.size(0))!=i-delete_row] 
-                start_timestamp_seqs_tensor = start_timestamp_seqs_tensor[torch.arange(start_timestamp_seqs_tensor.size(0))!=i-delete_row] 
-                correct_seqs_tensor = correct_seqs_tensor[torch.arange(correct_seqs_tensor.size(0))!=i-delete_row] 
-                mask_labels = mask_labels[torch.arange(mask_labels.size(0))!=i-delete_row] 
-                delete_row = delete_row + 1
+                mask = torch.arange(problem_seqs_tensor.size(0)) != (i - delete_row)
+                problem_seqs_tensor = problem_seqs_tensor[mask]
+                skill_seqs_tensor = skill_seqs_tensor[mask]
+                start_timestamp_seqs_tensor = start_timestamp_seqs_tensor[mask]
+                correct_seqs_tensor = correct_seqs_tensor[mask]
+                mask_labels = mask_labels[mask]
+                delete_row += 1
 
-        correct_seqs_tensor = torch.where(mask_labels == 0, -1, correct_seqs_tensor)
+        # 将 mask_labels == 0 的标签设置为 0 而不是 -1
+        correct_seqs_tensor = torch.where(mask_labels == 0, 0, correct_seqs_tensor)
         skill_seqs_tensor = torch.where(mask_labels == 0, 0, skill_seqs_tensor)
-        mask_labels_temp = mask_labels[:,1:]
+        mask_labels_temp = mask_labels[:, 1:]
         start_timestamp_seqs_tensor = torch.where(mask_labels_temp == 0, 0, start_timestamp_seqs_tensor)
         problem_seqs_tensor = torch.where(mask_labels_temp == 0, 0, problem_seqs_tensor)
         seqs_length = torch.sum(mask_labels, dim=1)
+
+        # 再次检查处理后的数据
+        assert not torch.isnan(problem_seqs_tensor).any(), "problem_seqs_tensor contains NaNs after processing"
+        assert not torch.isnan(skill_seqs_tensor).any(), "skill_seqs_tensor contains NaNs after processing"
+        assert not torch.isnan(start_timestamp_seqs_tensor).any(), "start_timestamp_seqs_tensor contains NaNs after processing"
+        assert not torch.isnan(correct_seqs_tensor).any(), "correct_seqs_tensor contains NaNs after processing"
 
         inter_embed_tensor = self.inter_embedding(skill_seqs_tensor + self.skill_num * mask_labels)
         batch_size = correct_seqs_tensor.size()[0]
 
         hidden, _ = self.continues_lstm(inter_embed_tensor, start_timestamp_seqs_tensor, seqs_length, batch_size)
-        hidden_packed = torch.nn.utils.rnn.pack_padded_sequence(hidden[1:,],
+        hidden_packed = torch.nn.utils.rnn.pack_padded_sequence(hidden[1:, ],
                                                                 seqs_length.cpu() - 1,
                                                                 batch_first=False,
                                                                 enforce_sorted=False)
         theta = hidden_packed.data
         problem_packed = torch.nn.utils.rnn.pack_padded_sequence(problem_seqs_tensor,
-                                                                 seqs_length.cpu() - 1,
-                                                                 batch_first=True,
-                                                                 enforce_sorted=False)
+                                                                seqs_length.cpu() - 1,
+                                                                batch_first=True,
+                                                                enforce_sorted=False)
         predictions = torch.squeeze(self.problem_hidden(theta, problem_packed.data))
-        labels_packed = torch.nn.utils.rnn.pack_padded_sequence(correct_seqs_tensor[:,1:],
+        labels_packed = torch.nn.utils.rnn.pack_padded_sequence(correct_seqs_tensor[:, 1:],
                                                                 seqs_length.cpu() - 1,
                                                                 batch_first=True,
                                                                 enforce_sorted=False)
         labels = labels_packed.data
         out_dict = {'predictions': predictions, 'labels': labels}
+
+        # 检查模型输出是否包含 NaN 或 Inf
+        if torch.isnan(predictions).any():
+            print("Predictions contain NaNs")
+        if torch.isnan(labels).any():
+            print("Labels contain NaNs")
+        if torch.isinf(predictions).any():
+            print("Predictions contain Inf")
+        if torch.isinf(labels).any():
+            print("Labels contain Inf")
+
+        assert not torch.isnan(predictions).any(), "Predictions contain NaNs"
+        assert not torch.isnan(labels).any(), "Labels contain NaNs"
+        assert not torch.isinf(predictions).any(), "Predictions contain Inf"
+        assert not torch.isinf(labels).any(), "Labels contain Inf"
+
         return out_dict
 
     def continues_lstm(self, inter_embed_tensor, start_timestamp_seqs_tensor, seqs_length, batch_size):
@@ -137,17 +182,16 @@ class CT_NCM(GDBaseModel):
             torch.Tensor: Output of LSTM.
         """
         self.init_states(batch_size=batch_size)
-        h_list = []
-        h_list.append(self.h_delay)
+        h_list = [self.h_delay]
         for t in range(max(seqs_length) - 1):
             one_batch = inter_embed_tensor[:, t]
-            c, self.c_bar, output_t, delay_t = \
-                self.conti_lstm(one_batch, self.h_delay, self.c_delay,
-                                self.c_bar)
+            c, self.c_bar, output_t, delay_t = self.conti_lstm(one_batch, self.h_delay, self.c_delay, self.c_bar)
             time_lag_batch = start_timestamp_seqs_tensor[:, t]
-            self.c_delay, self.h_delay = \
-                self.delay(c, self.c_bar, output_t, delay_t, time_lag_batch)
-            self.h_delay = torch.as_tensor(self.h_delay, dtype=torch.float)
+            self.c_delay, self.h_delay = self.delay(c, self.c_bar, output_t, delay_t, time_lag_batch)
+            # 确保 h_delay 没有 NaN 或 Inf
+            self.h_delay = torch.as_tensor(self.h_delay, dtype=torch.float).to(self.device)
+            assert not torch.isnan(self.h_delay).any(), f"h_delay at time {t} contains NaNs"
+            assert not torch.isinf(self.h_delay).any(), f"h_delay at time {t} contains Inf"
             h_list.append(self.h_delay)
         hidden = torch.stack(h_list)
 
@@ -185,13 +229,36 @@ class CT_NCM(GDBaseModel):
         i_bar = torch.sigmoid(i_bar)
         f_bar = torch.sigmoid(f_bar)
         delay = F.softplus(delay)
+
+        # 检查中间变量是否包含 NaN 或 Inf
+        assert not torch.isnan(i).any(), "i contains NaNs"
+        assert not torch.isnan(f).any(), "f contains NaNs"
+        assert not torch.isnan(z).any(), "z contains NaNs"
+        assert not torch.isnan(o).any(), "o contains NaNs"
+        assert not torch.isnan(i_bar).any(), "i_bar contains NaNs"
+        assert not torch.isnan(f_bar).any(), "f_bar contains NaNs"
+        assert not torch.isnan(delay).any(), "delay contains NaNs"
+        assert not torch.isinf(i).any(), "i contains Inf"
+        assert not torch.isinf(f).any(), "f contains Inf"
+        assert not torch.isinf(z).any(), "z contains Inf"
+        assert not torch.isinf(o).any(), "o contains Inf"
+        assert not torch.isinf(i_bar).any(), "i_bar contains Inf"
+        assert not torch.isinf(f_bar).any(), "f_bar contains Inf"
+        assert not torch.isinf(delay).any(), "delay contains Inf"
+
         c_t = f * c_d_t + i * z
         c_bar_t = f_bar * c_bar_t + i_bar * z
+
+        # 检查 c_t 和 c_bar_t 是否包含 NaN 或 Inf
+        assert not torch.isnan(c_t).any(), "c_t contains NaNs"
+        assert not torch.isnan(c_bar_t).any(), "c_bar_t contains NaNs"
+        assert not torch.isinf(c_t).any(), "c_t contains Inf"
+        assert not torch.isinf(c_bar_t).any(), "c_bar_t contains Inf"
+
         return c_t, c_bar_t, o, delay
 
     def delay(self, c, c_bar, output, delay, time_lag):
         """
-
         Args:
             c (torch.Tensor): Shape of [batch_size, embed_size]
             c_bar (torch.Tensor): Shape of [batch_size, embed_size]
@@ -202,8 +269,19 @@ class CT_NCM(GDBaseModel):
         Returns:
             torch.Tensor: Data inside LSTM
         """
-        c_delay = c_bar + (c - c_bar) * torch.exp(- delay * time_lag.unsqueeze(-1))
+        exponent = - delay * time_lag.unsqueeze(-1)
+        exponent = torch.clamp(exponent, min=-20, max=10)  # 限制指数的范围，max 降低到 10
+        delta = c - c_bar
+        delta = torch.clamp(delta, min=-10, max=10)  # 限制 delta 的范围
+        c_delay = c_bar + delta * torch.exp(exponent)
         h_delay = output * torch.tanh(c_delay)
+
+        # 检查 c_delay 和 h_delay 是否包含 NaN 或 Inf
+        assert not torch.isnan(c_delay).any(), "c_delay contains NaNs"
+        assert not torch.isnan(h_delay).any(), "h_delay contains NaNs"
+        assert not torch.isinf(c_delay).any(), "c_delay contains Inf"
+        assert not torch.isinf(h_delay).any(), "h_delay contains Inf"
+
         return c_delay, h_delay
 
     def problem_hidden(self, theta, problem_data):
@@ -218,10 +296,38 @@ class CT_NCM(GDBaseModel):
         """
         problem_diff = torch.sigmoid(self.problem_diff(problem_data))
         problem_disc = torch.sigmoid(self.problem_disc(problem_data))
-        input_x = (theta - problem_diff) * problem_disc * 10
-        input_x = self.dropout1(torch.sigmoid(self.linear1(input_x)))
-        input_x = self.dropout2(torch.sigmoid(self.linear2(input_x)))
-        output = torch.sigmoid(self.linear3(input_x))
+        input_x = (theta - problem_diff) * problem_disc  # 移除 * 10
+
+        # 添加限制
+        input_x = torch.clamp(input_x, min=-10, max=10)  # 根据数据情况调整范围
+
+        # 检查 input_x 是否包含 NaN 或 Inf
+        assert not torch.isnan(input_x).any(), "input_x contains NaNs"
+        assert not torch.isinf(input_x).any(), "input_x contains Inf"
+
+        # 使用 ReLU 替代 Sigmoid
+        input_x = self.dropout1(F.relu(self.linear1(input_x)))
+
+        # 检查 input_x 是否包含 NaN 或 Inf
+        assert not torch.isnan(input_x).any(), "input_x after linear1 and ReLU contains NaNs"
+        assert not torch.isinf(input_x).any(), "input_x after linear1 and ReLU contains Inf"
+
+        # 使用 ReLU 替代 Sigmoid
+        input_x = self.dropout2(F.relu(self.linear2(input_x)))
+
+        # 检查 input_x 是否包含 NaN 或 Inf
+        assert not torch.isnan(input_x).any(), "input_x after linear2 and ReLU contains NaNs"
+        assert not torch.isinf(input_x).any(), "input_x after linear2 and ReLU contains Inf"
+
+        output = self.linear3(input_x)  # 移除 Sigmoid 激活
+
+        # 检查 output 是否包含 NaN 或 Inf
+        assert not torch.isnan(output).any(), "output contains NaNs"
+        assert not torch.isinf(output).any(), "output contains Inf"
+
+        # 可选：打印 output 的统计信息
+        # print(f"Output - min: {output.min().item()}, max: {output.max().item()}")
+
         return output
 
     def predict(self, **kwargs):
@@ -231,8 +337,10 @@ class CT_NCM(GDBaseModel):
             dict: The predictions of the model and the real situation
         """
         outdict = self(**kwargs)
+        # 在预测阶段应用 Sigmoid 激活以获取概率值
+        y_pd = torch.sigmoid(outdict['predictions'])
         return {
-            'y_pd': outdict['predictions'],
+            'y_pd': y_pd,
             'y_gt': torch.as_tensor(outdict['labels'], dtype=torch.float)
         }
 
@@ -246,6 +354,14 @@ class CT_NCM(GDBaseModel):
         predictions = outdict['predictions']
         labels = outdict['labels']
         labels = torch.as_tensor(labels, dtype=torch.float)
+
+        # 添加断言以确保标签在 [0, 1] 范围内
+        assert torch.all((labels == 0) | (labels == 1)), "标签中存在非 0 或 1 的值"
+
+        # 检查 predictions 是否包含 NaN 或 Inf
+        assert not torch.isnan(predictions).any(), "Predictions contain NaNs"
+        assert not torch.isinf(predictions).any(), "Predictions contain Inf"
+
         loss = self.loss_function(predictions, labels)
         return {
             'loss_main': loss
