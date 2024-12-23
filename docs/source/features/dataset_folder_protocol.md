@@ -58,7 +58,7 @@ run_edustudio(
     },
     datatpl_cfg_dict={
         'cls': 'CDInterExtendsQDataTPL',
-        'load_data_from": "rawdata", # specify the loading stage of the dataset
+        'load_data_from': "rawdata", # specify the loading stage of the dataset
         'raw2mid_op': 'R2M_FrcSub' # specify the R2M atomic operation 
     },
     modeltpl_cfg_dict={
@@ -85,8 +85,8 @@ run_edustudio(
     },
     datatpl_cfg_dict={
         'cls': 'CDInterExtendsQDataTPL',
-        'load_data_from": "middata", # specify the loading stage of the dataset
-        'is_save_cache': True # whether to save cache data
+        'load_data_from': "middata", # specify the loading stage of the dataset
+        'is_save_cache': True, # whether to save cache data
         'cache_id': 'cache_default', # cache id, valid when is_save_cache=True
     },
     modeltpl_cfg_dict={
@@ -114,7 +114,8 @@ run_edustudio(
     },
     datatpl_cfg_dict={
         'cls': 'CDInterExtendsQDataTPL',
-        'load_data_from": "cachedata", # specify the loading stage of the dataset
+        'load_data_from': "cachedata", # specify the loading stage of the dataset
+        'is_save_cache': False,
         'cache_id': 'cache_default', # cache id, valid when is_save_cache=True
     },
     modeltpl_cfg_dict={

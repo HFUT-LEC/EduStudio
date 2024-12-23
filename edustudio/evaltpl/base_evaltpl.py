@@ -20,7 +20,7 @@ class BaseEvalTPL(object):
         self.frame_cfg: UnifyConfig = cfg.frame_cfg
         self.modeltpl_cfg: UnifyConfig = cfg.modeltpl_cfg
         self.logger: logging.Logger = logging.getLogger("edustudio")
-        self.name = self.name = self.__class__.__name__
+        self.name = self.__class__.__name__
         self._check_params()
 
     @classmethod

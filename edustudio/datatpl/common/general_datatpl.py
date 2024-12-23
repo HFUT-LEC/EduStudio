@@ -249,11 +249,15 @@ class GeneralDataTPL(BaseDataTPL):
         temp_cache_datatpl_cfg = copy.deepcopy(cache_datatpl_cfg)
         del temp_cache_datatpl_cfg['dt_info']
         del temp_cache_datatpl_cfg['load_data_from']
+        if 'is_save_cache' in temp_cache_datatpl_cfg:
+            del temp_cache_datatpl_cfg['is_save_cache']
         # del temp_cache_datatpl_cfg['raw2mid_op']
         # del temp_cache_datatpl_cfg['mid2cache_op_seq']
         curr_datatpl_cfg = copy.deepcopy(json.loads(self.datatpl_cfg.dump_fmt()))
         del curr_datatpl_cfg['dt_info']
         del curr_datatpl_cfg['load_data_from']
+        if 'is_save_cache' in curr_datatpl_cfg:
+            del curr_datatpl_cfg['is_save_cache']
         # del curr_datatpl_cfg['raw2mid_op']
         # del curr_datatpl_cfg['mid2cache_op_seq']
         diff = DeepDiff(temp_cache_datatpl_cfg, curr_datatpl_cfg)
@@ -280,6 +284,13 @@ class GeneralDataTPL(BaseDataTPL):
         self.dict_valid_folds = self.load_pickle(valid_folds_fph)
         self.dict_test_folds = self.load_pickle(test_folds_fph)
         self.final_kwargs = self.load_pickle(final_kwargs_fph)
+
+        for k,v in self.final_kwargs.items():
+            if not hasattr(self, k):
+                setattr(self, k, v)
+                self.logger.info(f"[load cache] set {k} from final_kwargs to current data template")
+            else:
+                self.logger.info(f"[load cache] duplicated attribute in final_kwargs: {k}")
 
     def build_datasets(self):
         """build datasets

@@ -40,6 +40,7 @@ class InterpretabilityEvalTPL(BaseEvalTPL):
                         self.stu_id_train_val,
                         self.exer_id_train_val,
                         self.label_id_train_val,
+                        user_emb=stu_stats,
                         Q_mat=Q_mat
                     )
                 elif metric_name == "doa_test":

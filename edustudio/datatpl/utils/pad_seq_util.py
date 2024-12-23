@@ -53,10 +53,15 @@ class PadSeqUtil(object):
 
         if return_idx:
             return_idx = np.concatenate(return_idx_list).astype(np.int64)
+        
+        version = np.__version__
 
-        is_dtype_str = np.issubdtype(dtype, np.str_) or np.issubdtype(
-            dtype, np.unicode_
-        )
+        if version.startswith('2.'):
+            is_dtype_str = np.issubdtype(dtype, np.str_)
+        else:
+            is_dtype_str = np.issubdtype(dtype, np.str_) or np.issubdtype(
+                dtype, np.unicode_
+            )
         if isinstance(value, str) and dtype != object and not is_dtype_str:
             raise ValueError(
                 f"`dtype` {dtype} is not compatible with `value`'s type: "

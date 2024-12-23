@@ -98,4 +98,7 @@ class IdentifiabilityEvalTPL(BaseEvalTPL):
                     continue
                 count += 1
                 val += (1+np.abs(T[s_i] - T[s_j]).sum())**2
+        if val == 0:
+            self.logger.error(f"invalid computation occurred in {self.name}")
+            return 0.0
         return (count / val).item()

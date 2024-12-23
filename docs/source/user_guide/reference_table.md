@@ -20,15 +20,15 @@
 | KSCD    | CDInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
 | MGCD    |            MGCDDataTPL | GroupCDTrainTPL | PredictionEvalTPL                            |
 | RCD     |             RCDDataTPL | GeneralTrainTPL | PredictionEvalTPL                            |
-| DCD     |             CCDDataTPL | DCDTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL       |
+| DCD     |             DCDDataTPL | DCDTrainTPL | PredictionEvalTPL, InterpretabilityEvalTPL, IdentifiabilityEvalTPL       |
 | FairCD  |          FAIRDataTPL | AdversarialTrainTPL | PredictionEvalTPL, FairnessEvalTPL       |
 
 ## KT models
 
 | Model        |                DataTPL |    TrainTPL    | EvalTPL                    |
 | :----------- | ----------------------: | :-------------: | --------------------------- |
-| AKT          | KTInterDataTPLCptUnfold | GeneralTrainTPL | PredictionEvalTPL |
-| ATKT         | KTInterDataTPLCptUnfold |  AtktTrainTPL   | PredictionEvalTPL |
+| AKT          | KTInterCptUnfoldDataTPL | GeneralTrainTPL | PredictionEvalTPL |
+| ATKT         | KTInterCptUnfoldDataTPL |  AtktTrainTPL   | PredictionEvalTPL |
 | CKT          |  KTInterExtendsQDataTPL | GeneralTrainTPL | PredictionEvalTPL |
 | CL4KT        |            CL4KTDataTPL | GeneralTrainTPL | PredictionEvalTPL |
 | CT_NCM       | KTInterCptUnfoldDataTPL | GeneralTrainTPL | PredictionEvalTPL |
