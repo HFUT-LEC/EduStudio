@@ -149,7 +149,7 @@ run_edustudio(
     },
     datatpl_cfg_dict={
         'cls': 'CDInterExtendsQDataTPL',
-        'load_data_from": "rawdata", # specify the loading stage of the dataset
+        'load_data_from': "rawdata", # specify the loading stage of the dataset
         'raw2mid_op': 'R2M_FrcSub', 
         # the 'mid2cache_op_seq' option specify the atomic operation sequence
         'mid2cache_op_seq': ['M2C_Label2Int', 'M2C_FilterRecords4CD', 'M2C_ReMapId', 'M2C_RandomDataSplit4CD', 'M2C_GenQMat'],

@@ -1,10 +1,10 @@
 .. EduStudio documentation master file.
-.. title:: EduStudio v1.1.3
+.. title:: EduStudio v1.1.4
 .. image:: assets/logo.png
 
 =========================================================
 
-`HomePage <https://edustudio.ai/>`_ | `Docs <https://edustudio.ai/docs/>`_ | `GitHub <https://github.com/HFUT-LEC/EduStudio>`_ 
+`HomePage <https://edustudio.ai/>`_ | `Docs <https://edustudio.ai/docs/>`_ | `GitHub <https://github.com/HFUT-LEC/EduStudio>`_ | `Paper <https://journal.hep.com.cn/fcs/EN/10.1007/s11704-024-40372-3>`_ 
 
 Introduction
 -------------------------
