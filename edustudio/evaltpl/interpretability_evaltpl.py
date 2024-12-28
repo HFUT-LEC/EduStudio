@@ -384,6 +384,7 @@ class InterpretabilityEvalTPL(BaseEvalTPL):
             Matrics_DM = Matrics_Z * Matrics_DM_divided
             Z = np.sum(Matrics_Z, dtype=np.float64)
             dm = round(np.sum(Matrics_DM, dtype=np.float64), 20)
-            doa = round(dm / Z, 20)
+
+            doa = round(dm / (Z+1e-9), 20)
             doa_all.append(doa)
         return np.mean(doa_all)
