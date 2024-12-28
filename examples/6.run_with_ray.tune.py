@@ -1,10 +1,16 @@
 # run following after installed edustudio
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from edustudio.quickstart import run_edustudio
 from ray import tune
 import ray
 ray.init(num_cpus=4, num_gpus=1)
-
+from edustudio.utils.common import IDUtil as idUtil
+import uuid
 
 def deliver_cfg(args):
     g_args = {
@@ -18,6 +24,9 @@ def deliver_cfg(args):
         g, k = k.split(".")
         assert g in g_args
         g_args[g][k] = v
+    g_args['frame_cfg'] = {
+        'ID': idUtil.get_random_id_bytime() + str(uuid.uuid4()).split("-")[-1]
+    }
     return g_args
 
 

@@ -15,11 +15,14 @@ Here we list two demos for `Ray.Tune` and `HyperOpt`.
 ## Ray.Tune
 
 ```python
+# run following after installed edustudio
+
 from edustudio.quickstart import run_edustudio
 from ray import tune
 import ray
 ray.init(num_cpus=4, num_gpus=1)
-
+from edustudio.utils.common import IDUtil as idUtil
+import uuid
 
 def deliver_cfg(args):
     g_args = {
@@ -33,6 +36,9 @@ def deliver_cfg(args):
         g, k = k.split(".")
         assert g in g_args
         g_args[g][k] = v
+    g_args['frame_cfg'] = {
+        'ID': idUtil.get_random_id_bytime() + str(uuid.uuid4()).split("-")[-1]
+    }
     return g_args
 
 
@@ -62,12 +68,13 @@ search_space= {
 
     'traintpl_cfg.batch_size': tune.grid_search([256,]),
     'traintpl_cfg.epoch_num': tune.grid_search([2]),
-    'traintpl_cfg.device': tune.grid_search(["cpu"]),
-    'modeltpl_cfg.emb_dim': tune.grid_search([20,40])
+    'traintpl_cfg.device': tune.grid_search(["cuda:0"]),
+    'modeltpl_cfg.emb_dim': tune.grid_search([20,40]),
+    'frame_cfg.DISABLE_LOG_STDOUT': tune.grid_search([False]),
 }
 
 tuner = tune.Tuner(
-    objective_function, param_space=search_space, tune_config=tune.TuneConfig(max_concurrent_trials=1)
+    tune.with_resources(objective_function, {"gpu": 1}), param_space=search_space, tune_config=tune.TuneConfig(max_concurrent_trials=1),
 ) 
 results = tuner.fit()
 
@@ -78,10 +85,14 @@ print(results.get_best_result(metric="auc", mode="max").config)
 ## HyperOpt
 
 ```python
+import sys
+import os
+
 from edustudio.quickstart import run_edustudio
 from hyperopt import hp
 from hyperopt import fmin, tpe, space_eval
-
+from edustudio.utils.common import IDUtil as idUtil
+import uuid
 
 def deliver_cfg(args):
     g_args = {
@@ -89,12 +100,14 @@ def deliver_cfg(args):
         'datatpl_cfg': {},
         'modeltpl_cfg': {},
         'evaltpl_cfg': {},
-        'frame_cfg': {},
     }
     for k,v in args.items():
         g, k = k.split(".")
         assert g in g_args
         g_args[g][k] = v
+    g_args['frame_cfg'] = {
+        'ID': idUtil.get_random_id_bytime() + str(uuid.uuid4()).split("-")[-1]
+    }
     return g_args
 
 
@@ -109,7 +122,7 @@ def objective_function(args):
         modeltpl_cfg_dict=g_args['modeltpl_cfg'],
         evaltpl_cfg_dict=g_args['evaltpl_cfg'],
         frame_cfg_dict=g_args['frame_cfg'],
-        return_cfg_and_result=True
+        return_cfg_and_result=True,
     )
     return res['auc']
 
@@ -131,4 +144,5 @@ best = fmin(objective_function, space, algo=tpe.suggest, max_evals=10, verbose=F
 print("=="*10)
 print(best)
 print(space_eval(space, best))
+
 ```

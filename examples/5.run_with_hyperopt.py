@@ -7,7 +7,8 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from edustudio.quickstart import run_edustudio
 from hyperopt import hp
 from hyperopt import fmin, tpe, space_eval
-
+from edustudio.utils.common import IDUtil as idUtil
+import uuid
 
 def deliver_cfg(args):
     g_args = {
@@ -15,12 +16,14 @@ def deliver_cfg(args):
         'datatpl_cfg': {},
         'modeltpl_cfg': {},
         'evaltpl_cfg': {},
-        'frame_cfg': {},
     }
     for k,v in args.items():
         g, k = k.split(".")
         assert g in g_args
         g_args[g][k] = v
+    g_args['frame_cfg'] = {
+        'ID': idUtil.get_random_id_bytime() + str(uuid.uuid4()).split("-")[-1]
+    }
     return g_args
 
 
@@ -35,7 +38,7 @@ def objective_function(args):
         modeltpl_cfg_dict=g_args['modeltpl_cfg'],
         evaltpl_cfg_dict=g_args['evaltpl_cfg'],
         frame_cfg_dict=g_args['frame_cfg'],
-        return_cfg_and_result=True
+        return_cfg_and_result=True,
     )
     return res['auc']
 
