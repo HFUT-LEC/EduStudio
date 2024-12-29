@@ -5,7 +5,7 @@ import numpy as np
 from edustudio.utils.common import tensor2npy
 from edustudio.utils.callback import ModeState
 from tqdm import tqdm
-
+import warnings
 
 class InterpretabilityEvalTPL(BaseEvalTPL):
     """Student Cogntive Representation Interpretability Evaluation
@@ -275,27 +275,28 @@ class InterpretabilityEvalTPL(BaseEvalTPL):
         return np.array(hit_df.to_list())
 
     """
-    reference code: https://github.com/CSLiJT/ID-CDF/blob/main/tools.py
+        reference code: https://github.com/CSLiJT/ID-CDF/blob/main/tools.py
     """
-    def degree_of_consistency(self, theta_mat: np.array, user_know_hit: np.array, \
-        log_mat: np.array, Q_mat: np.array, know_list = None):
+
+    def degree_of_consistency_official(self, theta_mat: np.array, user_know_hit: np.array, \
+                              log_mat: np.array, Q_mat: np.array, know_list=None):
         '''
         theta_mat: (n_user, n_know): the diagnostic result matrix
         user_know_hit: (n_user, n_know): the (i,j) element indicate \
             the number of hits of the i-th user on the j-th attribute
         log_mat: (n_user, n_exer): the matrix indicating whether the \
-            student has correctly answered the exercise (+1) or not(-1) 
+            student has correctly answered the exercise (+1) or not(-1)
         Q_mat: (n_exer, n_know)
         '''
-        n_user, n_know = theta_mat.shape 
+        n_user, n_know = theta_mat.shape
         n_exer = log_mat.shape[1]
         doa_all = []
         know_list = list(range(n_know)) if know_list is None else know_list
         for know_id in tqdm(know_list, desc='compute_DOC', ncols=100):
             Z = 1e-9
             dm = 0
-            exer_list = np.where(Q_mat[:,know_id] > 0)[0]
-            user_list = np.where(user_know_hit[:,know_id]>0)[0]
+            exer_list = np.where(Q_mat[:, know_id] > 0)[0]
+            user_list = np.where(user_know_hit[:, know_id] > 0)[0]
             n_u_k = len(user_list)
             # pbar = tqdm(total = n_u_k * (n_u_k - 1), desc='know_id = %d'%know_id)
             for a in user_list:
@@ -307,12 +308,83 @@ class InterpretabilityEvalTPL(BaseEvalTPL):
                     nab = 1e-9
                     dab = 1e-9
                     for exer_id in exer_list:
-                        Jab = (log_mat[a,exer_id] * log_mat[b,exer_id] != 0)
+                        Jab = (log_mat[a, exer_id] * log_mat[b, exer_id] != 0)
                         nab += Jab * (log_mat[a, exer_id] > log_mat[b, exer_id])
                         dab += Jab * (log_mat[a, exer_id] != log_mat[b, exer_id])
-                    dm += (theta_mat[a, know_id] > theta_mat[b, know_id]) * nab / dab 
+                    dm += (theta_mat[a, know_id] > theta_mat[b, know_id]) * nab / dab
                     # pbar.update(1)
 
-            doa = dm / Z 
+            doa = dm / Z
+            doa_all.append(doa)
+        return np.mean(doa_all)
+
+
+    def degree_of_consistency(self, theta_mat: np.array, user_know_hit: np.array, \
+                              log_mat: np.array, Q_mat: np.array, know_list=None):
+        '''
+        theta_mat: (n_user, n_know): the diagnostic result matrix
+        user_know_hit: (n_user, n_know): the (i,j) element indicate \
+            the number of hits of the i-th user on the j-th attribute
+        log_mat: (n_user, n_exer): the matrix indicating whether the \
+            student has correctly answered the exercise (+1) or not(-1)
+        Q_mat: (n_exer, n_know)
+        '''
+        n_user, n_know = theta_mat.shape
+        doa_all = []
+        know_list = list(range(n_know)) if know_list is None else know_list
+        for know_id in tqdm(know_list, desc='compute_DOC', ncols=100):
+            Z = 0
+            dm = 0
+            exer_list = np.where(Q_mat[:, know_id] > 0)[0]
+            user_list = np.where(user_know_hit[:, know_id] > 0)[0]
+            n_user_hit = len(user_list)
+            Matrics_NAB = np.zeros((n_user_hit, 1))
+            Matrics_DAB = np.zeros((n_user_hit, 1))
+            Matrics_Z = np.zeros((n_user_hit, 1))
+            exerShape = len(exer_list)
+
+            ###/////////###
+            Simply_log_mat = np.zeros((n_user_hit, exerShape))
+            Column_Z = np.zeros((n_user_hit))
+            for a in range(n_user_hit):
+                for b in range(exerShape):
+                    Simply_log_mat[a, b] = log_mat[user_list[a], exer_list[b]]
+                Column_Z[a] = theta_mat[user_list[a], know_id]
+            ###/////////###
+
+            for a in range(n_user_hit):
+                Matrics_NAB_column = np.zeros((n_user_hit, 1))
+                Matrics_DAB_column = np.zeros((n_user_hit, 1))
+                Matrics_Z_column = np.zeros((n_user_hit, 1))
+                for exer_matrics_num in range(exerShape):
+                    Colum_exer_matrics = Simply_log_mat[:, exer_matrics_num]
+                    Matrics_JAB_column = (Colum_exer_matrics * Simply_log_mat[a, exer_matrics_num] != 0).astype(
+                        int).reshape(-1, 1)
+                    if Colum_exer_matrics[a] == 1:
+                        Matrics_NAB_column += (Colum_exer_matrics == -1).astype(int).reshape(-1,
+                                                                                             1) * Matrics_JAB_column
+                    Matrics_DAB_column += (Colum_exer_matrics != Simply_log_mat[a, exer_matrics_num]).astype(
+                        int).reshape(-1, 1) * Matrics_JAB_column
+
+                Matrics_NAB = np.concatenate([Matrics_NAB, Matrics_NAB_column], axis=1)
+                Matrics_DAB = np.concatenate([Matrics_DAB, Matrics_DAB_column], axis=1)
+
+                Matrics_Z_column = (Column_Z[a] - Column_Z).reshape(-1, 1)
+                Matrics_Z = np.concatenate([Matrics_Z, Matrics_Z_column], axis=1)
+
+            Matrics_Z = (Matrics_Z > 0).astype(int)[:, 1:n_user + 1]
+            Matrics_NAB = Matrics_NAB[:, 1:n_user + 1]
+            Matrics_DAB = Matrics_DAB[:, 1:n_user + 1]
+
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                Matrics_DM_divided = Matrics_NAB / Matrics_DAB
+
+            Matrics_DM_divided = np.nan_to_num(Matrics_DM_divided, nan=1)
+            Matrics_DM = Matrics_Z * Matrics_DM_divided
+            Z = np.sum(Matrics_Z, dtype=np.float64)
+            dm = round(np.sum(Matrics_DM, dtype=np.float64), 20)
+
+            doa = round(dm / (Z+1e-9), 20)
             doa_all.append(doa)
         return np.mean(doa_all)
