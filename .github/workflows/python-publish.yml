@@ -3,6 +3,7 @@ name: Upload Python Package
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,7 +33,7 @@ jobs:
     - name: Build package
       run: python -m build
     - name: Publish package
-      uses: pypa/gh-action-pypi-publish@v1.8.7
+      uses: pypa/gh-action-pypi-publish@v1.13.0
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
