@@ -93,11 +93,11 @@ def get_global_cfg(
     cfg.frame_cfg = UnifyConfig.from_py_module(settings)
     cfg.frame_cfg.ID = idUtil.get_random_id_bytime()
     for k,v in frame_cfg_dict.items():
-        assert k in cfg.frame_cfg
+        assert k in cfg.frame_cfg, f"invalid key: {k}"
         assert type(v) is None or type(cfg.frame_cfg[k]) is type(v)
         cfg.frame_cfg[k] = v
     for k,v in unknown_arg_dict['frame_cfg'].items():
-        assert k in cfg.frame_cfg
+        assert k in cfg.frame_cfg, f"invalid key: {k}"
         if type(cfg.frame_cfg[k]) is not str:
             v = type(cfg.frame_cfg)(literal_eval(v))
         cfg.dot_set(k, v)

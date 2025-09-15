@@ -31,5 +31,8 @@ run_edustudio(
         'IdentifiabilityEvalTPL': {
             'use_metrics': ['IDS']
         }
+    },
+    frame_cfg_dict={
+        'ID': '123456',
     }
 )

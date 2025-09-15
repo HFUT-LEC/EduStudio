@@ -10,7 +10,7 @@ from itertools import chain
 class M2C_ReMapId(BaseMid2Cache):
     default_cfg = {
         'share_id_columns': [], # [{c1, c2, c3}]
-        'ignore_columns': {"order_id:float"}
+        'ignore_columns': {}
     }
 
     def __init__(self, m2c_cfg) -> None:
