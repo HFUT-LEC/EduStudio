@@ -20,10 +20,10 @@ class R2M_JunyiExerAsCpt(BaseRaw2Mid):
         # # 去除花费时间小于等于0s的或者超过半年的6*30*24*60*60s = 15552000s
         # data.drop(data[(data.time_taken <= 0) | (data.time_taken >= 15552000)].index, inplace=True)
         data = data[['user_id', 'exercise', 'time_done', 'time_taken', 'correct']]
-        # 确定start_timestamp:float, order_id:token, correct 和 time_taken (单位时间为ms)
+        # 确定start_timestamp:float, order_id:float, correct 和 time_taken (单位时间为ms)
         data['start_timestamp:float'] = data['time_done'] // 1000 - data['time_taken'] * 1000
         data = data.sort_values(by='start_timestamp:float', ascending=True)
-        data['order_id:token'] = range(len(data))
+        data['order_id:float'] = range(len(data))
         data['correct'] = data['correct'].astype(int)
         data['time_taken'] = data['time_taken'] * 1000
         df_inter = data.rename(columns={

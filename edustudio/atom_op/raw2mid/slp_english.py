@@ -77,7 +77,7 @@ class R2M_SLP_English(BaseRaw2Mid):
              'concept': 'cpt_seq:token_seq'
         }, inplace=True)
 
-        df_inter['order_id:token'] = df_inter['start_timestamp:float'].astype(int)
+        df_inter['order_id:float'] = df_inter['start_timestamp:float'].astype(int)
         
         # save
         df_inter.to_csv(f"{self.midpath}/{self.dt}.inter.csv", index=False, encoding='utf-8')

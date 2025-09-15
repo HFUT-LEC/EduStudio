@@ -60,7 +60,7 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
         return kwargs
 
     @staticmethod
-    def sort_records(df, col='order_id:token'):
+    def sort_records(df, col='order_id:float'):
         if df is not None:
             return df.sort_values(by=col, ascending=True).reset_index(drop=True)
     

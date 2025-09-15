@@ -24,7 +24,7 @@ class R2M_ASSIST_1516(BaseRaw2Mid):
         df_inter = inter.rename(columns={'sequence_id': 'exer_id', 'user_id': 'stu_id'}).reindex(
             columns=['stu_id', 'exer_id', 'label', 'order', ]).rename(
             columns={'stu_id': 'stu_id:token', 'exer_id': 'exer_id:token', 'label': 'label:float',
-                     'order': 'order_id:token'})
+                     'order': 'order_id:float'})
 
         # 获取学生信息
         stu = pd.DataFrame(set(raw_data['user_id']), columns=['stu_id', ])

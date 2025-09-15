@@ -549,26 +549,38 @@ class GeneralDataTPL(BaseDataTPL):
             df (DataFrame): data
         """
         for col in df.columns:
-            col_name, col_type = col.split(":")
-            if col_type == 'token':
-                try:
-                    df[col] = df[col].astype('int64')
-                except:
-                    pass
-            elif col_type == 'float':
+            _split = col.split(":")
+            assert len(_split) == 2 or len(_split) == 1, f"col {col} is not valid"
+            if len(_split) == 1: continue
+            _, col_type = col.split(":")
+            if col_type == 'float':
                 df[col] = df[col].astype('float32')
             elif col_type == 'token_seq':
                 try:
-                    df[col] = df[col].astype(str).apply(lambda x: [int(i) for i in x.split(",")])
-                except:
+                    if type(df[col].iloc[0]) in {np.ndarray, list}:
+                        continue
                     df[col] = df[col].astype(str).apply(lambda x: eval(x))
+                except:
+                    df[col] = df[col].astype(str).apply(lambda x: [i for i in x.split(",")])
             elif col_type == 'float_seq':
                 try:
-                    df[col] = df[col].astype(str).apply(lambda x: [float(i) for i in x.split(",")])
-                except:
                     df[col] = df[col].astype(str).apply(lambda x: eval(x))
-            else:
-                pass
+                except:
+                    df[col] = df[col].astype(str).apply(lambda x: [float(i) for i in x.split(",")])
+            elif col_type == 'int_seq':
+                try:
+                    df[col] = df[col].astype(str).apply(lambda x: eval(x))
+                except:
+                    df[col] = df[col].astype(str).apply(lambda x: [int(i) for i in x.split(",")])
+            elif col_type == 'str_seq':
+                try:
+                    df[col] = df[col].astype(str).apply(lambda x: eval(x))
+                except:
+                    df[col] = df[col].astype(str).apply(lambda x: [str(i) for i in x.split(",")])
+            elif col_type == 'str' or col_type == 'string':
+                df[col] = df[col].astype(str)
+            elif col_type =='int':
+                df[col] = df[col].astype(int)
             
     @staticmethod
     def _unwrap_feat(df:pd.DataFrame):

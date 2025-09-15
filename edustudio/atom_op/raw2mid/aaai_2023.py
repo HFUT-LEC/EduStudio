@@ -83,7 +83,7 @@ class R2M_AAAI_2023(BaseRaw2Mid):
         df_inter = df_inter.rename(
             columns={'user_id': 'stu_id:token', 'exer_id': 'exer_id:token', 'label': 'label:float',
                      'start_timestamp': 'start_timestamp:float',
-                     'order_id': 'order_id:token'})
+                     'order_id': 'order_id:float'})
         df_exer = df[['exer_id']]
         df_exer = df_exer.drop_duplicates(subset=['exer_id'])
         records = []

@@ -46,7 +46,7 @@ class R2M_EdNet_KT1(BaseRaw2Mid):
             .reindex(columns=['stu_id', 'exer_id', 'label', 'timestamp', 'elapsed_time', 'order']) \
             .rename(columns={'stu_id': 'stu_id:token', 'exer_id': 'exer_id:token', 'label': 'label:float',
                              'timestamp': 'start_timestamp:float', 'elapsed_time': 'cost_time:float',
-                             'order': 'order_id:token'})
+                             'order': 'order_id:float'})
 
         # 处理用户信息
         df_stu = df_inter['stu_id:token'].copy().unique()

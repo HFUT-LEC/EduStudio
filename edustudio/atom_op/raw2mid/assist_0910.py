@@ -94,17 +94,17 @@ class R2M_ASSIST_0910(BaseRaw2Mid):
             columns={'new_user_id': 'stu_id:token', 'new_problem_id': 'exer_id:token', 'correct': 'label:float',
                      'ms_first_response': 'start_timestamp:float', 'new_class_id': 'class_id:token',
                      'new_skill_id': 'cpt_seq:token_seq', 'overlap_time': 'cost_time:float',
-                     'new_assignment_id': 'assignment_id:token_seq', 'new_order_id': 'order_id:token'})
+                     'new_assignment_id': 'assignment_id:token_seq', 'new_order_id': 'order_id:float'})
         # 指定列的新顺序
         new_column_order = ['stu_id:token', 'exer_id:token', 'label:float', 'start_timestamp:float', 'cost_time:float',
-                            'order_id:token',
+                            'order_id:float',
                             'class_id:token', 'cpt_seq:token_seq', 'assignment_id:token_seq']
         df = df.reindex(columns=new_column_order)
         # print(df)
 
         # df_inter 相关处理
         df_inter = df[['stu_id:token', 'exer_id:token', 'label:float', 'start_timestamp:float', 'cost_time:float',
-                       'order_id:token']]
+                       'order_id:float']]
         df_inter.drop_duplicates(inplace=True)
         df_inter.sort_values('stu_id:token', inplace=True)
         # print(df_inter)

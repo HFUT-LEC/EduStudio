@@ -86,15 +86,15 @@ class R2M_Eedi_20_T34(BaseRaw2Mid):
                                 'QuestionId': 'exer_id:token', 'IsCorrect': 'label:float', 'GroupId': 'class_id:token',
                                 'timestamp': 'start_timestamp:float', 'Gender': 'gender:float',
                                 'SubjectId': 'cpt_seq:token_seq',
-                                'new_order_id': 'order_id:token'})
-        new_column_order = ['stu_id:token', 'exer_id:token', 'label:float', 'start_timestamp:float', 'order_id:token',
+                                'new_order_id': 'order_id:float'})
+        new_column_order = ['stu_id:token', 'exer_id:token', 'label:float', 'start_timestamp:float', 'order_id:float',
                             'class_id:token', 'gender:float', 'cpt_seq:token_seq', 'assignment_id:token_seq']
         df = df.reindex(columns=new_column_order)
 
         # df_inter 的相关处理
-        df_inter = df[['stu_id:token', 'exer_id:token', 'label:float', 'start_timestamp:float', 'order_id:token']]
+        df_inter = df[['stu_id:token', 'exer_id:token', 'label:float', 'start_timestamp:float', 'order_id:float']]
         df_inter.drop_duplicates(inplace=True)
-        df_inter.sort_values(by=['stu_id:token', 'order_id:token'], inplace=True)
+        df_inter.sort_values(by=['stu_id:token', 'order_id:float'], inplace=True)
 
         # df_user 相关处理
         df_user = df[['stu_id:token', 'class_id:token', 'gender:float']]

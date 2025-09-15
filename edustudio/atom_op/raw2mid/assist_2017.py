@@ -73,14 +73,14 @@ class R2M_ASSIST_17(BaseRaw2Mid):
         
         # 修改列名及顺序
         df = df.rename(columns = {'new_studentId' : 'stu_id:token', 'new_assignmentId':'assignment_id:token_seq','new_problemId' : 'exer_id:token',
-                                  'correct' : 'label:float','new_MiddleSchoolId':'school_id:token','new_order_id':'order_id:token',
+                                  'correct' : 'label:float','new_MiddleSchoolId':'school_id:token','new_order_id':'order_id:float',
                                   'startTime':'start_timestamp:float', 'timeTaken':'cost_time:float','skill_id':'cpt_seq:token_seq'})
-        new_column_order = ['stu_id:token','exer_id:token','label:float','start_timestamp:float','cost_time:float','order_id:token',
+        new_column_order = ['stu_id:token','exer_id:token','label:float','start_timestamp:float','cost_time:float','order_id:float',
                             'school_id:token', 'gender:float','cpt_seq:token_seq','assignment_id:token_seq']
         df = df.reindex(columns=new_column_order)
 
         # df_inter 的相关处理
-        df_inter = df[['stu_id:token','exer_id:token','label:float','start_timestamp:float','cost_time:float','order_id:token']]
+        df_inter = df[['stu_id:token','exer_id:token','label:float','start_timestamp:float','cost_time:float','order_id:float']]
         df_inter.drop_duplicates(inplace=True)
         df_inter .sort_values('stu_id:token', inplace=True)
         

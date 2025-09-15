@@ -83,7 +83,7 @@ class R2M_Algebra_0506(BaseRaw2Mid):
             columns=['stu_id', 'exer_id', 'label', 'start_timestamp', 'cost_time', 'order']).rename(
             columns={'stu_id': 'stu_id:token', 'exer_id': 'exer_id:token', 'label': 'label:float',
                      'start_timestamp': 'start_timestamp:float', 'cost_time': 'cost_time:float',
-                     'order': 'order_id:token'})
+                     'order': 'order_id:float'})
 
         # 处理用户信息
         df_stu = df_inter['stu_id:token'].copy().unique()
