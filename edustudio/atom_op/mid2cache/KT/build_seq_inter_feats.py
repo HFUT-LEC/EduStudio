@@ -7,7 +7,7 @@ from itertools import chain
 
 class M2C_BuildSeqInterFeats(BaseMid2Cache):
     default_cfg = {
-        'window_size': -1,
+        'window_size': 100,
         "extra_inter_feats": []
     }
     
