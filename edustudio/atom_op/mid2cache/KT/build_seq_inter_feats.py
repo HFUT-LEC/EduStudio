@@ -7,7 +7,7 @@ from itertools import chain
 
 class M2C_BuildSeqInterFeats(BaseMid2Cache):
     default_cfg = {
-        'window_size': 100,
+        'window_size': -1,
         "extra_inter_feats": []
     }
     
@@ -60,8 +60,16 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
         return kwargs
 
     @staticmethod
-    def sort_records(df, col='order_id:float'):
+    def sort_records(df, col=None):
         if df is not None:
+            if col is None:
+                if 'order_id:float' in df.columns:
+                    col = 'order_id:float'
+                elif 'order_id:token' in df.columns:
+                    col = 'order_id:token'
+                else:
+                    raise ValueError("please specificy the sort column")
+
             return df.sort_values(by=col, ascending=True).reset_index(drop=True)
     
     def construct_df2dict(self, df: pd.DataFrame):

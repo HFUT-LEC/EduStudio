@@ -20,6 +20,8 @@ class M2C_BuildKCRelation(BaseMid2Cache):
 
         if 'order_id:float' in df:
             df.sort_values(by=['order_id:float'], axis=0, ignore_index=True, inplace=True)
+        elif 'order_id:token' in df:
+            df.sort_values(by=['order_id:token'], axis=0, ignore_index=True, inplace=True)
         
         kwargs['df'] = df
 
