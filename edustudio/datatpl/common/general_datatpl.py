@@ -123,10 +123,11 @@ class GeneralDataTPL(BaseDataTPL):
         """
         kwargs = self.common_str2df
         for op in self.m2c_op_list:
+            self.logger.info(f"Processing mid2cache op: {op.__class__.__name__}")
             kwargs = op.process(**kwargs)
             assert kwargs is not None
             op.set_dt_info(**kwargs)
-        
+        self.logger.info(f"Mid2cache op done!")
         for k,v in kwargs.items():
             setattr(self, k, v)
 

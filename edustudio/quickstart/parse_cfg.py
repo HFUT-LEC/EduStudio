@@ -240,10 +240,12 @@ def get_global_cfg(
     for config_name in ['traintpl_cfg', 'datatpl_cfg', 'modeltpl_cfg']:
         for k,v in unknown_arg_dict[config_name].items():
             if k == 'cls': continue
-            kk = k.split('.')[-1]
+            kk = k.split('.')[1]
             assert kk in cfg[config_name], f"invalid key: {kk}"
-            if type(cfg[config_name][kk]) is not str:
-                v = type(cfg[config_name][kk])(literal_eval(v))
+            # if type(cfg[config_name][kk]) is not str:
+            #     v = type(cfg[config_name][kk])(literal_eval(v))
+            if type(cfg.dot_get(k)) is not str:
+                v = type(cfg.dot_get(k))(literal_eval(v))
             cfg.dot_set(k, v)
     for k,v in unknown_arg_dict["evaltpl_cfg"].items():
         kk = k.split('.')[-1]
