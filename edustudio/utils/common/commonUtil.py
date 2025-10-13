@@ -13,7 +13,7 @@ import random
 import torch
 import numpy as np
 import logging
-
+import pickle
 
 tensor2npy = lambda x: x.cpu().detach().numpy() if x.is_cuda else x.detach().numpy()
 tensor2cpu = lambda x: x.cpu() if x.is_cuda else x
@@ -66,6 +66,15 @@ class IOUtil(object):
         with open(filepath, 'w', encoding=encoding) as f:
             json.dump(data, f, ensure_ascii=ensure_ascii, indent=indent)
 
+    @staticmethod
+    def read_pickle_file(filepath):
+        with open(filepath, 'rb') as f:
+            return pickle.load(f)
+        
+    @staticmethod
+    def write_pickle_file(filepath, data):
+        with open(filepath, 'wb') as f:
+            pickle.dump(data, f)
 
 class IDUtil(object):
     @staticmethod

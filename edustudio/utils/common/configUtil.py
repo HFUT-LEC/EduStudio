@@ -11,6 +11,7 @@ import types
 import re
 from functools import reduce
 import numpy as np
+from .commonUtil import IOUtil
 
 
 class UnifyConfig(object):
@@ -33,6 +34,10 @@ class UnifyConfig(object):
         with open(filepath, 'r', encoding='utf-8') as f:
             config = yaml.load(f, Loader=cls._build_yaml_loader())
         return cls(config or dict())
+
+    @classmethod
+    def from_json_file(cls, filepath: str):
+        return cls(IOUtil.read_json_file(filepath))
 
     @staticmethod
     def _build_yaml_loader():
