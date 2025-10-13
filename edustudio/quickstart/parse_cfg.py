@@ -97,9 +97,10 @@ def get_global_cfg(
         assert type(v) is None or type(cfg.frame_cfg[k]) is type(v)
         cfg.frame_cfg[k] = v
     for k,v in unknown_arg_dict['frame_cfg'].items():
-        assert k in cfg.frame_cfg, f"invalid key: {k}"
-        if type(cfg.frame_cfg[k]) is not str:
-            v = type(cfg.frame_cfg)(literal_eval(v))
+        kk = k.split('.')[-1]
+        assert kk in cfg.frame_cfg, f"invalid key: {k}"
+        if type(cfg.frame_cfg[kk]) is not str:
+            v = type(cfg.frame_cfg[kk])(literal_eval(v))
         cfg.dot_set(k, v)
 
     traintpl_cls = args.traintpl_cls
