@@ -607,7 +607,7 @@ class GeneralDataTPL(BaseDataTPL):
                 break
             cfg.update(_cls.default_cfg, update_unknown_key_only=True)
         
-        for op in kwargs.get('mid2cache_op_seq', None) or cls.default_cfg['mid2cache_op_seq']:
+        for op in kwargs.get('mid2cache_op_seq', None) or cls.default_cfg.get('mid2cache_op_seq', []):
             if isinstance(op, str):
                 op = importlib.import_module('edustudio.atom_op.mid2cache').__getattribute__(op)
             if op.__name__ not in cfg:
