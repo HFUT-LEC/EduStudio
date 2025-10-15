@@ -28,6 +28,14 @@ class PredictionEvalTPL(BaseEvalTPL):
     def _get_metrics(self, metric):
         if metric == "auc":
             return roc_auc_score
+        elif metric == 'auc_weighted':
+            return lambda y_gt, y_pd: roc_auc_score(y_gt, y_pd, average='weighted')
+        elif metric == 'auc_samples':
+            return lambda y_gt, y_pd: roc_auc_score(y_gt, y_pd, average='samples')
+        elif metric == 'auc_macro':
+            return lambda y_gt, y_pd: roc_auc_score(y_gt, y_pd, average='macro')
+        elif metric == 'auc_micro':
+            return lambda y_gt, y_pd: roc_auc_score(y_gt, y_pd, average='micro')
         elif metric == "mse":
             return mean_squared_error
         elif metric == 'rmse':
@@ -35,15 +43,15 @@ class PredictionEvalTPL(BaseEvalTPL):
         elif metric == "acc":
             return lambda y_gt, y_pd: accuracy_score(y_gt, np.where(y_pd >= 0.5, 1, 0))
         elif metric == "f1_macro":
-            return lambda y_gt, y_pd: f1_score(y_gt, y_pd, average='macro')
+            return lambda y_gt, y_pd: f1_score(y_gt, np.where(y_pd >= 0.5, 1, 0), average='macro')
         elif metric == "f1_micro":
-            return lambda y_gt, y_pd: f1_score(y_gt, y_pd, average='micro')
+            return lambda y_gt, y_pd: f1_score(y_gt, np.where(y_pd >= 0.5, 1, 0), average='micro')
+        elif metric == "f1_weighted":
+            return lambda y_gt, y_pd: f1_score(y_gt, np.where(y_pd >= 0.5, 1, 0), average='weighted')
         elif metric == "ranking_loss":
             return lambda y_gt, y_pd: label_ranking_loss(y_gt, y_pd)
         elif metric == 'coverage_error':
             return lambda y_gt, y_pd: coverage_error(y_gt, y_pd)
-        elif metric == 'samples_auc':
-            return lambda y_gt, y_pd: roc_auc_score(y_gt, y_pd, average='samples')
         else:
             raise NotImplementedError
 
