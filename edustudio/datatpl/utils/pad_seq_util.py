@@ -51,8 +51,10 @@ class PadSeqUtil(object):
                 if return_idx:
                     return_idx_list.append([idx] * num)
 
-        if return_idx:
-            return_idx = np.concatenate(return_idx_list).astype(np.int64)
+            if return_idx:
+                return_idx = np.concatenate(return_idx_list).astype(np.int64)
+        else:
+            return_idx = np.arange(len(sequences))
         
         version = np.__version__
 
@@ -136,6 +138,8 @@ class PadSeqUtil(object):
 
 
 if __name__ == '__main__':
+    aa = [[1],[2,1,3,4,4,4,5,0,5,19,6],[0,1,1,1,1,1]]
+    print(aa)
     a = PadSeqUtil.pad_sequence(
-        [[1],[2,1,3,4,4,4,5,0,5,19,6],[],[0,1,1,1,1,1]], maxlen=4, is_truncate=False, value=-1, return_idx=True, return_mask=True, padding='pre')
+        aa, maxlen=4, is_truncate=True, value=-1, return_idx=True, return_mask=True, padding='post')
     print(a)
