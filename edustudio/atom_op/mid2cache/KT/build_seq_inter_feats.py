@@ -8,7 +8,8 @@ from itertools import chain
 class M2C_BuildSeqInterFeats(BaseMid2Cache):
     default_cfg = {
         'window_size': 100,
-        "extra_inter_feats": []
+        "extra_inter_feats": [],
+        'is_truncate': False,
     }
     
     def __init__(self, m2c_cfg, n_folds, is_dataset_divided) -> None:
@@ -74,15 +75,17 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
     
     def construct_df2dict(self, df: pd.DataFrame):
         if df is None: return None
-
+        is_truncate = self.m2c_cfg['is_truncate']
         tmp_df = df[['stu_id:token','exer_id:token','label:float'] + self.m2c_cfg['extra_inter_feats']].groupby('stu_id:token').agg(lambda x: list(x)).reset_index()
 
         exer_seq, idx, mask_seq = PadSeqUtil.pad_sequence(
             tmp_df['exer_id:token'].to_list(), return_idx=True, return_mask=True, 
+            is_truncate=is_truncate,
             maxlen=self.window_size
         )
         label_seq, _, _ = PadSeqUtil.pad_sequence(
             tmp_df['label:float'].to_list(), dtype=np.float32,
+            is_truncate=is_truncate,
             maxlen=self.window_size
         )
         stu_id = tmp_df['stu_id:token'].to_numpy()[idx]
@@ -98,12 +101,14 @@ class M2C_BuildSeqInterFeats(BaseMid2Cache):
             if type_ == 'token':
                 seq, _, _ = PadSeqUtil.pad_sequence(
                     tmp_df[extra_feat].to_list(), dtype=np.int64,
+                    is_truncate=is_truncate,
                     maxlen=self.window_size
                 )
                 ret_dict[f"{name}_seq:token_seq"] = seq
             elif type_ == 'float':
                 seq, _, _ = PadSeqUtil.pad_sequence(
                     tmp_df[extra_feat].to_list(), dtype=np.float32,
+                    is_truncate=is_truncate,
                     maxlen=self.window_size
                 )
                 ret_dict[f"{name}_seq:float_seq"] = seq
